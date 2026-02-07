@@ -19,15 +19,14 @@ func (cli *CLI) handleClose(){
 }
 
 func (cli *CLI) handleCommand(cmd string, game *GAME){
-	fmt.Printf("IMPORTANT: %s \n", cmd)
 	parsedCmd := strings.Fields(cmd) 
 
 	switch parsedCmd[0] {
-		case "exit":
+		case "exit", "e":
 			cli.handleClose()
-		case "viewBoard":
+		case "ls":
 			game.viewBoard()
-		case "move":
+		case "mvp":
 			if len(parsedCmd) == 2 {
 				game.move(parsedCmd[1])
 			}else{
@@ -83,8 +82,49 @@ func (game *GAME) viewBoard(){
 	}	
 }
 
+func (game *GAME) decodeGmPos(pos string) (int, int){
+	x, y := 0, 0
+	for i, char := range pos{
+		switch i{
+		case 0:
+			if unicode.IsLetter(char){
+				y = int(char - 'a')
+			}else{
+				fmt.Println("IMPROPER FORMAT")
+				return -1, -1
+			}
+		case 1:
+			if unicode.IsDigit(char){
+				x = int(char - '0')
+			}else{
+				fmt.Println("IMPROPER FORMAT")
+				return -1, -1
+			}
+		}
+	}
+
+	return x, y
+}
+
 func (game *GAME) move(cmd string){
-	fmt.Println("MOVING TOO")
+	//Consider moving this data validation into teh decodeGmPos function
+	if !strings.Contains(cmd, "-") {fmt.Println("IMPROPER FORMAT"); return}
+	parts := strings.Split(cmd, "-")
+	mvFrmX, mvFrmY := game.decodeGmPos(parts[0])
+	mvToX, mvToY := game.decodeGmPos(parts[1])
+
+	if mvFrmX == -1 || mvToX == -1 {fmt.Println("IMPROPER FORMAT"); return}
+
+	fmt.Printf("MOVING FROM X: %d Y: %d \n", mvFrmX,mvFrmY)
+	fmt.Printf("TO X: %d Y: %d \n", mvToX,mvToY)
+
+	
+	pieceToMove := game.board[mvFrmX][mvFrmY]
+	if pieceToMove == 0 { fmt.Println("No piece exists"); return }
+	game.board[mvToX][mvToY] = pieceToMove
+	game.board[mvFrmX][mvFrmY] = 0
+
+	fmt.Printf("Moved Piece %+v to X: %s, Y:%s \n", pieceToMove, mvToX, mvToY)
 } 
 
 
@@ -132,5 +172,9 @@ func main(){
 	}
 }
 
-
+//To Do List 
+// Swtich x and y so things line up
+// Find out when to clear cmd line for easier reading 
+//Get rid of certian debug commands 
+//Make the board view, one of letters
 
