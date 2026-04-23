@@ -1,11 +1,10 @@
 package root
 
 import (
-	"fmt"
+	"3DChessCLI/cmd/ls"
+	"3DChessCLI/util/logger"
 
 	"github.com/spf13/cobra"
-
-	"3DChessCLI/cmd/ls"
 )
 
 func RootCommand() *cobra.Command {
@@ -14,7 +13,7 @@ func RootCommand() *cobra.Command {
 		Short: "Root command for 3d chess",
 		Long:  "3DChessCLI is exactly as the name implies a CLI application for running 3D games of chess",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Fprintf(cmd.OutOrStdout(), "bruh")
+			logger.Debug("RootCmd Registered")
 		},
 	}
 	rootCmd.AddCommand(ls.LsCommand())

@@ -1,14 +1,15 @@
 package main
 
 import (
-	"3DChessCLI/cmd/3DChessCLI/root"
-	must "3DChessCLI/util"
+	"3DChessCLI/cmd/root"
+	util "3DChessCLI/util/must"
 	"fmt"
 	// "github.com/spf13/cobra"
 )
 
-func main(){
+func main() {
 	fmt.Println("Main Run")
+
 	rootCmd := root.RootCommand()
-	must.Must((rootCmd.Execute()))
+	util.Must((rootCmd.Execute()))
 }
