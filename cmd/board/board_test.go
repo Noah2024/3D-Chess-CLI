@@ -1,14 +1,14 @@
-package ls_test
+package board_test
 
 import (
-	"3DChessCLI/cmd/ls"
+	"3DC/cmd/board"
 	"bytes"
 	"testing"
 )
 
 func TestLSCmd(t *testing.T) {
 	//Create Greet Command
-	cmd := ls.LsCommand()
+	cmd := board.Board()
 
 	//Set up stdout to capure output
 	var stdout bytes.Buffer

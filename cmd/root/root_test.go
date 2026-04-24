@@ -1,7 +1,7 @@
 package root_test
 
 import (
-	"3DChessCLI/cmd/root"
+	"3DC/cmd/root"
 	"bytes"
 	"testing"
 )

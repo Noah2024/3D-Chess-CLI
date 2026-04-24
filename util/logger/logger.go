@@ -2,7 +2,7 @@
 package logger
 
 import (
-	"3DChessCLI/util/color"
+	"3DC/util/color"
 	"fmt"
 	"log"
 	"os"

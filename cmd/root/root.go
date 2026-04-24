@@ -1,21 +1,23 @@
 package root
 
 import (
-	"3DChessCLI/cmd/ls"
-	"3DChessCLI/util/logger"
+	"3DC/util/logger"
+
+	"3DC/cmd/board"
 
 	"github.com/spf13/cobra"
 )
 
 func RootCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   "3DChessCLI",
+		Use:   "3DC",
 		Short: "Root command for 3d chess",
-		Long:  "3DChessCLI is exactly as the name implies a CLI application for running 3D games of chess",
-		Run: func(cmd *cobra.Command, args []string) {
-			logger.Debug("RootCmd Registered")
+		Long:  "3DC is exactly as the name implies a CLI application for running 3D games of chess",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			logger.Debug("Init root command")
+			return nil
 		},
 	}
-	rootCmd.AddCommand(ls.LsCommand())
+	rootCmd.AddCommand(board.Board())
 	return rootCmd
 }
