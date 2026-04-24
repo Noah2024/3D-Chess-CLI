@@ -5,6 +5,8 @@ import (
 
 	"3DC/cmd/board"
 
+	"3DC/cmd/game"
+
 	"github.com/spf13/cobra"
 )
 
@@ -19,5 +21,6 @@ func RootCommand() *cobra.Command {
 		},
 	}
 	rootCmd.AddCommand(board.Board())
+	rootCmd.AddCommand(game.GameCommand())
 	return rootCmd
 }

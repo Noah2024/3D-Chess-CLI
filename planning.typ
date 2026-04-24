@@ -8,4 +8,10 @@
 == Root
 == Board
 === View
+== Game
+=== New
+=== List
+=== Load
+=== Save
+=== Delete
 == Move
