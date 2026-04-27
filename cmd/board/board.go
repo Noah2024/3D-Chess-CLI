@@ -10,8 +10,8 @@ import (
 func Board() *cobra.Command {
 	boardCMD := &cobra.Command{
 		Use:   "board",
-		Short: "View current slice of baord",
-		Long:  "view current slice of board",
+		Short: "view and manage the board",
+		Long:  "view and manage the board",
 		Run: func(cmd *cobra.Command, args []string) {
 			logger.Info("Calling Board command")
 			// fmt.Fprintf(cmd.OutOrStdout(), "Testing args %s\n", args[0])

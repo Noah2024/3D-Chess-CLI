@@ -21,30 +21,30 @@ const datapath = "../../data"
 var wg sync.WaitGroup
 
 // May need to change this depdent on size
-var yLevel = 3
-var sliceOfBoard [8][8]string
 
-// Takes a single bitmap and adds the necssary visual rune to the slice of board array for later display
-func buildBoardSlice(bm bitmap.Bitmap, vis string) {
+// Takes a single bitmap and adds the associated character to board array for specified y-level
+func buildBoardLayer(layerSlice *[8][8]string, bm bitmap.Bitmap, vis string, yLevel int) {
 	defer wg.Done()
 	bm.Range(func(index uint32) {
 		X, Y, Z := bitutil.UintToVec(index)
 		if Y == yLevel {
-			sliceOfBoard[Z-1][X-1] = vis
+			layerSlice[Z-1][X-1] = vis
 		}
 	})
 }
 
 // Internal function call to read the json storing board and output
-func ViewBoard() {
-
+func ViewLayer(yLevel int) {
 	//Will allow for variable input later
 	allPieces, _ := bitutil.LoadGame("data/output")
+	var sliceOfBoard [8][8]string
+
 	for meta, bm := range allPieces {
 		wg.Add(1)
-		go buildBoardSlice(bm, meta)
+		go buildBoardLayer(&sliceOfBoard, bm, meta, yLevel)
 	}
 	wg.Wait()
+	fmt.Printf("Layer : %d \n", yLevel)
 	fmt.Println("╔══════════════════╗")
 	for _, V := range sliceOfBoard {
 		fmt.Print("║")
@@ -59,5 +59,12 @@ func ViewBoard() {
 		fmt.Println()
 	}
 	fmt.Println("╚══════════════════╝")
-	fmt.Print("  A B C D E F G H ")
+	fmt.Println("  A B C D E F G H ")
+}
+
+func ViewAllLayers() {
+	numLayers := int(BoardSize / LayerSize)
+	for i := 0; i < numLayers; i++ {
+		ViewLayer(i)
+	}
 }
