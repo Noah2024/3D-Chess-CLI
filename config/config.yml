@@ -1,0 +1,10 @@
+#Still deciding on how best to do config, for no im mostly using the go file 
+#But I'll get a better way to handle this in the future
+# A simple configuration file
+app:
+  name: "MyApplication"
+  port: 8080
+  enabled: true
+  features:
+    - "login"
+    - "dashboard"

@@ -1,37 +1,54 @@
 package view
 
 import (
-	"3DC/util/logger"
+	"3DC/config"
+	"3DC/util/bitutil"
 	"fmt"
+	"sync"
 
 	"github.com/kelindar/bitmap"
 )
 
+const (
+	BoardSize = config.BoardSize
+	LayerSize = config.LayerSize
+	LineSize  = config.LineSize
+	SpaceSize = config.SpaceSize
+)
+
 const datapath = "../../data"
 
-type board struct {
-	Move    string `json:"move"`
-	Rows    []string
-	History string
+var wg sync.WaitGroup
+
+// May need to change this depdent on size
+var yLevel = 3
+var sliceOfBoard [8][8]string
+
+// Takes a single bitmap and adds the necssary visual rune to the slice of board array for later display
+func buildBoardSlice(bm bitmap.Bitmap, vis string) {
+	fmt.Print("Go Routine?")
+	defer wg.Done()
+	bm.Range(func(index uint32) {
+		X, Y, Z := bitutil.UintToVec(index)
+		if Y == yLevel {
+			sliceOfBoard[Z-1][X-1] = vis
+		}
+	})
 }
 
 // Internal function call to read the json storing board and output
 func ViewBoard() {
-	// root := must.Must(os.Executable())
-	// datapath := filepath.Join(root, "../data/boards/default.json")
-	// logger.Warn(datapath)
-	// rawData := must.Must(os.ReadFile(datapath))
-	//Consider adding a direct warning to the above if there is no data returned
 
-	var board bitmap.Bitmap
-	board.Set(512)
-	max, _ := board.Max()
-	logger.Info(fmt.Sprintf("%d", max))
+	//Will allow for variable input later
+	allPieces, _ := bitutil.LoadGame("data/output")
+	fmt.Print(len(allPieces))
 
-	// var data board
-	// json.Unmarshal(rawData, &data)
+	for meta, bm := range allPieces {
+		wg.Add(1)
+		go buildBoardSlice(bm, meta)
+	}
+	wg.Wait()
 
-	// print(data.Move)
-	// logger.Info(data.History)
-
+	fmt.Println("SLICE OF BOARD BELOW")
+	fmt.Print(sliceOfBoard)
 }
