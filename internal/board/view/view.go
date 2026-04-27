@@ -26,7 +26,6 @@ var sliceOfBoard [8][8]string
 
 // Takes a single bitmap and adds the necssary visual rune to the slice of board array for later display
 func buildBoardSlice(bm bitmap.Bitmap, vis string) {
-	fmt.Print("Go Routine?")
 	defer wg.Done()
 	bm.Range(func(index uint32) {
 		X, Y, Z := bitutil.UintToVec(index)
@@ -41,14 +40,24 @@ func ViewBoard() {
 
 	//Will allow for variable input later
 	allPieces, _ := bitutil.LoadGame("data/output")
-	fmt.Print(len(allPieces))
-
 	for meta, bm := range allPieces {
 		wg.Add(1)
 		go buildBoardSlice(bm, meta)
 	}
 	wg.Wait()
-
-	fmt.Println("SLICE OF BOARD BELOW")
-	fmt.Print(sliceOfBoard)
+	fmt.Println("╔══════════════════╗")
+	for _, V := range sliceOfBoard {
+		fmt.Print("║")
+		for _, K := range V {
+			if K == "" {
+				fmt.Print(" -")
+			} else {
+				fmt.Print(" " + K)
+			}
+		}
+		fmt.Print("  ║")
+		fmt.Println()
+	}
+	fmt.Println("╚══════════════════╝")
+	fmt.Print("  A B C D E F G H ")
 }
