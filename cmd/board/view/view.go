@@ -20,11 +20,12 @@ func View() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			logger.Info("Calling Board command")
 			//Validating view command input
+
 			if len(args) == 1 {
 				layerNum := must.Must(strconv.Atoi(args[0]))
 				numOfLayers := int((config.BoardSize / config.LayerSize)) - 1
 				if (layerNum > 0) && (layerNum <= numOfLayers) {
-					view.ViewLayer(layerNum)
+					view.ViewLayer(layerNum, true)
 				} else {
 					logger.Error(fmt.Sprintf("Layer %d does not exist; provide a number between (0-%d)", layerNum, numOfLayers))
 				}

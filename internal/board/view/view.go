@@ -3,7 +3,9 @@ package view
 import (
 	"3DC/config"
 	"3DC/util/bitutil"
+	"3DC/util/must"
 	"fmt"
+	"path/filepath"
 	"sync"
 
 	"github.com/kelindar/bitmap"
@@ -34,11 +36,16 @@ func buildBoardLayer(layerSlice *[8][8]string, bm bitmap.Bitmap, vis string, yLe
 }
 
 // Internal function call to read the json storing board and output
-func ViewLayer(yLevel int) {
+func ViewLayer(yLevel int, displayMetaData bool) {
 	//Will allow for variable input later
 	allPieces, _ := bitutil.LoadGame("data/output")
-	var sliceOfBoard [8][8]string
 
+	if displayMetaData == true {
+		meta := must.Must(bitutil.LoadMetaData(filepath.Join("data/output", "meta")))
+		bitutil.DistplayMetaData(meta)
+	}
+
+	var sliceOfBoard [8][8]string
 	for meta, bm := range allPieces {
 		wg.Add(1)
 		go buildBoardLayer(&sliceOfBoard, bm, meta, yLevel)
@@ -64,7 +71,10 @@ func ViewLayer(yLevel int) {
 
 func ViewAllLayers() {
 	numLayers := int(BoardSize / LayerSize)
+	meta := must.Must(bitutil.LoadMetaData(filepath.Join("data/output", "meta")))
+	bitutil.DistplayMetaData(meta)
+
 	for i := 0; i < numLayers; i++ {
-		ViewLayer(i)
+		ViewLayer(i, false)
 	}
 }
