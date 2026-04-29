@@ -1,6 +1,7 @@
 package game
 
 import (
+	"3DC/cmd/game/delete"
 	"3DC/cmd/game/list"
 	"3DC/cmd/game/load"
 	"3DC/cmd/game/new"
@@ -24,5 +25,6 @@ func GameCommand() *cobra.Command {
 	gameCmd.AddCommand(list.ListCommand())
 	gameCmd.AddCommand(save.SaveCommand())
 	gameCmd.AddCommand(load.LoadCommand())
+	gameCmd.AddCommand(delete.DeleteCommand())
 	return gameCmd
 }
