@@ -2,6 +2,7 @@
 package logger
 
 import (
+	"3DC/config"
 	"3DC/util/color"
 	"fmt"
 	"log"
@@ -12,7 +13,7 @@ import (
 )
 
 var logger *log.Logger
-var logLevel LOGLEVEL
+var LogLevel = config.LogLevel
 
 type LOGLEVEL int
 
@@ -20,7 +21,7 @@ const (
 	debug = iota // 0
 	info         // 1
 	warn         // 2
-	error        // 3
+	err          // 3
 	fatal        // 4
 )
 
@@ -37,9 +38,10 @@ const (
 )
 
 func init() {
-	logger = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
+	logFile, _ := os.OpenFile(config.CurrentLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+	logger = log.New(logFile, "", log.Ldate|log.Ltime|log.Lshortfile)
 	logger.SetFlags(0)
-	logLevel = debug
 }
 
 // For now im accepting the time cost of usign runtime.Caller
@@ -53,35 +55,35 @@ func metadata() string {
 }
 
 func Debug(msg string) {
-	if logLevel <= 0 {
-		fmt := "DEBUG: " + metadata() + msg
-		logger.Print(color.ColorText(fmt, color.CLR))
+	logger.Print("DEBUG: " + metadata() + msg)
+	if LogLevel <= 0 {
+		fmt.Println(color.ColorText("DEBUG: "+msg, color.CLR))
 	}
 }
 
 func Info(msg string) {
-	if logLevel <= 1 {
-		fmt := "INFO: " + metadata() + msg
-		logger.Print(color.ColorText(fmt, color.Blue))
+	logger.Print("INFO: " + metadata() + msg)
+	if LogLevel <= 1 {
+		fmt.Println(color.ColorText("INFO: "+msg, color.Blue))
 	}
 }
 
 func Warn(msg string) {
-	if logLevel <= 2 {
-		fmt := "WARN: " + metadata() + msg
-		logger.Print(color.ColorText(fmt, color.Yellow))
+	logger.Print("WARN: " + metadata() + msg)
+	if LogLevel <= 2 {
+		fmt.Print(color.ColorText("WARN: "+msg, color.Yellow))
 	}
 }
 
 func Error(msg string) {
-	if logLevel <= 2 {
-		fmt := "ERROR: " + metadata() + msg
-		logger.Print(color.ColorText(fmt, color.Red))
+	logger.Print("ERROR: " + metadata() + msg)
+	if LogLevel <= 3 {
+		fmt.Print(color.ColorText("ERROR: "+msg, color.Red))
 	}
 }
 
 func Fatal(msg string) {
-	fmt := "FATAL: " + metadata() + msg
-	logger.Print(color.ColorText(fmt, color.Purple))
-	//Exit
+	logger.Print("FATAL: " + metadata() + msg)
+	fmt.Println(color.ColorText("ERROR: "+msg, color.Red))
+	os.Exit(1)
 }
