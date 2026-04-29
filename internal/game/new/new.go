@@ -2,6 +2,7 @@
 package new
 
 import (
+	"3DC/internal/game/save"
 	"3DC/util/logger"
 	"fmt"
 
@@ -90,23 +91,33 @@ func NewCommand() {
 	blackKing.Set(VecToUint(5, 3, 8))
 
 	logger.Debug("Init new game setup")
-	fullMap := map[rune]bitmap.Bitmap{
-		'♙': whitePawn,
-		'♘': whiteKnight,
-		'♗': whiteBishop,
-		'♖': whiteRook,
-		'♕': whiteQueen,
-		'♔': whiteKing,
-		'♟': blackPawn,
-		'♞': blackKnight,
-		'♝': blackBishop,
-		'♜': blackRook,
-		'♛': blackQueen,
-		'♚': blackKing,
+	fullMap := map[string]bitmap.Bitmap{
+		"♙": whitePawn,
+		"♘": whiteKnight,
+		"♗": whiteBishop,
+		"♖": whiteRook,
+		"♕": whiteQueen,
+		"♔": whiteKing,
+		"♟": blackPawn,
+		"♞": blackKnight,
+		"♝": blackBishop,
+		"♜": blackRook,
+		"♛": blackQueen,
+		"♚": blackKing,
 	}
-	bitutil.SaveGame(fullMap, "data/output")
-	out, _ := bitutil.LoadGame("data/output")
 
-	fmt.Println("Board")
-	fmt.Println(out)
+	//Need a dialog box for this
+	save.SaveGame(fullMap, config.CurrentGame)
+	// out, _ := bitutil.LoadGame("data/CurrentGame")
+
+	// fmt.Println("Board")
+	// fmt.Println(out)
 }
+
+//TO DO
+//Create confimation dialog.go (which halts processing)
+//Implement game list
+//Implemnet game load
+//Implement game save
+//Implment game delete
+//THEN move back to postgres auth plugin

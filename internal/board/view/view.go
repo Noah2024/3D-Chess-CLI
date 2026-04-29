@@ -2,7 +2,9 @@ package view
 
 import (
 	"3DC/config"
+	"3DC/internal/game/load"
 	"3DC/util/bitutil"
+	"3DC/util/metadata"
 	"3DC/util/must"
 	"fmt"
 	"path/filepath"
@@ -38,11 +40,11 @@ func buildBoardLayer(layerSlice *[8][8]string, bm bitmap.Bitmap, vis string, yLe
 // Internal function call to read the json storing board and output
 func ViewLayer(yLevel int, displayMetaData bool) {
 	//Will allow for variable input later
-	allPieces, _ := bitutil.LoadGame("data/output")
+	allPieces, _ := load.LoadGame("data/output")
 
 	if displayMetaData == true {
-		meta := must.Must(bitutil.LoadMetaData(filepath.Join("data/output", "meta")))
-		bitutil.DistplayMetaData(meta)
+		meta := must.Must(metadata.LoadMetaData(filepath.Join("data/output", "meta")))
+		metadata.DistplayMetaData(meta)
 	}
 
 	var sliceOfBoard [8][8]string
@@ -71,8 +73,8 @@ func ViewLayer(yLevel int, displayMetaData bool) {
 
 func ViewAllLayers() {
 	numLayers := int(BoardSize / LayerSize)
-	meta := must.Must(bitutil.LoadMetaData(filepath.Join("data/output", "meta")))
-	bitutil.DistplayMetaData(meta)
+	meta := must.Must(metadata.LoadMetaData(filepath.Join("data/output", "meta")))
+	metadata.DistplayMetaData(meta)
 
 	for i := 0; i < numLayers; i++ {
 		ViewLayer(i, false)
