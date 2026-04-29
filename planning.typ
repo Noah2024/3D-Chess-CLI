@@ -6,19 +6,18 @@
 
 = All the shits
 == Root
-== Board
-=== View
+== Board 
+=== View ✅
 == Game
-=== New
-=== List
-=== Load
-=== Save
-=== Delete
+=== New ✅
+=== List ✅
+=== Load ✅
+=== Save ✅
+=== Delete ✅
 == Move
 
 == To DO
-- Finish Testing save and load functions 
-- Create yaml config (read and load in main file)
--- Find a way to keep this config in the file no matter what (possibility of saved state file)
-- Finalize the save and load command integration
--- Figure out all the other game managment commands
+
+Give cleaner input to user
+Rework how must function is imlemented (how do to error handling in general)
+Work on move command and how to actually generate moves for different pieces
