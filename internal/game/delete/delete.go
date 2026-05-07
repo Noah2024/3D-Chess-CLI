@@ -19,7 +19,7 @@ func deleteDir(entry os.DirEntry) {
 	must.Must("", err)
 }
 
-// Main delete function: loops the game directory to see if users choice matches entry
+// Main delete function: loops the game directory to see if users choice matches any entry
 func DeleteGame(name string) error {
 
 	dir := must.Must(os.ReadDir(config.DataDir))

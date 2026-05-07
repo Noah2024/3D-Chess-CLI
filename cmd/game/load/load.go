@@ -22,6 +22,7 @@ func LoadCommand() *cobra.Command {
 			//Ik ik I really need to do better input validation here
 			//But thats a later me problem
 
+			//Checks if file exists
 			if _, err := os.Stat(config.DataDir); err == nil {
 				if !dialog.Confirm("Are you sure you want to overwrite your current game?") {
 					return nil

@@ -51,9 +51,12 @@ func ViewLayer(yLevel int, displayMetaData bool) {
 	for meta, bm := range allPieces {
 		wg.Add(1)
 		go buildBoardLayer(&sliceOfBoard, bm, meta, yLevel)
+
 	}
+
 	wg.Wait()
-	fmt.Printf("Layer : %d \n", yLevel)
+	fmt.Printf("Layer : %c \n", rune('A'+yLevel))
+	zInc := 1
 	fmt.Println("╔══════════════════╗")
 	for _, V := range sliceOfBoard {
 		fmt.Print("║")
@@ -64,7 +67,8 @@ func ViewLayer(yLevel int, displayMetaData bool) {
 				fmt.Print(" " + K)
 			}
 		}
-		fmt.Print("  ║")
+		fmt.Printf("  ║ %v", zInc)
+		zInc += 1
 		fmt.Println()
 	}
 	fmt.Println("╚══════════════════╝")

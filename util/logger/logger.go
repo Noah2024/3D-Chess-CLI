@@ -80,6 +80,7 @@ func Error(msg string) {
 	if LogLevel <= 3 {
 		fmt.Print(color.ColorText("ERROR: "+msg, color.Red))
 	}
+	os.Exit(1)
 }
 
 func Fatal(msg string) {

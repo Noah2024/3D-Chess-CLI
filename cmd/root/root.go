@@ -4,6 +4,7 @@ import (
 	"3DC/util/logger"
 
 	"3DC/cmd/board"
+	"3DC/cmd/move"
 
 	"3DC/cmd/game"
 
@@ -22,5 +23,6 @@ func RootCommand() *cobra.Command {
 	}
 	rootCmd.AddCommand(board.Board())
 	rootCmd.AddCommand(game.GameCommand())
+	rootCmd.AddCommand(move.MoveCommand())
 	return rootCmd
 }

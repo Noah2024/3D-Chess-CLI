@@ -18,6 +18,7 @@
 
 == To DO
 
-Give cleaner input to user
+Give cleaner ouput to user
 Rework how must function is imlemented (how do to error handling in general)
 Work on move command and how to actually generate moves for different pieces
+Look into a nonstatic config file
