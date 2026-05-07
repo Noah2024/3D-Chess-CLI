@@ -1,10 +1,15 @@
 package move
 
 import (
+	"3DC/config"
 	"3DC/internal/game/load"
+	"3DC/internal/game/save"
 	"3DC/util/bitutil"
 	"3DC/util/logger"
+	"3DC/util/metadata"
 	"fmt"
+
+	"github.com/kelindar/bitmap"
 )
 
 var m = map[string]int{
@@ -22,32 +27,57 @@ func parseLoc(loc string) uint32 {
 	if len(loc) != 3 {
 		logger.Error(fmt.Sprintf("Could not parse location '%v' - invalid length of string", loc))
 	}
-	// fmt.Printf("%v %v %v\n", int(loc[0]-'a'+1), int(loc[1]-'1'+1), int(loc[2]-'A')+1)
 	x, z, y := int(loc[0]-'a'+1), int(loc[1]-'1'+1), int(loc[2]-'A'+1) //THIS ALSO NEEDS BETTER BOUNDS CHECKING
 
-	return bitutil.VecToUint(x, y, z) //NEEDS BETTER BOUNDS CHECKING
+	return bitutil.VecToUint(x, y, z)
 }
 
-// Determines piece type at a given location
-func pieceType(loc uint32) {
+// Determines piece type at a given location // Needs a better name
+func pieceType(loc uint32) (string, bitmap.Bitmap) {
 	//Loading data from current game
-	allPieces, _ := load.LoadGame("data/output")
+	allPieces, _ := load.LoadGame(config.CurrentGame)
 
-	// meta := must.Must(metadata.LoadMetaData(filepath.Join("data/output", "meta")))
 	for meta, bm := range allPieces {
 
 		if bm.Contains(loc) {
 			logger.Info(meta)
+			return meta, bm
 		}
 
 	}
+	return "", bitmap.Bitmap{}
 }
 
-func Move(to string, from string) {
+// This no work, recheck how the bitmaps contain each of the pieces
+func Move(from string, to string) {
+
+	uLocFrom := parseLoc(from)
+	visFrom, bmFrom := pieceType(uLocFrom)
+	if visFrom == "" {
+		logger.Error(fmt.Sprintf("Could not find piece at location [%v]", from))
+	}
 
 	logger.Info(fmt.Sprintf("%v", parseLoc(to)))
-	// logger.Info(fmt.Sprintf("%v", parseLoc(from)))
-	pieceType(parseLoc(to))
+	uintLocTo := parseLoc(to)
+	visTo, bmTo := pieceType(uintLocTo)
+
+	//Updates bitmap of piece being moved
+	bmFrom.Remove(uLocFrom)
+	bmFrom.Set(uintLocTo)
+
+	//Updates bitmap (if it exists) of piece being taken
+	bmTo.Remove(uintLocTo)
+
+	logger.Warn(fmt.Sprintf("%v", visFrom))
+	logger.Warn(fmt.Sprintf("%v", visTo))
+
+	metadata.CreateSaveMetaData(config.CurrentGame)
+	save.SavePieceType(visFrom, bmFrom)
+
+	if visTo != "" {
+		save.SavePieceType(visTo, bmTo)
+	}
+
 	logger.Warn("Aint no way bro")
 
 }

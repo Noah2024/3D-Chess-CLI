@@ -75,7 +75,8 @@ func init() {
 	//O_EXCL - Except fail if it already exsits
 	//O_Wrongly - Opens file for writing (which I don't need rn, but maybe later)
 
-	//Atomic create
+	//Atomic create //Because otherwise the gap between opening the file and checking its existence
+	//Could technically allow another program to create it
 	f, err3 := os.OpenFile(CurrentLog, os.O_CREATE|os.O_EXCL, 644)
 	if err3 != nil {
 		if !os.IsExist(err3) {

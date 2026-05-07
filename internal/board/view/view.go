@@ -37,10 +37,10 @@ func buildBoardLayer(layerSlice *[8][8]string, bm bitmap.Bitmap, vis string, yLe
 	})
 }
 
-// Internal function call to read the json storing board and output
+// Internal function call to bitmap storing the
 func ViewLayer(yLevel int, displayMetaData bool) {
 	//Will allow for variable input later
-	allPieces, _ := load.LoadGame("data/output")
+	allPieces, _ := load.LoadGame(config.CurrentGame)
 
 	if displayMetaData == true {
 		meta := must.Must(metadata.LoadMetaData(filepath.Join("data/output", "meta")))

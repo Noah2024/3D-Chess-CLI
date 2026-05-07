@@ -41,7 +41,7 @@ var EnPessentRights uint8 = 0b00000000
 
 // Creates directory at location and saves metadata as collection of bitmaps
 func CreateSaveMetaData(location string) error {
-	os.Mkdir(location, 0644)
+	os.Mkdir(filepath.Join(location, "meta"), 0644)
 	buf := new(bytes.Buffer)
 
 	binary.Write(buf, binary.LittleEndian, MetaData{
@@ -53,7 +53,7 @@ func CreateSaveMetaData(location string) error {
 		Time:      time.Now().Unix(),
 	})
 
-	err := os.WriteFile(filepath.Join(location, "meta.bin"), buf.Bytes(), 0644)
+	err := os.WriteFile(filepath.Join(location, "meta", "meta.bin"), buf.Bytes(), 0644)
 	must.Must("", err)
 	return nil
 }
