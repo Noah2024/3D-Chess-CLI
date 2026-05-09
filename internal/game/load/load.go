@@ -33,3 +33,8 @@ func LoadGame(location string) (data map[string]bitmap.Bitmap, err error) {
 	return result, nil
 
 }
+
+//Loads current game to bitmap AND handles checking
+func LoadCurrentGameToBitMap() {
+
+}

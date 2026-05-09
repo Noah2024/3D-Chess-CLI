@@ -92,32 +92,20 @@ func NewCommand() {
 
 	logger.Debug("Init new game setup")
 	fullMap := map[string]bitmap.Bitmap{
-		"♙": whitePawn,
-		"♘": whiteKnight,
-		"♗": whiteBishop,
-		"♖": whiteRook,
-		"♕": whiteQueen,
-		"♔": whiteKing,
-		"♟": blackPawn,
-		"♞": blackKnight,
-		"♝": blackBishop,
-		"♜": blackRook,
-		"♛": blackQueen,
-		"♚": blackKing,
+		"♙": blackPawn,
+		"♘": blackKnight,
+		"♗": blackBishop,
+		"♖": blackRook,
+		"♕": blackQueen,
+		"♔": blackKing,
+		"♟": whitePawn,
+		"♞": whiteKnight,
+		"♝": whiteBishop,
+		"♜": whiteRook,
+		"♛": whiteQueen,
+		"♚": whiteKing,
 	}
 
 	//Need a dialog box for this
 	save.SaveGame(fullMap, config.CurrentGame)
-	// out, _ := bitutil.LoadGame("data/CurrentGame")
-
-	// fmt.Println("Board")
-	// fmt.Println(out)
 }
-
-//TO DO
-//Create confimation dialog.go (which halts processing)
-//Implement game list
-//Implemnet game load
-//Implement game save
-//Implment game delete
-//THEN move back to postgres auth plugin

@@ -27,7 +27,7 @@ func parseLoc(loc string) uint32 {
 	if len(loc) != 3 {
 		logger.Error(fmt.Sprintf("Could not parse location '%v' - invalid length of string", loc))
 	}
-	x, z, y := int(loc[0]-'a'+1), int(loc[1]-'1'+1), int(loc[2]-'A'+1) //THIS ALSO NEEDS BETTER BOUNDS CHECKING
+	x, z, y := int(loc[0]-'a'+1), int(loc[1]-'1'+1), int(loc[2]-'A') //THIS ALSO NEEDS BETTER BOUNDS CHECKING
 
 	return bitutil.VecToUint(x, y, z)
 }
@@ -37,6 +37,7 @@ func pieceType(loc uint32) (string, bitmap.Bitmap) {
 	//Loading data from current game
 	allPieces, _ := load.LoadGame(config.CurrentGame)
 
+	//Contains is simd vectorized, I don't feel the need to optimize this search
 	for meta, bm := range allPieces {
 
 		if bm.Contains(loc) {
@@ -57,7 +58,7 @@ func Move(from string, to string) {
 		logger.Error(fmt.Sprintf("Could not find piece at location [%v]", from))
 	}
 
-	logger.Info(fmt.Sprintf("%v", parseLoc(to)))
+	// logger.Info(fmt.Sprintf("%v", parseLoc(to)))
 	uintLocTo := parseLoc(to)
 	visTo, bmTo := pieceType(uintLocTo)
 
@@ -68,8 +69,8 @@ func Move(from string, to string) {
 	//Updates bitmap (if it exists) of piece being taken
 	bmTo.Remove(uintLocTo)
 
-	logger.Warn(fmt.Sprintf("%v", visFrom))
-	logger.Warn(fmt.Sprintf("%v", visTo))
+	// logger.Warn(fmt.Sprintf("%v", visFrom))
+	// logger.Warn(fmt.Sprintf("%v", visTo))
 
 	metadata.CreateSaveMetaData(config.CurrentGame)
 	save.SavePieceType(visFrom, bmFrom)
@@ -79,5 +80,4 @@ func Move(from string, to string) {
 	}
 
 	logger.Warn("Aint no way bro")
-
 }
