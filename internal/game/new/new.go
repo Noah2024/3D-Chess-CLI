@@ -109,3 +109,14 @@ func NewCommand() {
 	//Need a dialog box for this
 	save.SaveGame(fullMap, config.CurrentGame)
 }
+
+func NewDataPlane(){
+	//Generate y 
+	
+	for i:= 0; i<8; i++{
+
+	}
+	//Generate x planes
+
+	//Generate z planes
+}

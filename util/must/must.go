@@ -16,6 +16,7 @@ import (
 func Must[T any](val T, err error) T {
 	if err != nil {
 		logger.Error(err.Error())
+		panic(err)
 		os.Exit(1)
 	}
 	return val

@@ -20,18 +20,15 @@
 
 Name shit better
 
-Change view board function 
-  - Making it match up with the lettering for layers (make A's on bottom and a's for layers)
-  - Change the increments and decrements of numbers to match normal chess (might be a pain with the numbering ystem)
-
 Movement
- Prevent taking friendly pieces
  Create way to display generated moves
+ Prevent taking friendly pieces
  Create list of generated moves
  Create function to validate attempted moves
 
 Checking
 
+NOTE TO SELF: If there are issues with not being able to move certian pieces try storing their indicies in uint64 and not uint32
 
 
 Give cleaner ouput to user
