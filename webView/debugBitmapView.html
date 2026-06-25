@@ -1,0 +1,202 @@
+<!-- Generated with ChatGPT -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>8x8x8 Bitmap Viewer</title>
+
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: #111;
+            font-family: sans-serif;
+        }
+
+        #ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 500px;
+            z-index: 10;
+        }
+
+        textarea {
+            width: 100%;
+            height: 140px;
+            background: #222;
+            color: white;
+            border: 1px solid #555;
+            padding: 8px;
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="ui">
+    <textarea id="bitmapInput">[0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+1111111111111111111111111111111111111111111111111111111111111111
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000]</textarea>
+
+    <br>
+    <button onclick="renderBitmap()">Render</button>
+</div>
+
+<canvas id="renderCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById("renderCanvas");
+const engine = new BABYLON.Engine(canvas, true);
+
+let scene;
+let voxelParent;
+
+function createScene() {
+    const scene = new BABYLON.Scene(engine);
+
+    scene.clearColor = new BABYLON.Color4(0.05, 0.05, 0.05, 1);
+
+    const camera = new BABYLON.ArcRotateCamera(
+        "camera",
+        -Math.PI / 4,
+        Math.PI / 3,
+        20,
+        new BABYLON.Vector3(3.5, 3.5, 3.5),
+        scene
+    );
+
+    camera.attachControl(canvas, true);
+
+    const light1 = new BABYLON.HemisphericLight(
+        "light1",
+        new BABYLON.Vector3(0, 1, 0),
+        scene
+    );
+
+    light1.intensity = 1.0;
+
+    const light2 = new BABYLON.PointLight(
+        "light2",
+        new BABYLON.Vector3(20, 20, -20),
+        scene
+    );
+
+    light2.intensity = 0.8;
+
+    voxelParent = new BABYLON.TransformNode("voxels", scene);
+
+    return scene;
+}
+
+scene = createScene();
+
+const onMaterial = new BABYLON.StandardMaterial("onMat", scene);
+onMaterial.diffuseColor = new BABYLON.Color3(0.2, 1.0, 0.2);
+onMaterial.alpha = 0.7;
+
+const offMaterial = new BABYLON.StandardMaterial("offMat", scene);
+offMaterial.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7);
+offMaterial.alpha = 0.08;
+
+function clearVoxels() {
+    voxelParent.getChildren().forEach(mesh => mesh.dispose());
+}
+
+function parseBitmap(input) {
+    input = input.replace(/[\[\]\s]/g, '');
+
+    if (input.length !== 512) {
+        throw new Error(
+            `Expected 512 bits but found ${input.length}`
+        );
+    }
+
+    return input;
+}
+
+function renderBitmap() {
+    clearVoxels();
+
+    let bits;
+
+    try {
+        bits = parseBitmap(
+            document.getElementById("bitmapInput").value
+        );
+    } catch (err) {
+        alert(err.message);
+        return;
+    }
+
+    const spacing = 1.0;
+
+    let index = 0;
+
+    for (let layer = 0; layer < 8; layer++) {
+
+        for (let row = 0; row < 8; row++) {
+
+            for (let col = 0; col < 8; col++) {
+
+                const bit = bits[index++];
+
+                const box = BABYLON.MeshBuilder.CreateBox(
+                    `v_${layer}_${row}_${col}`,
+                    { size: 0.9 },
+                    scene
+                );
+
+                box.position.x = col * spacing;
+                box.position.y = 7 - row;
+                box.position.z = layer * spacing;
+
+                box.material =
+                    bit === '1'
+                    ? onMaterial
+                    : offMaterial;
+
+                box.parent = voxelParent;
+            }
+        }
+    }
+
+    voxelParent.position.x = -3.5;
+    voxelParent.position.y = -3.5;
+    voxelParent.position.z = -3.5;
+}
+
+renderBitmap();
+
+engine.runRenderLoop(() => {
+    scene.render();
+});
+
+window.addEventListener("resize", () => {
+    engine.resize();
+});
+</script>
+
+</body>
+</html>
