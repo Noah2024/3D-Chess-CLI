@@ -52,6 +52,20 @@
             box-sizing: border-box;
         }
 
+        .coordRow {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .coordRow input {
+            flex: 1;
+            background: #222;
+            color: white;
+            border: 1px solid #555;
+            padding: 6px;
+        }
+
         button {
             margin-top: 8px;
             padding: 8px 16px;
@@ -72,6 +86,16 @@
             margin-right: 6px;
             border-radius: 2px;
             border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        #resultBox {
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px solid #555;
+            background: #1b1b1b;
+            color: #fff;
+            font-size: 13px;
+            min-height: 24px;
         }
 
         #renderCanvas {
@@ -120,6 +144,20 @@
 1111111111111111111111111111111111111111111111111111111111111111]</textarea>
     </div>
 
+    <div class="inputBlock">
+        <label>Test a position</label>
+        <div class="coordRow">
+            <input id="coordX" type="number" min="0" max="7" placeholder="x">
+            <input id="coordY" type="number" min="0" max="7" placeholder="y">
+            <input id="coordZ" type="number" min="0" max="7" placeholder="z">
+        </div>
+        <div class="coordRow">
+            <input id="coordIndex" type="number" min="0" max="511" placeholder="or index (0-511)">
+        </div>
+        <button onclick="testPosition()">Test Position</button>
+        <div id="resultBox">Result will appear here.</div>
+    </div>
+
     <button onclick="renderBitmap()">Render</button>
 
     <div id="legend">
@@ -141,6 +179,7 @@ const engine = new BABYLON.Engine(canvas, true);
 
 let scene;
 let voxelParent;
+let highlightBox;
 
 function createScene() {
     const scene = new BABYLON.Scene(engine);
@@ -217,8 +256,19 @@ function clearVoxels() {
     voxelParent.getChildren().forEach(mesh => mesh.dispose());
 }
 
+function clearHighlight() {
+    if (highlightBox) {
+        highlightBox.dispose();
+        highlightBox = null;
+    }
+}
+
 function parseBitmap(input) {
-    input = input.replace(/[\[\]\s]/g, '');
+    input = (input || '').replace(/[\[\]\s]/g, '');
+
+    if (!input) {
+        return '0'.repeat(512);
+    }
 
     if (input.length !== 512) {
         throw new Error(`Expected 512 bits but found ${input.length}`);
@@ -258,6 +308,7 @@ function chooseMaterial(state) {
 
 function renderBitmap() {
     clearVoxels();
+    clearHighlight();
 
     let bitmaps;
 
@@ -307,6 +358,78 @@ function renderBitmap() {
     voxelParent.position.x = -3.5;
     voxelParent.position.y = -3.5;
     voxelParent.position.z = -3.5;
+}
+
+function getIndexFromCoords(x, y, z) {
+    return z * 64 + y * 8 + x;
+}
+
+function testPosition() {
+    const bitmaps = getBitmapBits();
+    const resultBox = document.getElementById("resultBox");
+
+    let index = document.getElementById("coordIndex").value;
+    let x = document.getElementById("coordX").value;
+    let y = document.getElementById("coordY").value;
+    let z = document.getElementById("coordZ").value;
+
+    try {
+        if (index !== "") {
+            index = parseInt(index, 10);
+            if (index < 0 || index > 511) {
+                throw new Error("Index must be between 0 and 511.");
+            }
+        } else {
+            x = parseInt(x, 10);
+            y = parseInt(y, 10);
+            z = parseInt(z, 10);
+
+            if ([x, y, z].some(v => Number.isNaN(v) || v < 0 || v > 7)) {
+                throw new Error("x, y, and z must each be between 0 and 7.");
+            }
+
+            index = getIndexFromCoords(x, y, z);
+        }
+
+        const matches = [];
+        if (bitmaps[0][index] === '1') matches.push("A");
+        if (bitmaps[1][index] === '1') matches.push("B");
+        if (bitmaps[2][index] === '1') matches.push("C");
+
+        if (matches.length === 0) {
+            resultBox.textContent = `Position ${index} is not present in any bitmap.`;
+        } else {
+            resultBox.textContent = `Position ${index} is present in bitmap${matches.length > 1 ? "s" : ""}: ${matches.join(", ")}`;
+        }
+
+        clearHighlight();
+
+        const material = new BABYLON.StandardMaterial("highlightMat", scene);
+        material.diffuseColor = new BABYLON.Color3(1, 1, 0);
+        material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+        material.alpha = 0.9;
+
+        const xPos = index % 8;
+        const yPos = Math.floor(index / 8) % 8;
+        const zPos = Math.floor(index / 64);
+
+        highlightBox = BABYLON.MeshBuilder.CreateBox(
+            "highlightBox",
+            { size: 1.02 },
+            scene
+        );
+        highlightBox.position.x = xPos;
+        highlightBox.position.y = 7 - yPos;
+        highlightBox.position.z = zPos;
+        highlightBox.material = material;
+        highlightBox.parent = voxelParent;
+
+        voxelParent.position.x = -3.5;
+        voxelParent.position.y = -3.5;
+        voxelParent.position.z = -3.5;
+    } catch (err) {
+        resultBox.textContent = err.message;
+    }
 }
 
 renderBitmap();
