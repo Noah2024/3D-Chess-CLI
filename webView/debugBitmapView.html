@@ -23,22 +23,55 @@
             left: 10px;
             width: 500px;
             z-index: 10;
+            background: rgba(17, 17, 17, 0.92);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 12px;
+            box-sizing: border-box;
+        }
+
+        .inputBlock {
+            margin-bottom: 10px;
+        }
+
+        .inputBlock label {
+            display: block;
+            margin-bottom: 4px;
+            color: #ddd;
+            font-size: 13px;
         }
 
         textarea {
             width: 100%;
-            height: 140px;
+            height: 90px;
             background: #222;
             color: white;
             border: 1px solid #555;
             padding: 8px;
             resize: vertical;
+            box-sizing: border-box;
         }
 
         button {
             margin-top: 8px;
             padding: 8px 16px;
             cursor: pointer;
+        }
+
+        #legend {
+            margin-top: 10px;
+            color: #ddd;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .swatch {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            margin-right: 6px;
+            border-radius: 2px;
+            border: 1px solid rgba(255,255,255,0.3);
         }
 
         #renderCanvas {
@@ -51,7 +84,9 @@
 <body>
 
 <div id="ui">
-    <textarea id="bitmapInput">[0000000000000000000000000000000000000000000000000000000000000000
+    <div class="inputBlock">
+        <label for="bitmapInputA">Bitmap A</label>
+        <textarea id="bitmapInputA">[0000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000
 1111111111111111111111111111111111111111111111111111111111111111
 0000000000000000000000000000000000000000000000000000000000000000
@@ -59,9 +94,43 @@
 0000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000]</textarea>
+    </div>
 
-    <br>
+    <div class="inputBlock">
+        <label for="bitmapInputB">Bitmap B</label>
+        <textarea id="bitmapInputB">[0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+1111111111111111111111111111111111111111111111111111111111111111
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000]</textarea>
+    </div>
+
+    <div class="inputBlock">
+        <label for="bitmapInputC">Bitmap C</label>
+        <textarea id="bitmapInputC">[0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+1111111111111111111111111111111111111111111111111111111111111111]</textarea>
+    </div>
+
     <button onclick="renderBitmap()">Render</button>
+
+    <div id="legend">
+        <div><span class="swatch" style="background:#2ecc71"></span>Bitmap A</div>
+        <div><span class="swatch" style="background:#3498db"></span>Bitmap B</div>
+        <div><span class="swatch" style="background:#e74c3c"></span>Bitmap C</div>
+        <div><span class="swatch" style="background:#f1c40f"></span>Intersection A+B</div>
+        <div><span class="swatch" style="background:#ff66cc"></span>Intersection A+C</div>
+        <div><span class="swatch" style="background:#00d4ff"></span>Intersection B+C</div>
+        <div><span class="swatch" style="background:#ffffff"></span>Intersection A+B+C</div>
+    </div>
 </div>
 
 <canvas id="renderCanvas"></canvas>
@@ -112,13 +181,37 @@ function createScene() {
 
 scene = createScene();
 
-const onMaterial = new BABYLON.StandardMaterial("onMat", scene);
-onMaterial.diffuseColor = new BABYLON.Color3(0.2, 1.0, 0.2);
-onMaterial.alpha = 0.7;
-
 const offMaterial = new BABYLON.StandardMaterial("offMat", scene);
 offMaterial.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7);
 offMaterial.alpha = 0.08;
+
+const materialA = new BABYLON.StandardMaterial("matA", scene);
+materialA.diffuseColor = new BABYLON.Color3(0.18, 0.82, 0.44);
+materialA.alpha = 0.9;
+
+const materialB = new BABYLON.StandardMaterial("matB", scene);
+materialB.diffuseColor = new BABYLON.Color3(0.22, 0.58, 0.95);
+materialB.alpha = 0.9;
+
+const materialC = new BABYLON.StandardMaterial("matC", scene);
+materialC.diffuseColor = new BABYLON.Color3(0.90, 0.29, 0.24);
+materialC.alpha = 0.9;
+
+const materialAB = new BABYLON.StandardMaterial("matAB", scene);
+materialAB.diffuseColor = new BABYLON.Color3(0.95, 0.82, 0.18);
+materialAB.alpha = 0.95;
+
+const materialAC = new BABYLON.StandardMaterial("matAC", scene);
+materialAC.diffuseColor = new BABYLON.Color3(1.0, 0.4, 0.8);
+materialAC.alpha = 0.95;
+
+const materialBC = new BABYLON.StandardMaterial("matBC", scene);
+materialBC.diffuseColor = new BABYLON.Color3(0.0, 0.82, 1.0);
+materialBC.alpha = 0.95;
+
+const materialABC = new BABYLON.StandardMaterial("matABC", scene);
+materialABC.diffuseColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+materialABC.alpha = 1.0;
 
 function clearVoxels() {
     voxelParent.getChildren().forEach(mesh => mesh.dispose());
@@ -128,39 +221,70 @@ function parseBitmap(input) {
     input = input.replace(/[\[\]\s]/g, '');
 
     if (input.length !== 512) {
-        throw new Error(
-            `Expected 512 bits but found ${input.length}`
-        );
+        throw new Error(`Expected 512 bits but found ${input.length}`);
     }
 
     return input;
 }
 
+function getBitmapBits() {
+    return [
+        parseBitmap(document.getElementById("bitmapInputA").value),
+        parseBitmap(document.getElementById("bitmapInputB").value),
+        parseBitmap(document.getElementById("bitmapInputC").value)
+    ];
+}
+
+function chooseMaterial(state) {
+    switch (state) {
+        case 1:
+            return materialA;
+        case 2:
+            return materialB;
+        case 3:
+            return materialAB;
+        case 4:
+            return materialC;
+        case 5:
+            return materialAC;
+        case 6:
+            return materialBC;
+        case 7:
+            return materialABC;
+        default:
+            return offMaterial;
+    }
+}
+
 function renderBitmap() {
     clearVoxels();
 
-    let bits;
+    let bitmaps;
 
     try {
-        bits = parseBitmap(
-            document.getElementById("bitmapInput").value
-        );
+        bitmaps = getBitmapBits();
     } catch (err) {
         alert(err.message);
         return;
     }
 
     const spacing = 1.0;
-
     let index = 0;
 
     for (let layer = 0; layer < 8; layer++) {
-
         for (let row = 0; row < 8; row++) {
-
             for (let col = 0; col < 8; col++) {
+                let state = 0;
 
-                const bit = bits[index++];
+                if (bitmaps[0][index] === '1') {
+                    state += 1;
+                }
+                if (bitmaps[1][index] === '1') {
+                    state += 2;
+                }
+                if (bitmaps[2][index] === '1') {
+                    state += 4;
+                }
 
                 const box = BABYLON.MeshBuilder.CreateBox(
                     `v_${layer}_${row}_${col}`,
@@ -172,12 +296,10 @@ function renderBitmap() {
                 box.position.y = 7 - row;
                 box.position.z = layer * spacing;
 
-                box.material =
-                    bit === '1'
-                    ? onMaterial
-                    : offMaterial;
-
+                box.material = chooseMaterial(state);
                 box.parent = voxelParent;
+
+                index++;
             }
         }
     }
