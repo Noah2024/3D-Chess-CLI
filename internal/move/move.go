@@ -14,25 +14,34 @@ import (
 	"github.com/kelindar/bitmap"
 )
 
-// var yDataPlane = []uint32{
-// 	64,
-// 	128,
-// 	192,
-// 	256,
-// 	320,
-// 	384,
-// 	448,
-// 	512,
-// }
-
+// /BIG NOTE TO SELF 6/24/2026
+// BOth the forwards and backwards appear to generate the same side to side movement, not sure why
 func rookMove(x int, y int, z int) bitmap.Bitmap {
-	fmt.Print("Y being moved ")
-	fmt.Println(y)
-	tmp := dataplane.ZPlane[y-1].Clone(nil)
-	return tmp
+
+	fmt.Printf("X: %064b\n", dataplane.XPlane[6])
+	fmt.Printf("Y: %064b\n", dataplane.YPlane[2])
+	fmt.Printf("Z: %064b\n", dataplane.ZPlane[0])
+
+	forward := dataplane.XPlane[x-1].Clone(nil)
+	forward.And(dataplane.ZPlane[z-1])
+
+	sideToSide := dataplane.YPlane[y-1].Clone(nil)
+	sideToSide.And(dataplane.XPlane[x-1])
+
+	upAndDown := dataplane.YPlane[y-1].Clone(nil)
+	upAndDown.And(dataplane.ZPlane[z-1])
+
+	// fmt.Printf("Forward %064b\n", upAndDown)
+	fmt.Printf("Forward %064b\n", forward)
+
+	forward.Or(upAndDown)
+	forward.Or(sideToSide)
+	fmt.Printf("Intersection %064b\n", forward)
+
+	return forward
 }
 
-var fullMap = map[string]func(int, int, int) bitmap.Bitmap{
+var moveMap = map[string]func(int, int, int) bitmap.Bitmap{
 	// "♙": blackPawn,
 	// "♘": blackKnight,
 	// "♗": blackBishop,
@@ -65,7 +74,6 @@ func parseLoc(loc string) (uint32, int, int, int) {
 // Determines piece type at a given location // Needs a better name
 // Need a better way to do this
 func pieceType(loc uint32) (string, bitmap.Bitmap) {
-	dataplane.TestDataPlane()
 	fmt.Println("HERE")
 	fmt.Println(bitutil.VecToUint(2, 3, 5))
 	//Loading data from current game
@@ -87,6 +95,10 @@ func pieceType(loc uint32) (string, bitmap.Bitmap) {
 func Move(from string, to string) {
 
 	uLocFrom, fX, fY, fZ := parseLoc(from)
+	fmt.Println("FROM")
+	fmt.Printf("uLoc: %d | x: %d | y: %d | z: %d", uLocFrom, fX, fY, fZ)
+	dataplane.TestDataPlane(fX, fY, fZ)
+
 	visFrom, bmFrom := pieceType(uLocFrom)
 	if visFrom == "" {
 		logger.Error(fmt.Sprintf("Could not find piece at location %v", from))
@@ -94,10 +106,13 @@ func Move(from string, to string) {
 	}
 
 	// logger.Info(fmt.Sprintf("%v", parseLoc(to)))
-	uintLocTo, _, _, _ := parseLoc(to)
+	uintLocTo, tX, tY, tZ := parseLoc(to)
+	fmt.Println("TO")
+	fmt.Printf("uLoc: %d | x: %d | y: %d | z: %d", uintLocTo, tX, tY, tZ)
 	visTo, bmTo := pieceType(uintLocTo)
 
-	moveFunction := fullMap[visFrom]
+	//visFrom encodes the type of piece, and thus the move function we use to generate all possible moves
+	moveFunction := moveMap[visFrom]
 
 	if moveFunction == nil {
 		logger.Error(fmt.Sprintf("Unknown piece [%v]", visFrom))

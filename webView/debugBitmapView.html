@@ -179,6 +179,7 @@ const engine = new BABYLON.Engine(canvas, true);
 
 let scene;
 let voxelParent;
+let axisParent;
 let highlightBox;
 
 function createScene() {
@@ -214,6 +215,7 @@ function createScene() {
     light2.intensity = 0.8;
 
     voxelParent = new BABYLON.TransformNode("voxels", scene);
+    axisParent = new BABYLON.TransformNode("axes", scene);
 
     return scene;
 }
@@ -263,6 +265,10 @@ function clearHighlight() {
     }
 }
 
+function clearAxes() {
+    axisParent.getChildren().forEach(mesh => mesh.dispose());
+}
+
 function parseBitmap(input) {
     input = (input || '').replace(/[\[\]\s]/g, '');
 
@@ -306,6 +312,64 @@ function chooseMaterial(state) {
     }
 }
 
+function getViewerPosition(x, y, z) {
+    return {
+        x: x,
+        y: 7 - y,
+        z: z
+    };
+}
+
+function getIndexFromCoords(x, y, z) {
+    return x + y * 8 + z * 64;
+}
+
+function getCoordsFromIndex(index) {
+    const x = index % 8;
+    const y = Math.floor(index / 8) % 8;
+    const z = Math.floor(index / 64);
+    return { x, y, z };
+}
+
+function drawAxes() {
+    clearAxes();
+
+    const origin = new BABYLON.Vector3(0, 0, 0);
+    const xEnd = new BABYLON.Vector3(7, 0, 0);
+    const yEnd = new BABYLON.Vector3(0, 7, 0);
+    const zEnd = new BABYLON.Vector3(0, 0, 7);
+
+    const makeLine = (name, start, end, color) => {
+        const line = BABYLON.MeshBuilder.CreateLines(name, { points: [start, end] }, scene);
+        line.color = color;
+        line.parent = axisParent;
+        return line;
+    };
+
+    const makeTip = (name, position, color) => {
+        const sphere = BABYLON.MeshBuilder.CreateSphere(name, { diameter: 0.2 }, scene);
+        const mat = new BABYLON.StandardMaterial(name + "Mat", scene);
+        mat.diffuseColor = color;
+        mat.emissiveColor = color;
+        sphere.material = mat;
+        sphere.position.copyFrom(position);
+        sphere.parent = axisParent;
+        return sphere;
+    };
+
+    makeLine("axisX", origin, xEnd, new BABYLON.Color3(1, 0, 0));
+    makeLine("axisY", origin, yEnd, new BABYLON.Color3(0, 1, 0));
+    makeLine("axisZ", origin, zEnd, new BABYLON.Color3(0, 0, 1));
+
+    makeTip("axisXTip", xEnd, new BABYLON.Color3(1, 0, 0));
+    makeTip("axisYTip", yEnd, new BABYLON.Color3(0, 1, 0));
+    makeTip("axisZTip", zEnd, new BABYLON.Color3(0, 0, 1));
+
+    axisParent.position.x = -3.5;
+    axisParent.position.y = -3.5;
+    axisParent.position.z = -3.5;
+}
+
 function renderBitmap() {
     clearVoxels();
     clearHighlight();
@@ -343,9 +407,10 @@ function renderBitmap() {
                     scene
                 );
 
-                box.position.x = col * spacing;
-                box.position.y = 7 - row;
-                box.position.z = layer * spacing;
+                const pos = getViewerPosition(col, row, layer);
+                box.position.x = pos.x * spacing;
+                box.position.y = pos.y * spacing;
+                box.position.z = pos.z * spacing;
 
                 box.material = chooseMaterial(state);
                 box.parent = voxelParent;
@@ -355,13 +420,11 @@ function renderBitmap() {
         }
     }
 
+    drawAxes();
+
     voxelParent.position.x = -3.5;
     voxelParent.position.y = -3.5;
     voxelParent.position.z = -3.5;
-}
-
-function getIndexFromCoords(x, y, z) {
-    return z * 64 + y * 8 + x;
 }
 
 function testPosition() {
@@ -409,18 +472,17 @@ function testPosition() {
         material.emissiveColor = new BABYLON.Color3(1, 1, 0);
         material.alpha = 0.9;
 
-        const xPos = index % 8;
-        const yPos = Math.floor(index / 8) % 8;
-        const zPos = Math.floor(index / 64);
+        const pos = getCoordsFromIndex(index);
+        const viewerPos = getViewerPosition(pos.x, pos.y, pos.z);
 
         highlightBox = BABYLON.MeshBuilder.CreateBox(
             "highlightBox",
             { size: 1.02 },
             scene
         );
-        highlightBox.position.x = xPos;
-        highlightBox.position.y = 7 - yPos;
-        highlightBox.position.z = zPos;
+        highlightBox.position.x = viewerPos.x;
+        highlightBox.position.y = viewerPos.y;
+        highlightBox.position.z = viewerPos.z;
         highlightBox.material = material;
         highlightBox.parent = voxelParent;
 

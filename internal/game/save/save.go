@@ -5,6 +5,7 @@ import (
 	"3DC/util/metadata"
 	"3DC/util/must"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -29,4 +30,15 @@ func SavePieceType(vis string, bm bitmap.Bitmap) {
 	fmt.Println(fileLoc)
 	file := must.Must(os.Create(fileLoc))
 	bm.WriteTo(file)
+}
+
+func SaveDebugBoard(str string, location string) {
+	os.Mkdir(location, 0644) //Owner can rxw but everyone else can only r
+	fileLoc := filepath.Join(location, "DebugBoardState")
+	// file := must.Must(os.Create(fileLoc))
+	err := os.WriteFile(fileLoc, []byte(str), 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// bm.WriteTo(file)
 }

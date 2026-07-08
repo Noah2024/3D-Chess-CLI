@@ -14,7 +14,7 @@ func LoadGame(location string) (data map[string]bitmap.Bitmap, err error) {
 
 	result := make(map[string]bitmap.Bitmap)
 	if _, err := os.Stat(location); os.IsNotExist(err) {
-		logger.Warn("No game currently running, create one with '3DC game new'")
+		logger.Warn("No game currently running, create one with '3DC game new'\n")
 		return nil, err
 	}
 	entries := must.Must(os.ReadDir(location))

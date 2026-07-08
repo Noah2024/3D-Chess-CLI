@@ -1,3 +1,4 @@
+// Planes along with pieces can move are precomputed here for use in move.go
 package dataplane
 
 //Stored here for debug
@@ -7,6 +8,7 @@ package dataplane
 // fmt.Printf("%064b\n", uint64(18446744073709551614))
 import (
 	"3DC/config"
+	"3DC/util/bitutil"
 	"fmt"
 
 	"github.com/kelindar/bitmap"
@@ -57,6 +59,7 @@ func testIndex(bm bitmap.Bitmap, nums []uint32) {
 // Don't even say a god damn word on the atrocious time complexity of this function.
 // Its only meant to be run once EVER, its saying in the source code for reference
 func GenerateAllPlanes() {
+
 	var xzPlane [int(config.LineSize)]bitmap.Bitmap //Set Z
 	for i := 0; i < int(config.LineSize); i++ {
 		plane := GeneratePlane(func(x, y, z int) bool {
@@ -64,6 +67,7 @@ func GenerateAllPlanes() {
 		})
 		xzPlane[i] = plane
 	}
+
 	var xyPlane [int(config.LineSize)]bitmap.Bitmap // Set Y
 	for i := 0; i < int(config.LineSize); i++ {
 		plane := GeneratePlane(func(x, y, z int) bool {
@@ -79,20 +83,20 @@ func GenerateAllPlanes() {
 		})
 		zyPlane[i] = plane
 	}
-	// tmp := xyPlane[2].Clone(nil) // Z
 
-	// tmp.And(xzPlane[1]) // Y
-	// tmp.And(zyPlane[0]) // X
-	// fmt.Println("Please god")
+	tmp := xyPlane[3].Clone(nil) // Z
+	fmt.Printf("tmp: %064b\n", tmp)
+
+	tmp2 := xzPlane[3].Clone(nil) // Y
+	fmt.Printf("tmp2: %064b\n", tmp2)
+
+	tmp3 := zyPlane[3].Clone(nil) // X
+	fmt.Printf("tmp3: %064b\n", tmp3)
+
+	fmt.Println("Please god")
 	// tmp2, _ := tmp.Max()
 	// fmt.Println(tmp2 + 1)
 	// testIndex(tmp, []uint32{0, 1, 2, 3, 4, 5, 6, 7, 8, 63, 64, 65})
-
-	// tmp2 := xyPlane[4].Clone(nil) // Z
-	// tmp2.And(xzPlane[2])          // Y
-	// tmp2.And(zyPlane[1])          // X
-	// tmp3, _ := tmp2.Max()
-	// fmt.Println(tmp3 + 1)
 
 	//Temporary Visual Output
 	// fmt.Println(tmp)
@@ -114,8 +118,8 @@ func GeneratePlane(fn func(x, y, z int) bool) bitmap.Bitmap {
 			for x := 0; x < int(config.LineSize); x++ {
 				if fn(x, y, z) {
 					// fmt.Printf("Letting on %s, %s, %s \n", x, y, z)
-					idx := uint32(((x + 1) + (y)*int(config.LayerSize) + (z)*int(config.LineSize)) - 1)
-					// idx := config.VecToUint(x+1, y+1, z+1) - 1
+					// idx := uint32(((x + 1) + (y)*int(config.LayerSize) + (z)*int(config.LineSize)) - 1)
+					idx := bitutil.VecToUint(x+1, y+1, z+1) - 1
 
 					bm.Set(idx)
 				}
@@ -126,7 +130,7 @@ func GeneratePlane(fn func(x, y, z int) bool) bitmap.Bitmap {
 	return bm
 }
 
-func TestDataPlane() {
+func TestDataPlane(fx int, fy int, fz int) {
 	// XZ plane at y=4
 	GenerateAllPlanes()
 }

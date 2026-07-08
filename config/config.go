@@ -56,7 +56,7 @@ func init() {
 
 	//Data directory storing game states
 	DataDir = filepath.Join(userDir, "3DC/DATA")
-	err := os.MkdirAll(DataDir, 0644)
+	err := os.MkdirAll(DataDir, 755)
 	internalMust("", err)
 
 	//Establishing where the Current Game is
@@ -64,7 +64,7 @@ func init() {
 
 	//Defining where the path to the
 	LogDir = filepath.Join(userDir, "3DC/LOG")
-	err2 := os.MkdirAll(LogDir, 0644)
+	err2 := os.MkdirAll(LogDir, 755)
 	internalMust("", err2)
 
 	//Creating the log file if it dosn't exist
