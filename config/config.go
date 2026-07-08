@@ -56,7 +56,7 @@ func init() {
 
 	//Data directory storing game states
 	DataDir = filepath.Join(userDir, "3DC/DATA")
-	err := os.MkdirAll(DataDir, 755)
+	err := os.MkdirAll(DataDir, 0o755)
 	internalMust("", err)
 
 	//Establishing where the Current Game is
@@ -64,7 +64,7 @@ func init() {
 
 	//Defining where the path to the
 	LogDir = filepath.Join(userDir, "3DC/LOG")
-	err2 := os.MkdirAll(LogDir, 755)
+	err2 := os.MkdirAll(LogDir, 0o755)
 	internalMust("", err2)
 
 	//Creating the log file if it dosn't exist
@@ -77,7 +77,7 @@ func init() {
 
 	//Atomic create //Because otherwise the gap between opening the file and checking its existence
 	//Could technically allow another program to create it
-	f, err3 := os.OpenFile(CurrentLog, os.O_CREATE|os.O_EXCL, 644)
+	f, err3 := os.OpenFile(CurrentLog, os.O_CREATE|os.O_EXCL, 0o755)
 	if err3 != nil {
 		if !os.IsExist(err3) {
 			//Could not find or create log file

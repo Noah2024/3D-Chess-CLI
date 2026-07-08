@@ -14,7 +14,7 @@ import (
 
 // Saves entire board state
 func SaveGame(bmps map[string]bitmap.Bitmap, location string) {
-	os.Mkdir(location, 0644) //Owner can rxw but everyone else can only r
+	os.Mkdir(location, 0o755) //Owner can rwx but everyone else can only r and x
 	metadata.CreateSaveMetaData(location)
 	for key, bm := range bmps {
 		fileLoc := filepath.Join(location, string(key))
@@ -33,10 +33,10 @@ func SavePieceType(vis string, bm bitmap.Bitmap) {
 }
 
 func SaveDebugBoard(str string, location string) {
-	os.Mkdir(location, 0644) //Owner can rxw but everyone else can only r
+	os.Mkdir(location, 0o755) //Owner can rwx but everyone else can only r and x
 	fileLoc := filepath.Join(location, "DebugBoardState")
 	// file := must.Must(os.Create(fileLoc))
-	err := os.WriteFile(fileLoc, []byte(str), 0644)
+	err := os.WriteFile(fileLoc, []byte(str), 0o755)
 	if err != nil {
 		log.Fatal(err)
 	}

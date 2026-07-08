@@ -38,7 +38,7 @@ const (
 )
 
 func init() {
-	logFile, _ := os.OpenFile(config.CurrentLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	logFile, _ := os.OpenFile(config.CurrentLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o755)
 
 	logger = log.New(logFile, "", log.Ldate|log.Ltime|log.Lshortfile)
 	logger.SetFlags(0)
