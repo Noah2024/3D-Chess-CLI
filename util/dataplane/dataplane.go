@@ -1,6 +1,7 @@
 // package dataplane contains pre-generated bitmaps that represent the 3D planes of the board
 // The planes are defined for each axis (X, Y, Z) and are used to determine the possible movements of pieces based on their current positions.
 // Also contained for reference are the functinos used to generate the planes, which are only meant to be run once and are not used at runtime in anyway.
+// Linked here is a desmos 3D reference which corresponds to each of the plnes, to provide a visual representation of each of them; for reference.
 package dataplane
 
 //Stored here for debug
@@ -13,6 +14,7 @@ import (
 	"github.com/kelindar/bitmap"
 )
 
+// 3D reference: https://www.desmos.com/3d/0grqaurrjl
 var YPlane = [8]bitmap.Bitmap{
 	{18446744073709551615, 0, 0, 0, 0, 0, 0, 0},
 	{0, 18446744073709551615, 0, 0, 0, 0, 0, 0},
@@ -24,6 +26,7 @@ var YPlane = [8]bitmap.Bitmap{
 	{0, 0, 0, 0, 0, 0, 0, 18446744073709551615},
 }
 
+// 3D reference: https://www.desmos.com/3d/0gdasoxobg
 var ZPlane = [8]bitmap.Bitmap{
 
 	{255, 255, 255, 255, 255, 255, 255, 255},
@@ -36,6 +39,7 @@ var ZPlane = [8]bitmap.Bitmap{
 	{18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680},
 }
 
+// 3D reference: https://www.desmos.com/3d/umhoakbpz4
 var XPlane = [8]bitmap.Bitmap{
 	{72340172838076673, 72340172838076673, 72340172838076673, 72340172838076673, 72340172838076673, 72340172838076673, 72340172838076673, 72340172838076673},
 	{144680345676153346, 144680345676153346, 144680345676153346, 144680345676153346, 144680345676153346, 144680345676153346, 144680345676153346, 144680345676153346},
