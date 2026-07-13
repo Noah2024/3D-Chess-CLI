@@ -1,4 +1,5 @@
-// Embedded config values
+// Static config used to set certian game wide defaults at compile time.\n
+// Loaded into bitutil at runtime, which is intern loaded when a game is loaded
 package config
 
 import (

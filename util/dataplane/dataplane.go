@@ -1,10 +1,9 @@
-// Planes along with pieces can move are precomputed here for use in move.go
+// package dataplane contains pre-generated bitmaps that represent the 3D planes of the board
+// The planes are defined for each axis (X, Y, Z) and are used to determine the possible movements of pieces based on their current positions.
+// Also contained for reference are the functinos used to generate the planes, which are only meant to be run once and are not used at runtime in anyway.
 package dataplane
 
 //Stored here for debug
-//TO DO LIST
-//Figure out how dependencies will work for this system
-//Refactor config to take advantage of dataplanes
 // fmt.Printf("%064b\n", uint64(18446744073709551614))
 import (
 	"3DC/config"
@@ -83,28 +82,7 @@ func GenerateAllPlanes() {
 		})
 		zyPlane[i] = plane
 	}
-
-	tmp := xyPlane[3].Clone(nil) // Z
-	fmt.Printf("tmp: %064b\n", tmp)
-
-	tmp2 := xzPlane[3].Clone(nil) // Y
-	fmt.Printf("tmp2: %064b\n", tmp2)
-
-	tmp3 := zyPlane[3].Clone(nil) // X
-	fmt.Printf("tmp3: %064b\n", tmp3)
-
 	fmt.Println("Please god")
-	// tmp2, _ := tmp.Max()
-	// fmt.Println(tmp2 + 1)
-	// testIndex(tmp, []uint32{0, 1, 2, 3, 4, 5, 6, 7, 8, 63, 64, 65})
-
-	//Temporary Visual Output
-	// fmt.Println(tmp)
-	// fmt.Println(xzPlane) //Y
-	// fmt.Println("{{{}}}")
-	// fmt.Println(xyPlane) //Z
-	// fmt.Println("{{{}}}")
-	// fmt.Println(zyPlane) //X
 }
 
 func GeneratePlane(fn func(x, y, z int) bool) bitmap.Bitmap {
@@ -130,7 +108,7 @@ func GeneratePlane(fn func(x, y, z int) bool) bitmap.Bitmap {
 	return bm
 }
 
-func TestDataPlane(fx int, fy int, fz int) {
+func TestDataPlane() {
 	// XZ plane at y=4
 	GenerateAllPlanes()
 }

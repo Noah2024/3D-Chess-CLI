@@ -20,8 +20,6 @@ const (
 	SpaceSize = config.SpaceSize
 )
 
-const datapath = "../../data"
-
 var wg sync.WaitGroup
 
 // May need to change this depdent on size
@@ -31,7 +29,7 @@ func buildBoardLayer(layerSlice *[8][8]string, bm bitmap.Bitmap, vis string, yLe
 	defer wg.Done()
 	bm.Range(func(index uint32) {
 		X, Y, Z := bitutil.UintToVec(index)
-		if Y == yLevel {
+		if Y-1 == yLevel {
 			layerSlice[Z-1][X-1] = vis
 		}
 	})

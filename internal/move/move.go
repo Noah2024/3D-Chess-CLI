@@ -1,3 +1,5 @@
+// Package move contins the logic for moving pieces. Using the planes from dataplanes.go to generate valid moves then validates them for broken rules
+// This is the largest and most compelx file in the project, due to it being the core gameplay element
 package move
 
 import (
@@ -14,33 +16,36 @@ import (
 	"github.com/kelindar/bitmap"
 )
 
-// /BIG NOTE TO SELF 6/24/2026
-// BOth the forwards and backwards appear to generate the same side to side movement, not sure why
-func rookMove(x int, y int, z int) bitmap.Bitmap {
+//To Do
+// - Need to go through a better log regiment for all the moves
+// - Need to build out a test suite to ensure that moves don't break with new updates
 
-	fmt.Printf("X: %064b\n", dataplane.XPlane[6])
-	fmt.Printf("Y: %064b\n", dataplane.YPlane[2])
-	fmt.Printf("Z: %064b\n", dataplane.ZPlane[0])
+// BIG NOTE TO SELF 7/13/2026
+// uintLoc is ONE indexed, meanwhile the bitmap  is ZERO indexed, hence the fuckywucky -1's everywhere
+// So every use of Set, Contains, Remove, etc. needs to be -1 from the uintLoc value
 
-	forward := dataplane.XPlane[x-1].Clone(nil)
+// rookMove contains the bitwise operations necessary to generate all possible moves for a rook piece
+// it takes x y and z integer cooridnates and outputs a size 511 bitmap all ones of which represent possible moves
+// inputs: x, y, z int | outputs: bitmap.Bitmap
+func rookMove(x int, y int, z int) bitmap.Bitmap { // Will parallelize with go rountine
+
+	forward := dataplane.XPlane[x-1].Clone(nil) //-2
 	forward.And(dataplane.ZPlane[z-1])
 
 	sideToSide := dataplane.YPlane[y-1].Clone(nil)
-	sideToSide.And(dataplane.XPlane[x-1])
+	sideToSide.And(dataplane.XPlane[x-1]) //-2
 
 	upAndDown := dataplane.YPlane[y-1].Clone(nil)
 	upAndDown.And(dataplane.ZPlane[z-1])
 
-	// fmt.Printf("Forward %064b\n", upAndDown)
-	fmt.Printf("Forward %064b\n", forward)
-
 	forward.Or(upAndDown)
 	forward.Or(sideToSide)
-	fmt.Printf("Intersection %064b\n", forward)
-
+	// fmt.Printf("Intersection %064b\n", forward)
 	return forward
 }
 
+// moveMap matches a pieces visual representation to the function that generates all possible moves for that piece
+// inputs: string | outputs: function(int, int, int) bitmap.Bitmap
 var moveMap = map[string]func(int, int, int) bitmap.Bitmap{
 	// "♙": blackPawn,
 	// "♘": blackKnight,
@@ -60,23 +65,22 @@ var moveMap = map[string]func(int, int, int) bitmap.Bitmap{
 //X               Z               Y
 //a b c d e f g - 1 2 3 4 5 6 7 8 - A B C D E F G
 
-// turns the user friendly a1A to uint32 location vector
+// parseLoc turns the user friendly notation input by the user (e.g., "a1A") to a uint32 index which represents that location in the bitmap
+// inputs: string | outputs: uint32, x, y, z
 func parseLoc(loc string) (uint32, int, int, int) {
 
 	if len(loc) != 3 {
 		logger.Error(fmt.Sprintf("Could not parse location '%v' - invalid length of string", loc))
 	}
-	x, z, y := int(loc[0]-'a'+1), int(loc[1]-'1'+1), int(loc[2]-'A') //THIS ALSO NEEDS BETTER BOUNDS CHECKING
+	x, z, y := int(loc[0]-'a'+1), int(loc[1]-'1'+1), int(loc[2]-'A'+1)
 
 	return bitutil.VecToUint(x, y, z), x, y, z //bitutil.VecToUint(x, y, z)
 }
 
-// Determines piece type at a given location // Needs a better name
-// Need a better way to do this
+// Determines peice type
+// inputs uint32 location | outputs: string, bitmap.Bitmap (bitmap )
 func pieceType(loc uint32) (string, bitmap.Bitmap) {
-	fmt.Println("HERE")
-	fmt.Println(bitutil.VecToUint(2, 3, 5))
-	//Loading data from current game
+
 	allPieces, _ := load.LoadGame(config.CurrentGame)
 
 	//Contains is simd vectorized, I don't feel the need to optimize this search
@@ -91,13 +95,14 @@ func pieceType(loc uint32) (string, bitmap.Bitmap) {
 	return "", bitmap.Bitmap{}
 }
 
-// This no work, recheck how the bitmaps contain each of the pieces
+// Move is the standard function to move one piece to another location.
+// It takes the user friendly notation of the from and to locations, parses them into uint32 locations, and then checks if the move is valid for that piece type.
+// If it is valid, it updates the bitmaps for both pieces and saves the game state.
+// inputs: from string, to string | outputs: none
 func Move(from string, to string) {
-
 	uLocFrom, fX, fY, fZ := parseLoc(from)
-	fmt.Println("FROM")
-	fmt.Printf("uLoc: %d | x: %d | y: %d | z: %d", uLocFrom, fX, fY, fZ)
-	dataplane.TestDataPlane(fX, fY, fZ)
+	// fmt.Println("FROM")
+	// fmt.Printf("uLoc: %d | x: %d | y: %d | z: %d", uLocFrom, fX, fY, fZ)
 
 	visFrom, bmFrom := pieceType(uLocFrom)
 	if visFrom == "" {
@@ -106,9 +111,9 @@ func Move(from string, to string) {
 	}
 
 	// logger.Info(fmt.Sprintf("%v", parseLoc(to)))
-	uintLocTo, tX, tY, tZ := parseLoc(to)
-	fmt.Println("TO")
-	fmt.Printf("uLoc: %d | x: %d | y: %d | z: %d", uintLocTo, tX, tY, tZ)
+	uintLocTo, _, _, _ := parseLoc(to)
+	// fmt.Println("TO")
+	// fmt.Printf("uLoc: %d | x: %d | y: %d | z: %d \n", uintLocTo, tX, tY, tZ)
 	visTo, bmTo := pieceType(uintLocTo)
 
 	//visFrom encodes the type of piece, and thus the move function we use to generate all possible moves
@@ -120,12 +125,33 @@ func Move(from string, to string) {
 
 	allMoves := moveFunction(fX, fY, fZ)
 
-	if !(allMoves.Contains(uintLocTo)) {
+	// uintLoc is a 1-based board coordinate.
+	// bitmap.Bitmap uses 0-based bit indices.
+	// Move generation already outputs bitmap indices, but
+	// external board locations need conversion before use in bitmap.
+	if !(allMoves.Contains(uintLocTo - 1)) {
+		fmt.Printf("From %d | To %d \n", uLocFrom, uintLocTo)
 		logger.Error(fmt.Sprintf("Piece %v cannot move in that way", visFrom))
 	}
 
-	//Updates bitmap of piece being moved
-	bmFrom.Remove(uLocFrom)
+	//Now, the fun part is that for some ungodly reason, the usage of Remove and Set here DON'T require that -1 offset
+	//Why? you may ask, no fucking clue.
+
+	//Updates bitmap of piece being moved - does not validate if move is legal
+	atomicMove(uLocFrom, uintLocTo, visTo, visFrom, bmFrom, bmTo)
+
+	logger.Warn("Aint no way bro")
+
+}
+
+// atomicMove instantly moves a piece from one location to another without any validation or checks.
+// It is only used in practice from within a validated move funciton, and should only be used for debugging elsehwere
+// So many variables are needed becuase no state is stored in the compiled binary itself, and thus the piece must be updated here for changes to take effect.
+// inputs: from string, to string | outputs: none
+func atomicMove(uintLocFrom uint32, uintLocTo uint32, visTo string, visFrom string, bmFrom bitmap.Bitmap, bmTo bitmap.Bitmap) {
+
+	logger.Warn("Atomic move called")
+	bmFrom.Remove(uintLocFrom)
 	bmFrom.Set(uintLocTo)
 
 	//Updates bitmap (if it exists) of piece being taken
@@ -140,6 +166,4 @@ func Move(from string, to string) {
 	if visTo != "" {
 		save.SavePieceType(visTo, bmTo)
 	}
-
-	logger.Warn("Aint no way bro")
 }
