@@ -29,6 +29,7 @@ import (
 // inputs: x, y, z int | outputs: bitmap.Bitmap
 func rookMove(x int, y int, z int) bitmap.Bitmap { // Will parallelize with go rountine
 
+	logger.Debug(fmt.Sprintf("Generating all possible rook moves from :x: %d, y: %d, z: %d", x, y, z))
 	forward := dataplane.XPlane[x-1].Clone(nil) //-2
 	forward.And(dataplane.ZPlane[z-1])
 
@@ -87,7 +88,7 @@ func pieceType(loc uint32) (string, bitmap.Bitmap) {
 	for meta, bm := range allPieces {
 
 		if bm.Contains(loc) {
-			logger.Info(meta)
+			// logger.Info(meta)
 			return meta, bm
 		}
 
@@ -99,10 +100,12 @@ func pieceType(loc uint32) (string, bitmap.Bitmap) {
 // It takes the user friendly notation of the from and to locations, parses them into uint32 locations, and then checks if the move is valid for that piece type.
 // If it is valid, it updates the bitmaps for both pieces and saves the game state.
 // inputs: from string, to string | outputs: none
-func Move(from string, to string) {
+func MoveCommand(from string, to string) {
 	uLocFrom, fX, fY, fZ := parseLoc(from)
 	// fmt.Println("FROM")
-	// fmt.Printf("uLoc: %d | x: %d | y: %d | z: %d", uLocFrom, fX, fY, fZ)
+	logger.Debug(fmt.Sprintf("Move called from %v to %v", from, to))
+
+	logger.Debug(fmt.Sprintf("uLoc: %d | x: %d | y: %d | z: %d", uLocFrom, fX, fY, fZ))
 
 	visFrom, bmFrom := pieceType(uLocFrom)
 	if visFrom == "" {
@@ -140,7 +143,7 @@ func Move(from string, to string) {
 	//Updates bitmap of piece being moved - does not validate if move is legal
 	atomicMove(uLocFrom, uintLocTo, visTo, visFrom, bmFrom, bmTo)
 
-	logger.Warn("Aint no way bro")
+	logger.Info("Piece Moved Successfully!")
 
 }
 
@@ -150,7 +153,6 @@ func Move(from string, to string) {
 // inputs: from string, to string | outputs: none
 func atomicMove(uintLocFrom uint32, uintLocTo uint32, visTo string, visFrom string, bmFrom bitmap.Bitmap, bmTo bitmap.Bitmap) {
 
-	logger.Warn("Atomic move called")
 	bmFrom.Remove(uintLocFrom)
 	bmFrom.Set(uintLocTo)
 

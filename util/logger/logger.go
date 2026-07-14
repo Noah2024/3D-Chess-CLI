@@ -5,6 +5,7 @@ import (
 	"3DC/config"
 	"3DC/util/color"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -37,6 +38,13 @@ const (
 	LstdFlags     = Ldate | Ltime // initial values for the standard logger
 )
 
+// Setting up io writer so that the logger can be used later in test cases, or redirected for other purposes
+var output io.Writer = os.Stdout
+
+func SetOutput(w io.Writer) {
+	output = w
+}
+
 func init() {
 	logFile, _ := os.OpenFile(config.CurrentLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o755)
 
@@ -57,34 +65,34 @@ func metadata() string {
 func Debug(msg string) {
 	logger.Print("DEBUG: " + metadata() + msg)
 	if LogLevel <= 0 {
-		fmt.Println(color.ColorText("DEBUG: "+msg, color.CLR))
+		fmt.Fprintln(output, color.ColorText("DEBUG: "+msg, color.CLR))
 	}
 }
 
 func Info(msg string) {
 	logger.Print("INFO: " + metadata() + msg)
 	if LogLevel <= 1 {
-		fmt.Println(color.ColorText("INFO: "+msg, color.Blue))
+		fmt.Fprintln(output, color.ColorText("INFO: "+msg, color.Blue))
 	}
 }
 
 func Warn(msg string) {
 	logger.Print("WARN: " + metadata() + msg)
 	if LogLevel <= 2 {
-		fmt.Print(color.ColorText("WARN: "+msg, color.Yellow))
+		fmt.Fprint(output, color.ColorText("WARN: "+msg, color.Yellow))
 	}
 }
 
 func Error(msg string) {
 	logger.Print("ERROR: " + metadata() + msg)
 	if LogLevel <= 3 {
-		fmt.Print(color.ColorText("ERROR: "+msg, color.Red))
+		fmt.Fprint(output, color.ColorText("ERROR: "+msg, color.Red))
 	}
-	os.Exit(1)
+	// os.Exit(1)
 }
 
 func Fatal(msg string) {
 	logger.Print("FATAL: " + metadata() + msg)
-	fmt.Println(color.ColorText("ERROR: "+msg, color.Red))
-	os.Exit(1)
+	fmt.Fprintln(output, color.ColorText("FATAL: "+msg, color.Purple))
+	// os.Exit(1)
 }

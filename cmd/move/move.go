@@ -13,7 +13,7 @@ func MoveCommand() *cobra.Command {
 		Long:  "Takes two arguments, location of piece to be moved, location of where to move it",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			move.Move(args[0], args[1])
+			move.MoveCommand(args[0], args[1])
 			return nil
 		},
 	}

@@ -4,7 +4,6 @@ package new
 import (
 	"3DC/internal/game/save"
 	"3DC/util/logger"
-	"fmt"
 
 	"3DC/config"
 	"3DC/util/bitutil"
@@ -24,11 +23,11 @@ var UintToVec = bitutil.UintToVec
 
 // Generates new board with a hardcoded start state as a series of len 512 bitmaps
 func NewCommand() {
-	logger.Warn("Running New Command Now")
+	logger.Debug("Running New Command Now")
 	var whitePawn bitmap.Bitmap
 
 	whitePawn.Grow(BoardSize - 1)
-	logger.Warn(fmt.Sprintf("Presave len: %d", len(whitePawn)))
+	// logger.Debug(fmt.Sprintf("Presave len: %d", len(whitePawn)))
 
 	for i := 1; i <= 8; i++ {
 		whitePawn.Set(VecToUint(i, 3, 2))
