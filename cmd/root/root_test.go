@@ -2,6 +2,7 @@ package root_test
 
 import (
 	"3DC/cmd/root"
+	"3DC/util/logger"
 	"bytes"
 	"testing"
 )
@@ -14,6 +15,8 @@ func TestRootCommand(t *testing.T) {
 	var stdout bytes.Buffer
 	cmd.SetOut(&stdout)
 
+	logger.SetOutput(&stdout)
+
 	//set args
 
 	//execute the root command w/ args
@@ -23,7 +26,7 @@ func TestRootCommand(t *testing.T) {
 	}
 
 	//check the output
-	expectedOutput := "bruh"
+	expectedOutput := `[34mINFO: Init root command[0m` + "\n"
 	if stdout.String() != expectedOutput {
 		t.Errorf("Expected output: %q, but got: %q", expectedOutput, stdout.String())
 	}

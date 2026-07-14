@@ -4,7 +4,6 @@ import (
 	"3DC/config"
 	"3DC/util/metadata"
 	"3DC/util/must"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -25,9 +24,9 @@ func SaveGame(bmps map[string]bitmap.Bitmap, location string) {
 
 // Saves state for only one pieceType (lowkey need a better name)
 func SavePieceType(vis string, bm bitmap.Bitmap) {
-	fmt.Println(vis)
+	// fmt.Println(vis)
 	fileLoc := filepath.Join(config.CurrentGame, vis)
-	fmt.Println(fileLoc)
+	// fmt.Println(fileLoc)
 	file := must.Must(os.Create(fileLoc))
 	bm.WriteTo(file)
 }

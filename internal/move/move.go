@@ -133,7 +133,7 @@ func MoveCommand(from string, to string) {
 	// Move generation already outputs bitmap indices, but
 	// external board locations need conversion before use in bitmap.
 	if !(allMoves.Contains(uintLocTo - 1)) {
-		fmt.Printf("From %d | To %d \n", uLocFrom, uintLocTo)
+		// fmt.Printf("From %d | To %d \n", uLocFrom, uintLocTo)
 		logger.Error(fmt.Sprintf("Piece %v cannot move in that way", visFrom))
 	}
 

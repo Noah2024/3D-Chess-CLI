@@ -2,6 +2,7 @@ package board_test
 
 import (
 	"3DC/cmd/board"
+	"3DC/util/logger"
 	"bytes"
 	"testing"
 )
@@ -14,15 +15,17 @@ func TestLSCmd(t *testing.T) {
 	var stdout bytes.Buffer
 	cmd.SetOut(&stdout)
 
+	logger.SetOutput(&stdout)
+
 	//Pass Arguments
-	cmd.SetArgs([]string{"Printing Board now"})
+	// cmd.SetArgs([]string{"Printing Board now"})
 
 	//Execute the command
 	if err := cmd.Execute(); err != nil {
 		t.Errorf("Unexpected error at ls %v", err)
 	}
 
-	expectedOutput := "Testing args Printing Board now"
+	expectedOutput := `[34mINFO: Calling Board command[0m` + "\n"
 	if expectedOutput != stdout.String() {
 		t.Errorf("Expected output: %q, but got: %q", expectedOutput, stdout.String())
 	}

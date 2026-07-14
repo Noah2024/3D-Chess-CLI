@@ -17,7 +17,7 @@ func RootCommand() *cobra.Command {
 		Short: "Root command for 3d chess",
 		Long:  "3DC is exactly as the name implies a CLI application for running 3D games of chess",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logger.Debug("Init root command")
+			logger.Info("Init root command")
 			return nil
 		},
 	}
