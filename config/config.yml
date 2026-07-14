@@ -1,3 +1,6 @@
+// Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
+
+
 #Still deciding on how best to do config, for no im mostly using the go file 
 #But I'll get a better way to handle this in the future
 # A simple configuration file

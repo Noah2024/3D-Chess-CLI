@@ -1,3 +1,5 @@
+// Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
+
 // Package move_test contains test cases for each piece movments, it relies on new and view commands to properly validate movement.
 // New and delete commands must also pass test cases for this test to be accurate.
 package move_test

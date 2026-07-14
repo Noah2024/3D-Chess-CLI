@@ -1,3 +1,5 @@
+// Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
+
 // Hardcoded creation of a default board game state
 package new
 

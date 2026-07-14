@@ -1,3 +1,5 @@
+// Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
+// Copyright 2026 Your Company Name
 // package dataplane contains pre-generated bitmaps that represent the 3D planes of the board
 // The planes are defined for each axis (X, Y, Z) and are used to determine the possible movements of pieces based on their current positions.
 // Also contained for reference are the functinos used to generate the planes, which are only meant to be run once and are not used at runtime in anyway.

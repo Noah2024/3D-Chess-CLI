@@ -1,3 +1,5 @@
+// Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
+
 // Package move contins the logic for moving pieces. Using the planes from dataplanes.go to generate valid moves then validates them for broken rules
 // This is the largest and most compelx file in the project, due to it being the core gameplay element
 package move
@@ -15,10 +17,6 @@ import (
 
 	"github.com/kelindar/bitmap"
 )
-
-//To Do
-// - Need to go through a better log regiment for all the moves
-// - Need to build out a test suite to ensure that moves don't break with new updates
 
 // BIG NOTE TO SELF 7/13/2026
 // uintLoc is ONE indexed, meanwhile the bitmap  is ZERO indexed, hence the fuckywucky -1's everywhere
@@ -105,7 +103,7 @@ func MoveCommand(from string, to string) {
 	// fmt.Println("FROM")
 	logger.Debug(fmt.Sprintf("Move called from %v to %v", from, to))
 
-	logger.Debug(fmt.Sprintf("uLoc: %d | x: %d | y: %d | z: %d", uLocFrom, fX, fY, fZ))
+	// logger.Debug(fmt.Sprintf("uLoc: %d | x: %d | y: %d | z: %d", uLocFrom, fX, fY, fZ))
 
 	visFrom, bmFrom := pieceType(uLocFrom)
 	if visFrom == "" {
