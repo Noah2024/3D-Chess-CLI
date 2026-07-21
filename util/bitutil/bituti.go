@@ -16,7 +16,7 @@ const (
 )
 
 func VecToUint(x, y, z int) uint32 {
-	return uint32(x + (y-1)*int(LayerSize) + (z-1)*int(LineSize))
+	return uint32(x - 1 + (y-1)*int(LayerSize) + (z-1)*int(LineSize))
 }
 
 // Decodes uint32 position into integer x,y,z position
@@ -28,7 +28,6 @@ func UintToVec(space uint32) (int, int, int) {
 
 	// index = x + y*8 + z*64 essentially decoding this
 	//Step by step removing the largest term at a time
-	space-- // convert to 0-based
 	y := space / LayerSize
 	space %= LayerSize
 	z := space / LineSize
