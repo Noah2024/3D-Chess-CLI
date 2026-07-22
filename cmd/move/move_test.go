@@ -48,25 +48,35 @@ var allTestCases = []MoveTestCase{
 		moveTo:   "a1H",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
-	MoveTestCase{
+	MoveTestCase{ //Ensuring we can't move thorugh pieces
 		moveFrom: "a1H",
+		moveTo:   "a1A",
+		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
+	},
+	MoveTestCase{ //Ensuring we can take enemy pieces
+		moveFrom: "a1H",
+		moveTo:   "a1C",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "a1C",
 		moveTo:   "a1A",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
 	MoveTestCase{
 		moveFrom: "a1A",
-		moveTo:   "a8A",
+		moveTo:   "a7A",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
-	MoveTestCase{
-		moveFrom: "a8A",
-		moveTo:   "h8A",
-		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	MoveTestCase{ //Testing Can't move through friendly pieces
+		moveFrom: "a7A",
+		moveTo:   "a7H",
+		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
 	},
-	MoveTestCase{
-		moveFrom: "h8A",
-		moveTo:   "h1A",
-		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	MoveTestCase{ //Testing Can't TAKE friendly pieces
+		moveFrom: "a7A",
+		moveTo:   "a7C",
+		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
 	},
 }
 
@@ -101,7 +111,7 @@ func TestMoveCommand(t *testing.T) {
 
 		// execute the move command w/ args
 		if err := moveCMD.Execute(); err != nil {
-			t.Errorf("Unexpected error at move %v", err)
+			t.Errorf("Unexpected error moving from %s to %s at move %v", testCase.moveFrom, testCase.moveTo, err)
 			break
 		}
 

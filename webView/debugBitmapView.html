@@ -275,7 +275,7 @@ function clearAxes() {
 function parseBitmap(input) {
     input = (input || '').replace(/[\[\]\s]/g, '');
 
-    if (!input) {
+    if (!input) {511
         return '0'.repeat(512);
     }
 
@@ -324,13 +324,14 @@ function getViewerPosition(x, y, z) {
 }
 
 function getIndexFromCoords(x, y, z) {
-    return x + y * 8 + z * 64;
+    return x + z * 8 + y * 64;
 }
 
 function getCoordsFromIndex(index) {
     const x = index % 8;
-    const y = Math.floor(index / 8) % 8;
-    const z = Math.floor(index / 64);
+    const z = Math.floor(index / 8) % 8;
+    const y = Math.floor(index / 64);
+
     return { x, y, z };
 }
 
@@ -389,9 +390,11 @@ function renderBitmap() {
     const spacing = 1.0;
     let index = 0;
 
-    for (let layer = 0; layer < 8; layer++) {
-        for (let row = 0; row < 8; row++) {
-            for (let col = 0; col < 8; col++) {
+    for (let y = 0; y < 8; y++) {
+        for (let z = 0; z < 8; z++) {
+            for (let x = 0; x < 8; x++) {
+
+                index = x + z * 8 + y * 64;
                 let state = 0;
 
                 if (bitmaps[0][index] === '1') {
@@ -405,12 +408,13 @@ function renderBitmap() {
                 }
 
                 const box = BABYLON.MeshBuilder.CreateBox(
-                    `v_${layer}_${row}_${col}`,
+                    `v_${y}_${z}_${x}`,
                     { size: 0.9 },
                     scene
                 );
 
-                const pos = getViewerPosition(col, row, layer);
+                // const pos = getViewerPosition(col, row, layer);
+                const pos = getViewerPosition(x, y, z);
                 box.position.x = pos.x * spacing;
                 box.position.y = pos.y * spacing;
                 box.position.z = pos.z * spacing;

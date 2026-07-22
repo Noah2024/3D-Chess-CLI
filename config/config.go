@@ -1,6 +1,5 @@
-// Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
-// Copyright 2026 Your Company Name
 // Static config used to set certian game wide defaults at compile time.\n
+
 // Loaded into bitutil at runtime, which is intern loaded when a game is loaded
 package config
 
@@ -11,6 +10,11 @@ import (
 	"path/filepath"
 	"time"
 )
+
+const name = "3DC"
+const year = "2026"
+const version = "0.1.0"
+const author = "Noah Yoder"
 
 // Controls what log level the users sees.
 // All logs are output to LOG dir no matter what

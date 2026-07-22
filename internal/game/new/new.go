@@ -80,7 +80,7 @@ func NewCommand() {
 
 	var blackRook bitmap.Bitmap
 	blackRook.Grow(BoardSize - 1)
-	blackRook.Set(VecToUint(1, 3, 8))
+	blackRook.Set(VecToUint(1, 3, 8)) ///Why?
 	blackRook.Set(VecToUint(8, 3, 8))
 
 	var blackQueen bitmap.Bitmap
@@ -106,6 +106,8 @@ func NewCommand() {
 		"♛": whiteQueen,
 		"♚": whiteKing,
 	}
+	// _, _, all, _ := load.GetFriendsAndEnemies(config.CurrentGame, "♖")
+	// fmt.Printf("ALL %064b\n", all)
 
 	//Need a dialog box for this
 	save.SaveGame(fullMap, config.CurrentGame)

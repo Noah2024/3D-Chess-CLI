@@ -4,6 +4,11 @@ package color
 
 //"\033[31mThis is red text\033[0m"
 
+// ============================= IMPORTANT =============================
+//Test cases EXPECT the use of ASCII escape codes in their espected outputs
+//If changing colors make sure to review test cases as well
+// ============================= IMPORTANT =============================
+
 type COLOR string
 
 const (
@@ -15,7 +20,7 @@ const (
 	Blue   = "\033[34m"
 	Purple = "\033[35m"
 
-	// Background
+	// Background (not really needed, but just in case)
 	BgBlack  = "\033[40m"
 	BgRed    = "\033[41m"
 	BgYellow = "\033[43m"
