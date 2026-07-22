@@ -65,29 +65,29 @@ func testIndex(bm bitmap.Bitmap, nums []uint32) {
 // Its only meant to be run once EVER, its saying in the source code for reference
 func GenerateAllPlanes() {
 
-	var xzPlane [int(config.LineSize)]bitmap.Bitmap //Set Z
-	for i := 0; i < int(config.LineSize); i++ {
-		plane := GeneratePlane(func(x, y, z int) bool {
-			return y == i //Zero indexed
-		})
-		xzPlane[i] = plane
-	}
+	// var xzPlane [int(config.LineSize)]bitmap.Bitmap //Set Z
+	// for i := 0; i < int(config.LineSize); i++ {
+	// 	plane := GeneratePlane(func(x, y, z int) bool {
+	// 		return y == i //Zero indexed
+	// 	})
+	// 	xzPlane[i] = plane
+	// }
 
-	var xyPlane [int(config.LineSize)]bitmap.Bitmap // Set Y
-	for i := 0; i < int(config.LineSize); i++ {
-		plane := GeneratePlane(func(x, y, z int) bool {
-			return z == i //Zero indexed
-		})
-		xyPlane[i] = plane
-	}
+	// var xyPlane [int(config.LineSize)]bitmap.Bitmap // Set Y
+	// for i := 0; i < int(config.LineSize); i++ {
+	// 	plane := GeneratePlane(func(x, y, z int) bool {
+	// 		return z == i //Zero indexed
+	// 	})
+	// 	xyPlane[i] = plane
+	// }
 
-	var zyPlane [int(config.LineSize)]bitmap.Bitmap // Set X
-	for i := 0; i < int(config.LineSize); i++ {
-		plane := GeneratePlane(func(x, y, z int) bool {
-			return x == i //Zero indexed
-		})
-		zyPlane[i] = plane
-	}
+	// var zyPlane [int(config.LineSize)]bitmap.Bitmap // Set X
+	// for i := 0; i < int(config.LineSize); i++ {
+	// 	plane := GeneratePlane(func(x, y, z int) bool {
+	// 		return x == i //Zero indexed
+	// 	})
+	// 	zyPlane[i] = plane
+	// }
 	fmt.Println("Please god")
 }
 
@@ -112,9 +112,4 @@ func GeneratePlane(fn func(x, y, z int) bool) bitmap.Bitmap {
 	}
 	// fmt.Println(bm)
 	return bm
-}
-
-func TestDataPlane() {
-	// XZ plane at y=4
-	GenerateAllPlanes()
 }
