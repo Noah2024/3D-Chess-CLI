@@ -12,6 +12,7 @@ import (
 	"3DC/util/dataplane"
 	"3DC/util/logger"
 	"3DC/util/metadata"
+	"sync"
 
 	"fmt"
 
@@ -22,6 +23,7 @@ var friendPieces bitmap.Bitmap
 var enemyPieces bitmap.Bitmap
 var allPieces bitmap.Bitmap
 var pieceLoadError error
+var wg sync.WaitGroup
 
 // BIG NOTE TO SELF 7/13/2026
 // uintLoc is ONE indexed, meanwhile the bitmap  is ZERO indexed, hence the fuckywucky -1's everywhere
@@ -130,6 +132,35 @@ func restrictMoves(curtPieceUintLoc uint32, moveLine bitmap.Bitmap) bitmap.Bitma
 	return rightHalf
 }
 
+//Strange thing, becuase of how fucking fast this bitmap library is, I think the overhead on the creation of a wait group
+// Is actually SLOWER than just doing all the operations sequentually, though given im only working with one piece and a few test cases
+// And and operating on a differnece of a few miliseconds, im going to wait until after I implment more pieces and thus more test cases
+//Until then this old version will stay here until I can determine a real runtime benefit to using the waitgroup
+// func generateRookMoves(loc uint32, x int, y int, z int) bitmap.Bitmap { // Will parallelize with go rountine
+// 	//Note to self, OK SO, the bitmaps when storing values store an ENTIRE BYTE at a time
+
+// 	// logger.Debug(fmt.Sprintf("Generating all possible rook moves from :x: %d, y: %d, z: %d", x, y, z))
+// 	forward := dataplane.XPlane[x-1].Clone(nil) //-2
+// 	forward.And(dataplane.ZPlane[z-1])
+// 	forward = restrictMoves(loc, forward) //x
+
+// 	sideToSide := dataplane.YPlane[y-1].Clone(nil)
+// 	sideToSide.And(dataplane.XPlane[x-1])       //-2
+// 	sideToSide = restrictMoves(loc, sideToSide) //z
+
+// 	upAndDown := dataplane.YPlane[y-1].Clone(nil)
+// 	upAndDown.And(dataplane.ZPlane[z-1])
+// 	upAndDown = restrictMoves(loc, upAndDown) //y
+
+// 	forward.Or(upAndDown)
+// 	forward.Or(sideToSide)
+// 	// fmt.Printf("All Pieces %064b\n", allPieces) //For Debug
+// 	// fmt.Printf("All Allowed Moves %064b\n", forward) //For Debug
+// 	return forward
+// }
+
+// Go Routine Version
+
 // generateRookMoves contains the bitwise operations necessary to generate all possible moves for a rook piece
 // it takes x y and z integer cooridnates and outputs a size 511 bitmap all ones of which represent possible moves
 // inputs: x, y, z int | outputs: bitmap.Bitmap
@@ -138,17 +169,32 @@ func generateRookMoves(loc uint32, x int, y int, z int) bitmap.Bitmap { // Will 
 
 	// logger.Debug(fmt.Sprintf("Generating all possible rook moves from :x: %d, y: %d, z: %d", x, y, z))
 	forward := dataplane.XPlane[x-1].Clone(nil) //-2
-	forward.And(dataplane.ZPlane[z-1])
-	forward = restrictMoves(loc, forward) //x
-
 	sideToSide := dataplane.YPlane[y-1].Clone(nil)
-	sideToSide.And(dataplane.XPlane[x-1])       //-2
-	sideToSide = restrictMoves(loc, sideToSide) //z
-
 	upAndDown := dataplane.YPlane[y-1].Clone(nil)
-	upAndDown.And(dataplane.ZPlane[z-1])
-	upAndDown = restrictMoves(loc, upAndDown) //y
 
+	wg.Go(
+		func() {
+			forward.And(dataplane.ZPlane[z-1])
+			forward = restrictMoves(loc, forward) //x
+		},
+	)
+
+	wg.Go(
+		func() {
+			sideToSide.And(dataplane.XPlane[x-1])       //-2
+			sideToSide = restrictMoves(loc, sideToSide) //z
+		},
+	)
+
+	// wg.Add(1)
+	wg.Go(
+		func() {
+			upAndDown.And(dataplane.ZPlane[z-1])
+			upAndDown = restrictMoves(loc, upAndDown) //y
+		},
+	)
+
+	wg.Wait()
 	forward.Or(upAndDown)
 	forward.Or(sideToSide)
 	// fmt.Printf("All Pieces %064b\n", allPieces) //For Debug
