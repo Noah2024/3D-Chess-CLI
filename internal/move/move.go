@@ -45,8 +45,8 @@ func removeFriends(allPossibleMoves bitmap.Bitmap) bitmap.Bitmap {
 }
 
 // Takes a given vector of a move and seperates it into right and left halves, before running checks on each half to determine if a piece is intersecting
-// If no piece is present nothing happens and that half is jointed with the other, if its an enemy that piece is included, if it is friendly it is not.
-// All checks are done using bitmap operations
+// If no piece is present nothing happens and that half is jointed with the other, elsewise only the half upto and including the piece that is intersecting
+// Friendly pieces are removed later
 func restrictMoves(curtPieceUintLoc uint32, moveLine bitmap.Bitmap) bitmap.Bitmap {
 	// ==============================================
 	// Seperate both directions of attack vector
@@ -274,14 +274,6 @@ func generateQueenMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 
 	rookMoves.Or(bishopMoves)
 	return rookMoves
-}
-
-// Helper function for generateKnightMove
-func validIndex(index uint32) bool {
-	if index <= 511 {
-		return true
-	}
-	return false
 }
 
 // Hand coded and validated moves for the knight (becuase I can't use a cheeky lil bitmap for it)
