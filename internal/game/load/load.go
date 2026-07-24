@@ -38,17 +38,18 @@ func LoadGame(fileLocation string) (data map[string]bitmap.Bitmap, err error) {
 
 // GetFriendsAndEnemies loops through all the bitmaps returned by LoadGame and using a reference piece determines friendly, & enemy pieces.
 // Defined in load becuase it is indepdendly loading in the board to make this determination
-func GetFriendsAndEnemies(fileLocation string, referencePiece string) (bitmap.Bitmap, bitmap.Bitmap, bitmap.Bitmap, error) {
+func GetFriendsAndEnemies(fileLocation string, referencePiece string) (bitmap.Bitmap, bitmap.Bitmap, bitmap.Bitmap, bitmap.Bitmap, error) {
 	// result := make(map[string]bitmap.Bitmap)
 	if _, err := os.Stat(fileLocation); os.IsNotExist(err) {
 		logger.Warn("No game currently running, create one with '3DC game new'\n")
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	entries := must.Must(os.ReadDir(fileLocation))
 
 	var friendPieces bitmap.Bitmap
 	var enemyPieces bitmap.Bitmap
 	var allPieces bitmap.Bitmap
+	var blackPawns bitmap.Bitmap
 
 	r, _ := utf8.DecodeRuneInString(referencePiece)
 
@@ -74,12 +75,16 @@ func GetFriendsAndEnemies(fileLocation string, referencePiece string) (bitmap.Bi
 		} else {
 			enemyPieces.Or(bm)
 		}
+
+		if vis == "♙" {
+			blackPawns = bm
+		}
 		// fmt.Println(vis)
 		// fmt.Printf("BM FOR %064b\n", bm)
 		allPieces.Or(bm)
 
 	}
-	return friendPieces, enemyPieces, allPieces, nil
+	return friendPieces, enemyPieces, allPieces, blackPawns, nil
 
 }
 

@@ -23,6 +23,7 @@ var friendPieces bitmap.Bitmap
 var enemyPieces bitmap.Bitmap
 var allPieces bitmap.Bitmap
 var pieceLoadError error
+var blackPawns bitmap.Bitmap //Used to determine direction of pawns move dynamically at runtime
 var wg sync.WaitGroup
 
 //Note to self for future development 7/24/2026
@@ -411,16 +412,84 @@ func generateKingMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 	return result
 }
 
+// Hand coded and validated moves for the knight (becuase I can't use a cheeky lil bitmap for it)
+func generatePawnMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
+	// x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing da
+
+	var result bitmap.Bitmap
+	result.Grow(config.BoardSize - 1)
+
+	zOffset := 1
+	if blackPawns.Contains(loc) {
+		zOffset = -1
+	}
+
+	//AI used to speed up the processes of finding all valid permutations
+	var normalMoves = [][]int{
+		{0, 0, zOffset},
+		{0, 1, zOffset},
+		{0, -1, zOffset},
+	}
+
+	var attackingMoves = [][]int{
+		{1, 0, zOffset},
+		{1, 1, zOffset},
+		{1, -1, zOffset},
+		{-1, 0, zOffset},
+		{-1, 1, zOffset},
+		{-1, -1, zOffset},
+	}
+
+	for _, comb := range normalMoves {
+		wg.Go(func() {
+			X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
+
+			if X > 8 || Y > 8 || Z > 8 {
+				return
+			}
+			if X < 1 || Y < 1 || Z < 1 {
+				return
+			}
+			uin := bitutil.VecToUint(X, Y, Z)
+			if !allPieces.Contains(uin) { //Normal moves can only be made if there are no pieces there, ANY
+				result.Set(uin)
+			}
+		})
+	}
+
+	for _, comb := range attackingMoves {
+		wg.Go(func() {
+			X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
+
+			if X > 8 || Y > 8 || Z > 8 {
+				return
+			}
+			if X < 1 || Y < 1 || Z < 1 {
+				return
+			}
+			uin := bitutil.VecToUint(X, Y, Z)
+			if enemyPieces.Contains(uin) { //Attacking moves can only be made if there ARE enemy pieces there
+				result.Set(uin)
+			}
+		})
+	}
+
+	wg.Wait()
+	// fmt.Printf("All Pieces %064b\n", allPieces)
+	// fmt.Printf("Result %064b\n", result)
+	return result
+}
+
 // moveMap matches a pieces visual representation to the function that generates all possible moves for that piece
 // inputs: string | outputs: function(int, int, int) bitmap.Bitmap
 var moveMap = map[string]func(uint32, int, int, int) bitmap.Bitmap{
-	// "♙": blackPawn,
+	"♙": generatePawnMove,
 	"♘": generateKnightMove,
 	"♗": generateBishopMove,
 	"♖": generateRookMoves,
 	"♕": generateQueenMove,
 	"♔": generateKingMove,
-	// "♟": whitePawn,
+	"♟": generatePawnMove,
 	"♞": generateKnightMove,
 	"♝": generateBishopMove,
 	"♜": generateRookMoves,
@@ -477,7 +546,7 @@ func MoveCommand(from string, to string) {
 		return
 	}
 
-	friendPieces, enemyPieces, allPieces, pieceLoadError = load.GetFriendsAndEnemies(config.CurrentGame, visFrom)
+	friendPieces, enemyPieces, allPieces, blackPawns, pieceLoadError = load.GetFriendsAndEnemies(config.CurrentGame, visFrom)
 
 	if pieceLoadError != nil {
 		logger.Error(fmt.Sprintf("Error in determing pieces team %v", pieceLoadError))

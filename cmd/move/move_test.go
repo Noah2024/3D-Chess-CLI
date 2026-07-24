@@ -269,6 +269,58 @@ var allTestCases = []MoveTestCase{
 		reason:   "general movement",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
+	// ============================================
+	// Pawn Test Cases ♙
+	// Will add some taking move checking later
+	// ============================================
+	MoveTestCase{
+		moveFrom: "b7C",
+		moveTo:   "b8C",
+		reason:   "general movement",
+		expected: `[31mERROR: Piece ♙ cannot move in that way[0m`,
+	},
+	MoveTestCase{
+		moveFrom: "b7C",
+		moveTo:   "b6C",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "b6C",
+		moveTo:   "b5C",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "b5C",
+		moveTo:   "b4C",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "b4C",
+		moveTo:   "b3D",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "b3D",
+		moveTo:   "b2D",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "b2D",
+		moveTo:   "c2C",
+		reason:   "pawn forward non attack",
+		expected: `[31mERROR: Piece ♙ cannot move in that way[0m`,
+	},
+	MoveTestCase{
+		moveFrom: "c2C",
+		moveTo:   "c3C",
+		reason:   "pawn angled attack",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
 }
 
 func TestMoveCommand(t *testing.T) {
