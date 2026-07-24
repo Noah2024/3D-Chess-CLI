@@ -22,60 +22,101 @@ import (
 type MoveTestCase struct {
 	moveFrom string
 	moveTo   string
+	reason   string
 	expected string
 }
 
 // Contains all test cases to test for the move command
 // Executed sequentially, so be aware that the state of the board will change after each test case
 var allTestCases = []MoveTestCase{
+	// ============================================
+	// Rook Test Cases
+	// ============================================
 	MoveTestCase{
 		moveFrom: "a8C",
 		moveTo:   "a8H",
+		reason:   "general movment",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
 	MoveTestCase{
 		moveFrom: "a8H",
 		moveTo:   "h8H",
+		reason:   "general movment",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
 	MoveTestCase{
 		moveFrom: "h8H",
 		moveTo:   "h1H",
+		reason:   "general movment",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
 	MoveTestCase{
 		moveFrom: "h1H",
 		moveTo:   "a1H",
+		reason:   "general movment",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
 	MoveTestCase{ //Ensuring we can't move thorugh pieces
 		moveFrom: "a1H",
 		moveTo:   "a1A",
+		reason:   "friendly passthoough",
 		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
 	},
 	MoveTestCase{ //Ensuring we can take enemy pieces
 		moveFrom: "a1H",
 		moveTo:   "a1C",
+		reason:   "taking enemy",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
 	MoveTestCase{
 		moveFrom: "a1C",
 		moveTo:   "a1A",
+		reason:   "general movment",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
 	MoveTestCase{
 		moveFrom: "a1A",
 		moveTo:   "a7A",
+		reason:   "general movment",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
 	MoveTestCase{ //Testing Can't move through friendly pieces
 		moveFrom: "a7A",
 		moveTo:   "a7H",
+		reason:   "friendly passthrough",
 		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
 	},
 	MoveTestCase{ //Testing Can't TAKE friendly pieces
 		moveFrom: "a7A",
 		moveTo:   "a7C",
+		reason:   "friendly protection",
+		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
+	},
+	// ============================================
+	// Bishop Test Cases
+	// ============================================
+	MoveTestCase{ //Testing Can't TAKE friendly pieces
+		moveFrom: "f8C",
+		moveTo:   "g7C",
+		reason:   "friendly protection",
+		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
+	},
+	MoveTestCase{ //Testing Can't TAKE friendly pieces on the other side
+		moveFrom: "f8c",
+		moveTo:   "a7C",
+		reason:   "friendly protection",
+		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
+	},
+	MoveTestCase{ //Testing Can't move thorugh friendly pieces
+		moveFrom: "f8C",
+		moveTo:   "c5C",
+		reason:   "friendly protection",
+		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
+	},
+	MoveTestCase{ //Testing Can't TAKE friendly pieces
+		moveFrom: "f8C",
+		moveTo:   "a7C",
+		reason:   "friendly protection",
 		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
 	},
 }
@@ -117,6 +158,7 @@ func TestMoveCommand(t *testing.T) {
 
 		//check the output
 		if stdout.String() != testCase.expected {
+			t.Errorf("Failed at move check FROM %s TO %s. Failed check type %s", testCase.moveFrom, testCase.moveTo, testCase.reason)
 			t.Errorf("Expected output: %q, but got: %q", testCase.expected, stdout.String())
 			break
 		}
