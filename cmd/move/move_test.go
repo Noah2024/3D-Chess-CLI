@@ -143,6 +143,35 @@ var allTestCases = []MoveTestCase{
 		reason:   "enemy movethrough",
 		expected: `[31mERROR: Piece ♗ cannot move in that way[0m`,
 	},
+	// ============================================
+	// Queen Test Cases
+	// Which are unessary, becuase queen movement is just the bitwise or
+	// Between rook and bishop moves
+	// ============================================
+	// MoveTestCase{
+	// 	moveFrom: "d8C",
+	// 	moveTo:   "d7C",
+	// 	reason:   "friendly protection",
+	// 	expected: `[31mERROR: Piece ♕ cannot move in that way[0m`,
+	// },
+	// MoveTestCase{
+	// 	moveFrom: "d8C",
+	// 	moveTo:   "e8C",
+	// 	reason:   "friendly protection",
+	// 	expected: `[31mERROR: Piece ♕ cannot move in that way[0m`,
+	// },
+	// MoveTestCase{
+	// 	moveFrom: "d8C",
+	// 	moveTo:   "e8C",
+	// 	reason:   "friendly protection",
+	// 	expected: `[31mERROR: Piece ♕ cannot move in that way[0m`,
+	// },
+	// MoveTestCase{
+	// 	moveFrom: "d8C",
+	// 	moveTo:   "d8D",
+	// 	reason:   "general movment",
+	// 	expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	// },
 }
 
 func TestMoveCommand(t *testing.T) {

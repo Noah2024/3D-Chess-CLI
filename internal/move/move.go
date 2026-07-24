@@ -263,6 +263,20 @@ func generateBishopMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 	return cardinalRight
 }
 
+func generateQueenMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
+	// x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing da
+	var bishopMoves bitmap.Bitmap
+	var rookMoves bitmap.Bitmap
+
+	bishopMoves = generateBishopMove(loc, x, y, z)
+	rookMoves = generateRookMoves(loc, x, y, z)
+
+	rookMoves.Or(bishopMoves)
+	fmt.Printf("All Allowed Move %064b\n", rookMoves) //For Debug
+
+	return rookMoves
+}
+
 // moveMap matches a pieces visual representation to the function that generates all possible moves for that piece
 // inputs: string | outputs: function(int, int, int) bitmap.Bitmap
 var moveMap = map[string]func(uint32, int, int, int) bitmap.Bitmap{
@@ -270,13 +284,13 @@ var moveMap = map[string]func(uint32, int, int, int) bitmap.Bitmap{
 	// "♘": blackKnight,
 	"♗": generateBishopMove,
 	"♖": generateRookMoves,
-	// "♕": blackQueen,
+	"♕": generateQueenMove,
 	// "♔": blackKing,
 	// "♟": whitePawn,
 	// "♞": whiteKnight,
 	"♝": generateBishopMove,
 	"♜": generateRookMoves,
-	// "♛": whiteQueen,
+	"♛": generateQueenMove,
 	// "♚": whiteKing,
 }
 
