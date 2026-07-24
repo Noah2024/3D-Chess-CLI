@@ -23,12 +23,16 @@ var friendPieces bitmap.Bitmap
 var enemyPieces bitmap.Bitmap
 var allPieces bitmap.Bitmap
 var pieceLoadError error
-var wg sync.WaitGroup //This waitgroup is used by all of the move generators at differnet times
-//Becuase only one piece is generated at a time this shoudln't cause issues
+var wg sync.WaitGroup
+
+//Note to self for future development 7/24/2026
+//Im noticing some concurrency issues when it comes to seperating out move generation with goroutines
+//This was a given with the bishop but I've begun to see it elsewhere as well
+//In the future I my plan is the leave move generation as sequential, then when I need to generate muliple moves
+//Simply seperate those out and put them in parallel (such as for determining checking)
 
 // BIG NOTE TO SELF 7/13/2026
-// uintLoc is ONE indexed, meanwhile the bitmap  is ZERO indexed, hence the fuckywucky -1's everywhere
-// So every use of Set, Contains, Remove, etc. needs to be -1 from the uintLoc value
+// uintLoc is ONE indexed, meanwhile the bitmap  is ZERO indexed
 
 func removeFriends(allPossibleMoves bitmap.Bitmap) bitmap.Bitmap {
 	// fmt.Printf("ALL POSSIBLE MOVES BEFORE %064b\n", allPossibleMoves)//For Debug
@@ -340,6 +344,73 @@ func generateKnightMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 	return result
 }
 
+// Hand coded and validated moves for the knight (becuase I can't use a cheeky lil bitmap for it)
+func generateKingMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
+	// x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing da
+
+	var result bitmap.Bitmap
+	result.Grow(config.BoardSize - 1)
+
+	//AI used to speed up the processes of finding all valid permutations
+	var allCombs = [][]int{
+		// 0 in the middle
+		{1, 0, 1},
+		{1, 0, -1},
+		{-1, 0, 1},
+		{-1, 0, -1},
+
+		// 0 in the first position
+		{0, 1, 1},
+		{0, 1, -1},
+		{0, -1, 1},
+		{0, -1, -1},
+
+		// 0 in the third position
+		{1, 1, 0},
+		{1, -1, 0},
+		{-1, 1, 0},
+		{-1, -1, 0},
+
+		// All
+		{1, 1, 1},
+		{1, 1, -1},
+		{1, -1, 1},
+		{1, -1, -1},
+		{-1, 1, 1},
+		{-1, 1, -1},
+		{-1, -1, 1},
+		{-1, -1, -1},
+
+		//Permutations w zero
+		{1, 0, 0},
+		{-1, 0, 0},
+		{0, 1, 0},
+		{0, -1, 0},
+		{0, 0, 1},
+		{0, 0, -1},
+	}
+
+	for _, comb := range allCombs {
+		wg.Go(func() {
+			X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
+
+			if X > 8 || Y > 8 || Z > 8 {
+				return
+			}
+			if X < 1 || Y < 1 || Z < 1 {
+				return
+			}
+			result.Set(bitutil.VecToUint(X, Y, Z))
+		})
+	}
+
+	wg.Wait()
+	result = removeFriends(result)
+	// fmt.Printf("All Pieces %064b\n", allPieces)
+	// fmt.Printf("Result %064b\n", result)
+	return result
+}
+
 // moveMap matches a pieces visual representation to the function that generates all possible moves for that piece
 // inputs: string | outputs: function(int, int, int) bitmap.Bitmap
 var moveMap = map[string]func(uint32, int, int, int) bitmap.Bitmap{
@@ -348,13 +419,13 @@ var moveMap = map[string]func(uint32, int, int, int) bitmap.Bitmap{
 	"♗": generateBishopMove,
 	"♖": generateRookMoves,
 	"♕": generateQueenMove,
-	// "♔": blackKing,
+	"♔": generateKingMove,
 	// "♟": whitePawn,
 	"♞": generateKnightMove,
 	"♝": generateBishopMove,
 	"♜": generateRookMoves,
 	"♛": generateQueenMove,
-	// "♚": whiteKing,
+	"♚": generateKingMove,
 }
 
 //Taking input from

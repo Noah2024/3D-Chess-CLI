@@ -178,7 +178,7 @@ var allTestCases = []MoveTestCase{
 	MoveTestCase{
 		moveFrom: "b8C",
 		moveTo:   "b9C",
-		reason:   "general movement",
+		reason:   "friendly protection",
 		expected: `[31mERROR: Piece ♘ cannot move in that way[0m`,
 	},
 	MoveTestCase{
@@ -221,6 +221,52 @@ var allTestCases = []MoveTestCase{
 		moveFrom: "a2E",
 		moveTo:   "a1C",
 		reason:   "taking enemy",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	// ============================================
+	// King Test Cases ♔
+	// Will add some taking move checking later
+	// ============================================
+	MoveTestCase{
+		moveFrom: "e8C",
+		moveTo:   "e7C",
+		reason:   "friendly protection",
+		expected: `[31mERROR: Piece ♔ cannot move in that way[0m`,
+	},
+	MoveTestCase{
+		moveFrom: "e8C",
+		moveTo:   "e7D",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "e7D",
+		moveTo:   "e6D",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "e6D",
+		moveTo:   "e5D",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "e5D",
+		moveTo:   "e4D",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "e4D",
+		moveTo:   "e3D",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "e3D",
+		moveTo:   "f2D",
+		reason:   "general movement",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
 }
