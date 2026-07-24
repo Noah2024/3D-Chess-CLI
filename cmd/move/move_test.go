@@ -172,6 +172,57 @@ var allTestCases = []MoveTestCase{
 	// 	reason:   "general movment",
 	// 	expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	// },
+	// ============================================
+	// Knight Test Cases ♘
+	// ============================================
+	MoveTestCase{
+		moveFrom: "b8C",
+		moveTo:   "b9C",
+		reason:   "general movement",
+		expected: `[31mERROR: Piece ♘ cannot move in that way[0m`,
+	},
+	MoveTestCase{
+		moveFrom: "b8C",
+		moveTo:   "d7C",
+		reason:   "friendly protection",
+		expected: `[31mERROR: Piece ♘ cannot move in that way[0m`,
+	},
+	MoveTestCase{
+		moveFrom: "b8C",
+		moveTo:   "c6C",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "c6C",
+		moveTo:   "d6E",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "d6E",
+		moveTo:   "c4E",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "c4E",
+		moveTo:   "a4F",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "a4F",
+		moveTo:   "a2E",
+		reason:   "general movement",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "a2E",
+		moveTo:   "a1C",
+		reason:   "taking enemy",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
 }
 
 func TestMoveCommand(t *testing.T) {

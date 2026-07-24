@@ -23,7 +23,8 @@ var friendPieces bitmap.Bitmap
 var enemyPieces bitmap.Bitmap
 var allPieces bitmap.Bitmap
 var pieceLoadError error
-var wg sync.WaitGroup
+var wg sync.WaitGroup //This waitgroup is used by all of the move generators at differnet times
+//Becuase only one piece is generated at a time this shoudln't cause issues
 
 // BIG NOTE TO SELF 7/13/2026
 // uintLoc is ONE indexed, meanwhile the bitmap  is ZERO indexed, hence the fuckywucky -1's everywhere
@@ -219,35 +220,30 @@ func generateBishopMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 	//Beuase the cardinal right and left cut thorugh all dimensions however we need to
 	//Use our current Y layer to get them AND becuase of the descructive nature of the .And operation
 	//We need to do so in new bitmaps
-	wg.Go(func() {
 
-		realRight.And(cardinalRight)
-		realLeft.And(cardinalLeft)
-		realRight = restrictMoves(loc, realRight)
-		realLeft = restrictMoves(loc, realLeft)
-	})
+	realRight.And(cardinalRight)
+	realLeft.And(cardinalLeft)
+	realRight = restrictMoves(loc, realRight)
+	realLeft = restrictMoves(loc, realLeft)
 
 	//Again becuase of the descructive nature of .And the ordering of these operations is VERY IMPORTANT
 	//Done in the wrong order one plane could be destroyed before it can be used in a different operation
 	//This means that ALL of these must take place in a single thread
 
-	wg.Go(func() {
-		bottomLeft.And(cardinalLeft)
-		bottomLeft = restrictMoves(loc, bottomLeft) //
+	bottomLeft.And(cardinalLeft)
+	bottomLeft = restrictMoves(loc, bottomLeft) //
 
-		bottomRight.And(cardinalRight)
-		bottomRight = restrictMoves(loc, bottomRight)
+	bottomRight.And(cardinalRight)
+	bottomRight = restrictMoves(loc, bottomRight)
 
-		//After non descructivly using cardinal right and left above
-		//We can use them descrustivly to get the top movements
+	//After non descructivly using cardinal right and left above
+	//We can use them descrustivly to get the top movements
 
-		cardinalRight.And(dataplane.ZY45Plane[-z+y+7].Clone(nil)) // Top Right
-		cardinalLeft.And(dataplane.ZY45Plane[-z+y+7].Clone(nil))  // Top Left
-		cardinalRight = restrictMoves(loc, cardinalRight)
-		cardinalLeft = restrictMoves(loc, cardinalLeft)
-	})
+	cardinalRight.And(dataplane.ZY45Plane[-z+y+7].Clone(nil)) // Top Right
+	cardinalLeft.And(dataplane.ZY45Plane[-z+y+7].Clone(nil))  // Top Left
+	cardinalRight = restrictMoves(loc, cardinalRight)
+	cardinalLeft = restrictMoves(loc, cardinalLeft)
 
-	wg.Wait()
 	//Then Or them all together to form the bishop's moves
 
 	cardinalRight.Or(cardinalLeft)
@@ -259,12 +255,12 @@ func generateBishopMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 	// fmt.Printf("All Pieces %064b\n", allPieces)
 	// fmt.Printf("All Allowed Move, forward)s %064b\n", cardinalRight) //For Debug
 	cardinalRight = removeFriends(cardinalRight)
-
 	return cardinalRight
 }
 
 func generateQueenMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
-	// x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing da
+	// Must not zero index here becuase otherwise that would throw off the move generation
+	// from the generators below
 	var bishopMoves bitmap.Bitmap
 	var rookMoves bitmap.Bitmap
 
@@ -272,22 +268,89 @@ func generateQueenMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 	rookMoves = generateRookMoves(loc, x, y, z)
 
 	rookMoves.Or(bishopMoves)
-	fmt.Printf("All Allowed Move %064b\n", rookMoves) //For Debug
-
 	return rookMoves
+}
+
+// Helper function for generateKnightMove
+func validIndex(index uint32) bool {
+	if index <= 511 {
+		return true
+	}
+	return false
+}
+
+// Hand coded and validated moves for the knight (becuase I can't use a cheeky lil bitmap for it)
+func generateKnightMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
+	// x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing da
+
+	var result bitmap.Bitmap
+	result.Grow(config.BoardSize - 1)
+
+	//AI used to speed up the processes of finding all valid permutations
+	var allCombs = [][]int{
+		// 0 in the middle (original orientation)
+		{2, 0, 1},
+		{2, 0, -1},
+		{1, 0, 2},
+		{1, 0, -2},
+		{-1, 0, 2},
+		{-1, 0, -2},
+		{-2, 0, 1},
+		{-2, 0, -1},
+
+		// 0 in the first position
+		{0, 2, 1},
+		{0, 2, -1},
+		{0, 1, 2},
+		{0, 1, -2},
+		{0, -1, 2},
+		{0, -1, -2},
+		{0, -2, 1},
+		{0, -2, -1},
+
+		// 0 in the third position
+		{2, 1, 0},
+		{2, -1, 0},
+		{1, 2, 0},
+		{1, -2, 0},
+		{-1, 2, 0},
+		{-1, -2, 0},
+		{-2, 1, 0},
+		{-2, -1, 0},
+	}
+
+	for _, comb := range allCombs {
+		wg.Go(func() {
+			X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
+
+			if X > 8 || Y > 8 || Z > 8 {
+				return
+			}
+			if X < 1 || Y < 1 || Z < 1 {
+				return
+			}
+			result.Set(bitutil.VecToUint(X, Y, Z))
+		})
+	}
+
+	wg.Wait()
+	result = removeFriends(result)
+	// fmt.Printf("All Pieces %064b\n", allPieces)
+	// fmt.Printf("Result %064b\n", result)
+	return result
 }
 
 // moveMap matches a pieces visual representation to the function that generates all possible moves for that piece
 // inputs: string | outputs: function(int, int, int) bitmap.Bitmap
 var moveMap = map[string]func(uint32, int, int, int) bitmap.Bitmap{
 	// "♙": blackPawn,
-	// "♘": blackKnight,
+	"♘": generateKnightMove,
 	"♗": generateBishopMove,
 	"♖": generateRookMoves,
 	"♕": generateQueenMove,
 	// "♔": blackKing,
 	// "♟": whitePawn,
-	// "♞": whiteKnight,
+	"♞": generateKnightMove,
 	"♝": generateBishopMove,
 	"♜": generateRookMoves,
 	"♛": generateQueenMove,
