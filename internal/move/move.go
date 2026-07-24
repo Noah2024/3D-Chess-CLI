@@ -29,24 +29,13 @@ var wg sync.WaitGroup
 // uintLoc is ONE indexed, meanwhile the bitmap  is ZERO indexed, hence the fuckywucky -1's everywhere
 // So every use of Set, Contains, Remove, etc. needs to be -1 from the uintLoc value
 
-// Helper fucntion to determine offset from intersected pieces during restriction of moves
-// When calculating wether a move is restricted or not we need to determine wether or not to include it
-// Becuase right and left (positive and negative) sides of a move line are calculated differnetly, we need to know which side were dealing with
-// in order to correctly offset it
-func teamOffset(foundPieceLocation uint32, isRight bool) uint32 {
-	if enemyPieces.Contains(foundPieceLocation) {
-		if isRight {
-			return foundPieceLocation + 1
-		} else { //isLeft
-			return foundPieceLocation - 1
-		}
-	} else {
-		if isRight {
-			return foundPieceLocation - 1
-		} else { //isLeft
-			return foundPieceLocation + 1
-		}
-	}
+func removeFriends(allPossibleMoves bitmap.Bitmap) bitmap.Bitmap {
+	// fmt.Printf("ALL POSSIBLE MOVES BEFORE %064b\n", allPossibleMoves)//For Debug
+	result := allPossibleMoves.Clone(nil)
+	result.Xor(friendPieces)
+	result.And(allPossibleMoves)
+	// fmt.Printf("ALL POSSIBLE MOVES AFTER %064b\n", allPossibleMoves)//For Debug
+	return result
 }
 
 // Takes a given vector of a move and seperates it into right and left halves, before running checks on each half to determine if a piece is intersecting
@@ -56,6 +45,8 @@ func restrictMoves(curtPieceUintLoc uint32, moveLine bitmap.Bitmap) bitmap.Bitma
 	// ==============================================
 	// Seperate both directions of attack vector
 	// ==============================================
+
+	// fmt.Printf("Move line %064b \n", moveLine)
 
 	var leftMask bitmap.Bitmap
 	var rightHalf bitmap.Bitmap
@@ -84,6 +75,7 @@ func restrictMoves(curtPieceUintLoc uint32, moveLine bitmap.Bitmap) bitmap.Bitma
 	// ==============================================
 
 	// fmt.Printf("Right Before %064b \n", rightHalf)
+	// fmt.Printf("Left Before %064b \n", leftHalf)
 
 	rightHitPieces := rightHalf.Clone(nil)   //bitmap.Bitmap
 	rightHitPieces.And(allPieces)            //Contians all the pieces if any in the right half
@@ -93,9 +85,8 @@ func restrictMoves(curtPieceUintLoc uint32, moveLine bitmap.Bitmap) bitmap.Bitma
 		var newRight bitmap.Bitmap
 		newRight.Grow(config.BoardSize - 1)
 		newRight.Ones()
-		teamOffset := teamOffset(foundPerson, true) //Determines wether to include or not include the piece itself in possible moves
 		newRight.Filter(func(x uint32) bool {
-			return x < teamOffset //Team offset handles the
+			return x <= foundPerson //Team offset handles the
 		})
 
 		rightHalf.And(newRight)
@@ -105,24 +96,21 @@ func restrictMoves(curtPieceUintLoc uint32, moveLine bitmap.Bitmap) bitmap.Bitma
 	leftHitPieces.And(allPieces)                //Contians all the pieces if any in the left half
 	foundPersonLeft, rtn := leftHitPieces.Max() //Gets first piece to be in line with attack
 
-	// fmt.Printf("Left Before %064b \n", leftHalf)
-
 	if rtn == true { //If there is an enemy
 		var newLeft bitmap.Bitmap
 		var newLeftMask bitmap.Bitmap //Supposed to be all zeros
 		newLeft.Grow(config.BoardSize - 1)
 		newLeft.Ones()
-		newLeftMask.Grow(config.BoardSize - 1)
-		newLeftMask.Ones()                                  //Can only filter through set bits
-		teamOffsetVal := teamOffset(foundPersonLeft, false) //Determines wether to include or not include the piece itself in possible moves
+		newLeftMask.Grow(config.BoardSize - 1) //Can only filter through set bits)
+		newLeftMask.Ones()
 
 		newLeftMask.Filter(func(x uint32) bool {
-			return x > teamOffsetVal
+			return x >= foundPersonLeft
 		})
-		newLeft.And(newLeftMask) //
+
+		newLeft.And(newLeftMask)
 		leftHalf.And(newLeft)
 	}
-	// fmt.Printf("Left After %064b \n", leftHalf)
 
 	// ==============================================
 	// Combine into final bitmap and return
@@ -197,9 +185,82 @@ func generateRookMoves(loc uint32, x int, y int, z int) bitmap.Bitmap { // Will 
 	wg.Wait()
 	forward.Or(upAndDown)
 	forward.Or(sideToSide)
-	// fmt.Printf("All Pieces %064b\n", allPieces) //For Debug
-	// fmt.Printf("All Allowed Moves %064b\n", forward) //For Debug
+	// fmt.Printf("All Pieces %064b\n", allPieces)                //For Debug
+	// fmt.Printf("All Allowed Move, forward)s %064b\n", forward) //For Debug
+	forward = removeFriends(forward)
 	return forward
+}
+
+func generateBishopMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
+	x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing dataplanes
+
+	//The indexing for each of these is computed using a formula based on how they were computed, go to dataplanes to check
+	//And work it out for yourself until I have time to better document it
+	// XY45NegPlane := dataplane.XY45NegPlane[-x-y+14].Clone(nil) //-14
+	// XY45Plane := dataplane.XY45Plane[-x+y+7].Clone(nil)
+	// XZ45NegPlane := dataplane.XZ45NegPlane[-x-z+14].Clone(nil) //
+	// XZ45PosPlane := dataplane.XZ45PosPlane[-x+z+7].Clone(nil)  //
+	// ZY45NegPlane := dataplane.ZY45NegPlane[-z-y+14].Clone(nil)
+	// ZY45Plane := dataplane.ZY45Plane[-z+y+7].Clone(nil)
+
+	// Cardinal Right and left are the direct diagnols you would see WITHOUT any dimension in the Y,
+	// Essentially they are the diagnols you would see on a normal chess board looking down
+
+	cardinalRight := dataplane.XZ45PosPlane[-x+z+7].Clone(nil)
+	cardinalLeft := dataplane.XZ45NegPlane[-x-z+14].Clone(nil)
+
+	//Real Right and Left are those cardinal directions cast onto the y axis where the piece is
+	realRight := dataplane.YPlane[y].Clone(nil)
+	realLeft := dataplane.YPlane[y].Clone(nil)
+
+	bottomLeft := dataplane.XY45Plane[-x+y+7].Clone(nil)      // Side Left
+	bottomRight := dataplane.XY45NegPlane[-x-y+14].Clone(nil) //-14
+
+	//Beuase the cardinal right and left cut thorugh all dimensions however we need to
+	//Use our current Y layer to get them AND becuase of the descructive nature of the .And operation
+	//We need to do so in new bitmaps
+	wg.Go(func() {
+
+		realRight.And(cardinalRight)
+		realLeft.And(cardinalLeft)
+		realRight = restrictMoves(loc, realRight)
+		realLeft = restrictMoves(loc, realLeft)
+	})
+
+	//Again becuase of the descructive nature of .And the ordering of these operations is VERY IMPORTANT
+	//Done in the wrong order one plane could be destroyed before it can be used in a different operation
+	//This means that ALL of these must take place in a single thread
+
+	wg.Go(func() {
+		bottomLeft.And(cardinalLeft)
+		bottomLeft = restrictMoves(loc, bottomLeft) //
+
+		bottomRight.And(cardinalRight)
+		bottomRight = restrictMoves(loc, bottomRight)
+
+		//After non descructivly using cardinal right and left above
+		//We can use them descrustivly to get the top movements
+
+		cardinalRight.And(dataplane.ZY45Plane[-z+y+7].Clone(nil)) // Top Right
+		cardinalLeft.And(dataplane.ZY45Plane[-z+y+7].Clone(nil))  // Top Left
+		cardinalRight = restrictMoves(loc, cardinalRight)
+		cardinalLeft = restrictMoves(loc, cardinalLeft)
+	})
+
+	wg.Wait()
+	//Then Or them all together to form the bishop's moves
+
+	cardinalRight.Or(cardinalLeft)
+	cardinalRight.Or(bottomLeft)
+	cardinalRight.Or(bottomRight)
+	cardinalRight.Or(realLeft)
+	cardinalRight.Or(realRight)
+
+	// fmt.Printf("All Pieces %064b\n", allPieces)
+	// fmt.Printf("All Allowed Move, forward)s %064b\n", cardinalRight) //For Debug
+	cardinalRight = removeFriends(cardinalRight)
+
+	return cardinalRight
 }
 
 // moveMap matches a pieces visual representation to the function that generates all possible moves for that piece
@@ -207,13 +268,13 @@ func generateRookMoves(loc uint32, x int, y int, z int) bitmap.Bitmap { // Will 
 var moveMap = map[string]func(uint32, int, int, int) bitmap.Bitmap{
 	// "♙": blackPawn,
 	// "♘": blackKnight,
-	// "♗": blackBishop,
+	"♗": generateBishopMove,
 	"♖": generateRookMoves,
 	// "♕": blackQueen,
 	// "♔": blackKing,
 	// "♟": whitePawn,
 	// "♞": whiteKnight,
-	// "♝": whiteBishop,
+	"♝": generateBishopMove,
 	"♜": generateRookMoves,
 	// "♛": whiteQueen,
 	// "♚": whiteKing,

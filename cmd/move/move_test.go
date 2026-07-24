@@ -99,25 +99,49 @@ var allTestCases = []MoveTestCase{
 		moveFrom: "f8C",
 		moveTo:   "g7C",
 		reason:   "friendly protection",
-		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
+		expected: `[31mERROR: Piece ♗ cannot move in that way[0m`,
 	},
 	MoveTestCase{ //Testing Can't TAKE friendly pieces on the other side
-		moveFrom: "f8c",
+		moveFrom: "f8C",
 		moveTo:   "a7C",
 		reason:   "friendly protection",
-		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
+		expected: `[31mERROR: Piece ♗ cannot move in that way[0m`,
 	},
 	MoveTestCase{ //Testing Can't move thorugh friendly pieces
 		moveFrom: "f8C",
 		moveTo:   "c5C",
 		reason:   "friendly protection",
-		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
+		expected: `[31mERROR: Piece ♗ cannot move in that way[0m`,
 	},
 	MoveTestCase{ //Testing Can't TAKE friendly pieces
 		moveFrom: "f8C",
 		moveTo:   "a7C",
 		reason:   "friendly protection",
-		expected: `[31mERROR: Piece ♖ cannot move in that way[0m`,
+		expected: `[31mERROR: Piece ♗ cannot move in that way[0m`,
+	},
+	MoveTestCase{
+		moveFrom: "f8C",
+		moveTo:   "d6E",
+		reason:   "general movment",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{ //////////////////////Will need to see if checking works here later
+		moveFrom: "d6E",
+		moveTo:   "g3E",
+		reason:   "general movment",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "g3E",
+		moveTo:   "e1C",
+		reason:   "taking enemy",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "e1C",
+		moveTo:   "g3C",
+		reason:   "enemy movethrough",
+		expected: `[31mERROR: Piece ♗ cannot move in that way[0m`,
 	},
 }
 
@@ -158,7 +182,7 @@ func TestMoveCommand(t *testing.T) {
 
 		//check the output
 		if stdout.String() != testCase.expected {
-			t.Errorf("Failed at move check FROM %s TO %s. Failed check type %s", testCase.moveFrom, testCase.moveTo, testCase.reason)
+			t.Errorf("Failed at move check FROM: '%s' TO: '%s'. Failed check type: '%s'", testCase.moveFrom, testCase.moveTo, testCase.reason)
 			t.Errorf("Expected output: %q, but got: %q", testCase.expected, stdout.String())
 			break
 		}
