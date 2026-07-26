@@ -11,6 +11,16 @@ import (
 	"github.com/kelindar/bitmap"
 )
 
+type BoardState struct {
+	FriendPieces        bitmap.Bitmap
+	EnemyPieces         bitmap.Bitmap
+	AllPieces           bitmap.Bitmap
+	PieceLoadError      error
+	FriendKing          bitmap.Bitmap
+	FriendKingLoc       uint32
+	AllIndividualPieces map[string]bitmap.Bitmap //map[string]bitmap.Bitmap
+}
+
 // Loads dictionary mapping display char to the bitmap corresponding with that piece
 func LoadGame(fileLocation string) (data map[string]bitmap.Bitmap, err error) {
 
@@ -36,20 +46,19 @@ func LoadGame(fileLocation string) (data map[string]bitmap.Bitmap, err error) {
 
 }
 
-// GetFriendsAndEnemies loops through all the bitmaps returned by LoadGame and using a reference piece determines friendly, & enemy pieces.
+// GenerateBoardState loops through all the bitmaps returned by LoadGame and using a reference piece determines friendly, & enemy pieces.
 // Defined in load becuase it is indepdendly loading in the board to make this determination
-func GetFriendsAndEnemies(fileLocation string, referencePiece string) (bitmap.Bitmap, bitmap.Bitmap, bitmap.Bitmap, bitmap.Bitmap, error) {
+func GenerateBoardState(fileLocation string, referencePiece string) (BoardState, error) {
 	// result := make(map[string]bitmap.Bitmap)
 	if _, err := os.Stat(fileLocation); os.IsNotExist(err) {
 		logger.Warn("No game currently running, create one with '3DC game new'\n")
-		return nil, nil, nil, nil, err
+		return BoardState{}, err
 	}
 	entries := must.Must(os.ReadDir(fileLocation))
 
-	var friendPieces bitmap.Bitmap
-	var enemyPieces bitmap.Bitmap
-	var allPieces bitmap.Bitmap
-	var blackPawns bitmap.Bitmap
+	//Need to initalize the map
+	rtn := BoardState{}
+	rtn.AllIndividualPieces = make(map[string]bitmap.Bitmap) //Need to initalize this map
 
 	r, _ := utf8.DecodeRuneInString(referencePiece)
 
@@ -71,21 +80,21 @@ func GetFriendsAndEnemies(fileLocation string, referencePiece string) (bitmap.Bi
 		bm := must.Must(bitmap.ReadFrom(file))
 
 		if visAsRune >= start && visAsRune <= end {
-			friendPieces.Or(bm)
+			rtn.FriendPieces.Or(bm)
+			if vis == "♔" || vis == "♚" {
+				rtn.FriendKing = bm
+			}
 		} else {
-			enemyPieces.Or(bm)
+			rtn.EnemyPieces.Or(bm)
 		}
 
-		if vis == "♙" {
-			blackPawns = bm
-		}
 		// fmt.Println(vis)
 		// fmt.Printf("BM FOR %064b\n", bm)
-		allPieces.Or(bm)
-
+		rtn.FriendKingLoc, _ = rtn.FriendKing.Max() //Sets Friend King only once during move commnad
+		rtn.AllIndividualPieces[vis] = bm
+		rtn.AllPieces.Or(bm)
 	}
-	return friendPieces, enemyPieces, allPieces, blackPawns, nil
-
+	return rtn, nil
 }
 
 //Char Reference

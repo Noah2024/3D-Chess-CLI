@@ -18,6 +18,8 @@ import (
 	"github.com/kelindar/bitmap"
 )
 
+var BoardState load.BoardState
+
 //Note to self for future development 7/24/2026
 //Im noticing some concurrency issues when it comes to seperating out move generation with goroutines
 //This was a given with the bishop but I've begun to see it elsewhere as well
@@ -76,12 +78,13 @@ func MoveCommand(from string, to string) {
 		return
 	}
 
-	genMoves.FriendPieces, genMoves.EnemyPieces, genMoves.AllPieces, genMoves.BlackPawns, genMoves.PieceLoadError = load.GetFriendsAndEnemies(config.CurrentGame, visFrom)
+	BoardState, err := load.GenerateBoardState(config.CurrentGame, visFrom)
 
-	if genMoves.PieceLoadError != nil {
-		logger.Error(fmt.Sprintf("Error in determing pieces team %v", genMoves.PieceLoadError))
+	if err != nil {
+		logger.Error(fmt.Sprintf("Error in determing pieces team %v", BoardState.PieceLoadError))
 		return
 	}
+
 	uintLocTo, _, _, _ := parseLoc(to)
 	// fmt.Println("TO")
 	// fmt.Printf("uLoc: %d | x: %d | y: %d | z: %d \n", uintLocTo, tX, tY, tZ)
@@ -95,7 +98,7 @@ func MoveCommand(from string, to string) {
 		return
 	}
 
-	allMoves := moveFunction(uLocFrom, fX, fY, fZ)
+	allMoves := moveFunction(BoardState, uLocFrom, fX, fY, fZ)
 
 	//Kept for eventual need at debug
 	// fmt.Printf("Piece Moving %s: ", visFrom)

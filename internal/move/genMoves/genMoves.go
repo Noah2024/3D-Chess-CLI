@@ -1,9 +1,11 @@
-// Generate moves contians all the functions which are used at runtime by the move function to generate all moves
-// As well as used in checkState to determine if the king is in check
+// Generate moves contians all the functions which are used at runtime by the move function to generate all moves.
+// Move generates the board state which is then passed into these functions, hence move needs to be run/loaded first otherwise
+// BordState will have no data
 package genMoves
 
 import (
 	"3DC/config"
+	"3DC/internal/game/load"
 	"3DC/util/bitutil"
 	"3DC/util/dataplane"
 	"sync"
@@ -11,17 +13,14 @@ import (
 	"github.com/kelindar/bitmap"
 )
 
-var FriendPieces bitmap.Bitmap
-var EnemyPieces bitmap.Bitmap
-var AllPieces bitmap.Bitmap
-var PieceLoadError error
-var BlackPawns bitmap.Bitmap //Used to determine direction of pawns move dynamically at runtime
+// Friend & Enemy pieces get swaped during the very beginning of check testing
+// Due to the need to see if the king is under attack
 var wg sync.WaitGroup
 
-func removeFriends(allPossibleMoves bitmap.Bitmap) bitmap.Bitmap {
+func removeFriends(BoardState load.BoardState, allPossibleMoves bitmap.Bitmap) bitmap.Bitmap {
 	// fmt.Printf("ALL POSSIBLE MOVES BEFORE %064b\n", allPossibleMoves)//For Debug
 	result := allPossibleMoves.Clone(nil)
-	result.Xor(FriendPieces)
+	result.Xor(BoardState.FriendPieces)
 	result.And(allPossibleMoves)
 	// fmt.Printf("ALL POSSIBLE MOVES AFTER %064b\n", allPossibleMoves)//For Debug
 	return result
@@ -30,12 +29,10 @@ func removeFriends(allPossibleMoves bitmap.Bitmap) bitmap.Bitmap {
 // Takes a given vector of a move and seperates it into right and left halves, before running checks on each half to determine if a piece is intersecting
 // If no piece is present nothing happens and that half is jointed with the other, elsewise only the half upto and including the piece that is intersecting
 // Friendly pieces are removed later
-func restrictMoves(curtPieceUintLoc uint32, moveLine bitmap.Bitmap) bitmap.Bitmap {
+func restrictMoves(BoardState load.BoardState, curtPieceUintLoc uint32, moveLine bitmap.Bitmap) bitmap.Bitmap {
 	// ==============================================
 	// Seperate both directions of attack vector
 	// ==============================================
-
-	// fmt.Printf("Move line %064b \n", moveLine)
 
 	var leftMask bitmap.Bitmap
 	var rightHalf bitmap.Bitmap
@@ -67,7 +64,7 @@ func restrictMoves(curtPieceUintLoc uint32, moveLine bitmap.Bitmap) bitmap.Bitma
 	// fmt.Printf("Left Before %064b \n", leftHalf)
 
 	rightHitPieces := rightHalf.Clone(nil)   //bitmap.Bitmap
-	rightHitPieces.And(AllPieces)            //Contians all the pieces if any in the right half
+	rightHitPieces.And(BoardState.AllPieces) //Contians all the pieces if any in the right half
 	foundPerson, rtn := rightHitPieces.Min() //Gets first piece to be in line with attack
 
 	if rtn == true { //If there is an enemy
@@ -82,7 +79,7 @@ func restrictMoves(curtPieceUintLoc uint32, moveLine bitmap.Bitmap) bitmap.Bitma
 	}
 
 	leftHitPieces := leftHalf.Clone(nil)
-	leftHitPieces.And(AllPieces)                //Contians all the pieces if any in the left half
+	leftHitPieces.And(BoardState.AllPieces)     //Contians all the pieces if any in the left half
 	foundPersonLeft, rtn := leftHitPieces.Max() //Gets first piece to be in line with attack
 
 	if rtn == true { //If there is an enemy
@@ -141,7 +138,7 @@ func restrictMoves(curtPieceUintLoc uint32, moveLine bitmap.Bitmap) bitmap.Bitma
 // generateRookMoves contains the bitwise operations necessary to generate all possible moves for a rook piece
 // it takes x y and z integer cooridnates and outputs a size 511 bitmap all ones of which represent possible moves
 // inputs: x, y, z int | outputs: bitmap.Bitmap
-func generateRookMoves(loc uint32, x int, y int, z int) bitmap.Bitmap { // Will parallelize with go rountine
+func generateRookMoves(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap { // Will parallelize with go rountine
 	//Note to self, OK SO, the bitmaps when storing values store an ENTIRE BYTE at a time
 
 	// logger.Debug(fmt.Sprintf("Generating all possible rook moves from :x: %d, y: %d, z: %d", x, y, z))
@@ -152,14 +149,14 @@ func generateRookMoves(loc uint32, x int, y int, z int) bitmap.Bitmap { // Will 
 	wg.Go(
 		func() {
 			forward.And(dataplane.ZPlane[z-1])
-			forward = restrictMoves(loc, forward) //x
+			forward = restrictMoves(BoardState, loc, forward) //x
 		},
 	)
 
 	wg.Go(
 		func() {
-			sideToSide.And(dataplane.XPlane[x-1])       //-2
-			sideToSide = restrictMoves(loc, sideToSide) //z
+			sideToSide.And(dataplane.XPlane[x-1])                   //-2
+			sideToSide = restrictMoves(BoardState, loc, sideToSide) //z
 		},
 	)
 
@@ -167,7 +164,7 @@ func generateRookMoves(loc uint32, x int, y int, z int) bitmap.Bitmap { // Will 
 	wg.Go(
 		func() {
 			upAndDown.And(dataplane.ZPlane[z-1])
-			upAndDown = restrictMoves(loc, upAndDown) //y
+			upAndDown = restrictMoves(BoardState, loc, upAndDown) //y
 		},
 	)
 
@@ -176,11 +173,11 @@ func generateRookMoves(loc uint32, x int, y int, z int) bitmap.Bitmap { // Will 
 	forward.Or(sideToSide)
 	// fmt.Printf("All Pieces %064b\n", allPieces)                //For Debug
 	// fmt.Printf("All Allowed Move, forward)s %064b\n", forward) //For Debug
-	forward = removeFriends(forward)
+	forward = removeFriends(BoardState, forward)
 	return forward
 }
 
-func generateBishopMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
+func generateBishopMove(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
 	x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing dataplanes
 
 	//The indexing for each of these is computed using a formula based on how they were computed, go to dataplanes to check
@@ -211,26 +208,26 @@ func generateBishopMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 
 	realRight.And(cardinalRight)
 	realLeft.And(cardinalLeft)
-	realRight = restrictMoves(loc, realRight)
-	realLeft = restrictMoves(loc, realLeft)
+	realRight = restrictMoves(BoardState, loc, realRight)
+	realLeft = restrictMoves(BoardState, loc, realLeft)
 
 	//Again becuase of the descructive nature of .And the ordering of these operations is VERY IMPORTANT
 	//Done in the wrong order one plane could be destroyed before it can be used in a different operation
 	//This means that ALL of these must take place in a single thread
 
 	bottomLeft.And(cardinalLeft)
-	bottomLeft = restrictMoves(loc, bottomLeft) //
+	bottomLeft = restrictMoves(BoardState, loc, bottomLeft) //
 
 	bottomRight.And(cardinalRight)
-	bottomRight = restrictMoves(loc, bottomRight)
+	bottomRight = restrictMoves(BoardState, loc, bottomRight)
 
 	//After non descructivly using cardinal right and left above
 	//We can use them descrustivly to get the top movements
 
 	cardinalRight.And(dataplane.ZY45Plane[-z+y+7].Clone(nil)) // Top Right
 	cardinalLeft.And(dataplane.ZY45Plane[-z+y+7].Clone(nil))  // Top Left
-	cardinalRight = restrictMoves(loc, cardinalRight)
-	cardinalLeft = restrictMoves(loc, cardinalLeft)
+	cardinalRight = restrictMoves(BoardState, loc, cardinalRight)
+	cardinalLeft = restrictMoves(BoardState, loc, cardinalLeft)
 
 	//Then Or them all together to form the bishop's moves
 
@@ -242,25 +239,25 @@ func generateBishopMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 
 	// fmt.Printf("All Pieces %064b\n", allPieces)
 	// fmt.Printf("All Allowed Move, forward)s %064b\n", cardinalRight) //For Debug
-	cardinalRight = removeFriends(cardinalRight)
+	cardinalRight = removeFriends(BoardState, cardinalRight)
 	return cardinalRight
 }
 
-func generateQueenMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
+func generateQueenMove(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
 	// Must not zero index here becuase otherwise that would throw off the move generation
 	// from the generators below
 	var bishopMoves bitmap.Bitmap
 	var rookMoves bitmap.Bitmap
 
-	bishopMoves = generateBishopMove(loc, x, y, z)
-	rookMoves = generateRookMoves(loc, x, y, z)
+	bishopMoves = generateBishopMove(BoardState, loc, x, y, z)
+	rookMoves = generateRookMoves(BoardState, loc, x, y, z)
 
 	rookMoves.Or(bishopMoves)
 	return rookMoves
 }
 
 // Hand coded and validated moves for the knight (becuase I can't use a cheeky lil bitmap for it)
-func generateKnightMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
+func generateKnightMove(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
 	// x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing da
 
 	var result bitmap.Bitmap
@@ -314,14 +311,14 @@ func generateKnightMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 	}
 
 	wg.Wait()
-	result = removeFriends(result)
-	// fmt.Printf("All Pieces %064b\n", allPieces)
+	result = removeFriends(BoardState, result)
+	// fmt.Printf("All Pieces %064b\n", load.BS.AllPieces)
 	// fmt.Printf("Result %064b\n", result)
 	return result
 }
 
 // Hand coded and validated moves for the knight (becuase I can't use a cheeky lil bitmap for it)
-func generateKingMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
+func generateKingMove(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
 	// x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing da
 
 	var result bitmap.Bitmap
@@ -381,21 +378,21 @@ func generateKingMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 	}
 
 	wg.Wait()
-	result = removeFriends(result)
+	result = removeFriends(BoardState, result)
 	// fmt.Printf("All Pieces %064b\n", allPieces)
 	// fmt.Printf("Result %064b\n", result)
 	return result
 }
 
 // Hand coded and validated moves for the knight (becuase I can't use a cheeky lil bitmap for it)
-func generatePawnMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
+func generatePawnMove(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
 	// x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing da
 
 	var result bitmap.Bitmap
 	result.Grow(config.BoardSize - 1)
 
-	zOffset := 1
-	if BlackPawns.Contains(loc) {
+	zOffset := 1 //Using all black pieces to determine which way to move the pawn
+	if BoardState.AllIndividualPieces["♙"].Contains(loc) {
 		zOffset = -1
 	}
 
@@ -426,7 +423,7 @@ func generatePawnMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 				return
 			}
 			uin := bitutil.VecToUint(X, Y, Z)
-			if !AllPieces.Contains(uin) { //Normal moves can only be made if there are no pieces there, ANY
+			if !BoardState.AllPieces.Contains(uin) { //Normal moves can only be made if there are no pieces there, ANY
 				result.Set(uin)
 			}
 		})
@@ -443,7 +440,7 @@ func generatePawnMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 				return
 			}
 			uin := bitutil.VecToUint(X, Y, Z)
-			if EnemyPieces.Contains(uin) { //Attacking moves can only be made if there ARE enemy pieces there
+			if BoardState.EnemyPieces.Contains(uin) { //Attacking moves can only be made if there ARE enemy pieces there
 				result.Set(uin)
 			}
 		})
@@ -457,7 +454,7 @@ func generatePawnMove(loc uint32, x int, y int, z int) bitmap.Bitmap {
 
 // moveMap matches a pieces visual representation to the function that generates all possible moves for that piece
 // inputs: string | outputs: function(int, int, int) bitmap.Bitmap
-var MoveMap = map[string]func(uint32, int, int, int) bitmap.Bitmap{
+var MoveMap = map[string]func(load.BoardState, uint32, int, int, int) bitmap.Bitmap{
 	"♙": generatePawnMove,
 	"♘": generateKnightMove,
 	"♗": generateBishopMove,
