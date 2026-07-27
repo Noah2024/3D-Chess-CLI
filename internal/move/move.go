@@ -8,6 +8,7 @@ import (
 	"3DC/config"
 	"3DC/internal/game/load"
 	"3DC/internal/game/save"
+	"3DC/internal/move/checking"
 	"3DC/internal/move/genMoves"
 	"3DC/util/bitutil"
 	"3DC/util/logger"
@@ -79,6 +80,7 @@ func MoveCommand(from string, to string) {
 	}
 
 	BoardState, err := load.GenerateBoardState(config.CurrentGame, visFrom)
+	BoardState.PieceInProcess = visFrom //Setting the piece were working with
 
 	if err != nil {
 		logger.Error(fmt.Sprintf("Error in determing pieces team %v", BoardState.PieceLoadError))
@@ -86,8 +88,6 @@ func MoveCommand(from string, to string) {
 	}
 
 	uintLocTo, _, _, _ := parseLoc(to)
-	// fmt.Println("TO")
-	// fmt.Printf("uLoc: %d | x: %d | y: %d | z: %d \n", uintLocTo, tX, tY, tZ)
 	visTo, bmTo := pieceType(uintLocTo)
 
 	//visFrom encodes the type of piece, and thus the move function we use to generate all possible moves
@@ -99,6 +99,14 @@ func MoveCommand(from string, to string) {
 	}
 
 	allMoves := moveFunction(BoardState, uLocFrom, fX, fY, fZ)
+
+	//Make sure this piece isn't protecting the king
+	protectingMoves, kingDanger := checking.KingInDanger(BoardState, uLocFrom)
+	if kingDanger {
+		allMoves.And(protectingMoves)
+		logger.Error(fmt.Sprintf("Piece %v is protecting its king!", visFrom))
+		return
+	}
 
 	//Kept for eventual need at debug
 	// fmt.Printf("Piece Moving %s: ", visFrom)

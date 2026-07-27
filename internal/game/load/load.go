@@ -19,6 +19,9 @@ type BoardState struct {
 	FriendKing          bitmap.Bitmap
 	FriendKingLoc       uint32
 	AllIndividualPieces map[string]bitmap.Bitmap //map[string]bitmap.Bitmap
+	ProtectingKing      map[uint32]bitmap.Bitmap //Used to keep pieces from moving if they are in line of sight of king
+	KingInDanger        bitmap.Bitmap            //Only set to non 0 values when there are squares the king is in danger from
+	PieceInProcess      string                   //The piece currently being processed (used in protecting king in genMoves.restrictMoves)
 }
 
 // Loads dictionary mapping display char to the bitmap corresponding with that piece

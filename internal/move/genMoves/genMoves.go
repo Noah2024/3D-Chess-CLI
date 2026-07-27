@@ -63,11 +63,11 @@ func restrictMoves(BoardState load.BoardState, curtPieceUintLoc uint32, moveLine
 	// fmt.Printf("Right Before %064b \n", rightHalf)
 	// fmt.Printf("Left Before %064b \n", leftHalf)
 
-	rightHitPieces := rightHalf.Clone(nil)   //bitmap.Bitmap
-	rightHitPieces.And(BoardState.AllPieces) //Contians all the pieces if any in the right half
-	foundPerson, rtn := rightHitPieces.Min() //Gets first piece to be in line with attack
+	rightHitPieces := rightHalf.Clone(nil)        //bitmap.Bitmap
+	rightHitPieces.And(BoardState.AllPieces)      //Contians all the pieces if any in the right half
+	foundPerson, rtnRight := rightHitPieces.Min() //Gets first piece to be in line with attack
 
-	if rtn == true { //If there is an enemy
+	if rtnRight == true { //If there is an enemy
 		var newRight bitmap.Bitmap
 		newRight.Grow(config.BoardSize - 1)
 		newRight.Ones()
@@ -79,10 +79,10 @@ func restrictMoves(BoardState load.BoardState, curtPieceUintLoc uint32, moveLine
 	}
 
 	leftHitPieces := leftHalf.Clone(nil)
-	leftHitPieces.And(BoardState.AllPieces)     //Contians all the pieces if any in the left half
-	foundPersonLeft, rtn := leftHitPieces.Max() //Gets first piece to be in line with attack
+	leftHitPieces.And(BoardState.AllPieces)         //Contians all the pieces if any in the left half
+	foundPersonLeft, rtnLeft := leftHitPieces.Max() //Gets first piece to be in line with attack
 
-	if rtn == true { //If there is an enemy
+	if rtnLeft == true { //If there is an enemy
 		var newLeft bitmap.Bitmap
 		var newLeftMask bitmap.Bitmap //Supposed to be all zeros
 		newLeft.Grow(config.BoardSize - 1)
@@ -101,7 +101,6 @@ func restrictMoves(BoardState load.BoardState, curtPieceUintLoc uint32, moveLine
 	// ==============================================
 	// Combine into final bitmap and return
 	// ==============================================
-
 	rightHalf.Or(leftHalf)
 	return rightHalf
 }

@@ -143,38 +143,38 @@ var allTestCases = []MoveTestCase{
 		reason:   "enemy movethrough",
 		expected: `[31mERROR: Piece ♗ cannot move in that way[0m`,
 	},
-	// ============================================
-	// Queen Test Cases
-	// Which are unessary, becuase queen movement is just the bitwise or
-	// Between rook and bishop moves
-	// ============================================
-	// MoveTestCase{
-	// 	moveFrom: "d8C",
-	// 	moveTo:   "d7C",
-	// 	reason:   "friendly protection",
-	// 	expected: `[31mERROR: Piece ♕ cannot move in that way[0m`,
-	// },
-	// MoveTestCase{
-	// 	moveFrom: "d8C",
-	// 	moveTo:   "e8C",
-	// 	reason:   "friendly protection",
-	// 	expected: `[31mERROR: Piece ♕ cannot move in that way[0m`,
-	// },
-	// MoveTestCase{
-	// 	moveFrom: "d8C",
-	// 	moveTo:   "e8C",
-	// 	reason:   "friendly protection",
-	// 	expected: `[31mERROR: Piece ♕ cannot move in that way[0m`,
-	// },
-	// MoveTestCase{
-	// 	moveFrom: "d8C",
-	// 	moveTo:   "d8D",
-	// 	reason:   "general movment",
-	// 	expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
-	// },
-	// ============================================
-	// Knight Test Cases ♘
-	// ============================================
+	// // ============================================
+	// // Queen Test Cases
+	// // Which are unessary, becuase queen movement is just the bitwise or
+	// // Between rook and bishop moves
+	// // ============================================
+	// // MoveTestCase{
+	// // 	moveFrom: "d8C",
+	// // 	moveTo:   "d7C",
+	// // 	reason:   "friendly protection",
+	// // 	expected: `[31mERROR: Piece ♕ cannot move in that way[0m`,
+	// // },
+	// // MoveTestCase{
+	// // 	moveFrom: "d8C",
+	// // 	moveTo:   "e8C",
+	// // 	reason:   "friendly protection",
+	// // 	expected: `[31mERROR: Piece ♕ cannot move in that way[0m`,
+	// // },
+	// // MoveTestCase{
+	// // 	moveFrom: "d8C",
+	// // 	moveTo:   "e8C",
+	// // 	reason:   "friendly protection",
+	// // 	expected: `[31mERROR: Piece ♕ cannot move in that way[0m`,
+	// // },
+	// // MoveTestCase{
+	// // 	moveFrom: "d8C",
+	// // 	moveTo:   "d8D",
+	// // 	reason:   "general movment",
+	// // 	expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	// // },
+	// // ============================================
+	// // Knight Test Cases ♘
+	// // ============================================
 	MoveTestCase{
 		moveFrom: "b8C",
 		moveTo:   "b9C",
@@ -269,14 +269,13 @@ var allTestCases = []MoveTestCase{
 		reason:   "general movement",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
-	// ============================================
-	// Pawn Test Cases ♙
-	// Will add some taking move checking later
-	// ============================================
+	// // ============================================
+	// // Pawn Test Cases ♙
+	// // ============================================
 	MoveTestCase{
 		moveFrom: "b7C",
 		moveTo:   "b8C",
-		reason:   "general movement",
+		reason:   "friendly protection",
 		expected: `[31mERROR: Piece ♙ cannot move in that way[0m`,
 	},
 	MoveTestCase{
@@ -321,6 +320,48 @@ var allTestCases = []MoveTestCase{
 		reason:   "pawn angled attack",
 		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
 	},
+	// // ============================================
+	// // Checking System Test Cases ♙
+	// // ============================================
+	MoveTestCase{
+		reason: "reset",
+	},
+	MoveTestCase{
+		moveFrom: "e7C",
+		moveTo:   "e6C",
+		reason:   "pawn move in checking system",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "f8C",
+		moveTo:   "b4C",
+		reason:   "bishop move in checking system",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "d2C",
+		moveTo:   "d3C",
+		reason:   "pawn move preventing check",
+		expected: `[31mERROR: Piece ♟ is protecting its king![0m`,
+	},
+	MoveTestCase{
+		moveFrom: "c2C",
+		moveTo:   "c3C",
+		reason:   "pawn move preventing check",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "d2C",
+		moveTo:   "d3C",
+		reason:   "pawn move preventing check",
+		expected: `[34mINFO: Piece Moved Successfully![0m` + "\n",
+	},
+	MoveTestCase{
+		moveFrom: "c3C",
+		moveTo:   "c4C",
+		reason:   "pawn move preventing check",
+		expected: `[31mERROR: Piece ♟ is protecting its king![0m`,
+	},
 }
 
 func TestMoveCommand(t *testing.T) {
@@ -349,7 +390,15 @@ func TestMoveCommand(t *testing.T) {
 
 	//Loop all indivudal test cases and execute
 	for _, testCase := range allTestCases {
-		//set args
+
+		//Alllow resetting of test board when needed
+		if testCase.reason == "reset" {
+			if err := newCMD.Execute(); err != nil {
+				t.Fatalf("new command failed: %v", err)
+			}
+			continue
+		}
+
 		moveCMD.SetArgs([]string{testCase.moveFrom, testCase.moveTo})
 
 		// execute the move command w/ args
