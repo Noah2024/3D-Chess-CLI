@@ -21,7 +21,7 @@ func VecToUint(x, y, z int) uint32 {
 
 // Decodes uint32 position into integer x,y,z position
 func UintToVec(space uint32) (int, int, int) {
-	if space < 0 || space > 511 {
+	if space > 511 {
 		logger.Error(fmt.Sprintf("uint32 %d out of range for board size %d ", space, BoardSize))
 		panic(fmt.Sprintf("uint32 %d out of range for board size %d ", space, BoardSize))
 	}
