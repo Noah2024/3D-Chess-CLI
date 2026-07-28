@@ -98,25 +98,45 @@ func MoveCommand(from string, to string) {
 		return
 	}
 
+	//Run entire checking system
+	inCheck, inCheckMate, allowedKingMoves, allowedProtectingMoves := checking.IsKingInCheck(BoardState)
+	//If in checkmate, exit immiedatley
+	if inCheckMate {
+		logger.Error("Game is over, this pieces team is in checkmate!")
+		return
+	}
+
 	allMoves := moveFunction(BoardState, uLocFrom, fX, fY, fZ)
 
 	//Make sure this piece isn't protecting the king
 	protectingMoves, kingDanger := checking.KingInDanger(BoardState, uLocFrom)
-	if kingDanger {
+	if kingDanger { //I don't think this is right
 		allMoves.And(protectingMoves)
-		logger.Error(fmt.Sprintf("Piece %v is protecting its king!", visFrom))
-		return
+		fmt.Printf("Protecting Moves: %064b\n", protectingMoves)
+		// logger.Error(fmt.Sprintf("Piece %v is protecting its king!", visFrom))
 	}
 
 	//Kept for eventual need at debug
 	// fmt.Printf("Piece Moving %s: ", visFrom)
 	// fmt.Printf("Piece Being Taken %s ", visTo)
 
+	//Restrict King Moves for king
+	if visFrom == "♚" || visFrom == "♔" {
+		fmt.Println("Restricting kings moves")
+		fmt.Printf("Pos: %064b\n", BoardState.FriendKing)
+		allMoves.And(allowedKingMoves)
+	} else { //If king is in check can this piece take it out of check
+		if inCheck {
+			fmt.Println("Piece can take the king out of check")
+			allMoves.And(allowedProtectingMoves)
+		}
+	}
+
+	//Final check to see if piece can or can not move
 	if !(allMoves.Contains(uintLocTo)) {
 		logger.Error(fmt.Sprintf("Piece %v cannot move in that way", visFrom))
 		return
 	}
-
 	//Updates bitmap of piece being moved - does not validate if move is legal
 	atomicMove(uLocFrom, uintLocTo, visTo, visFrom, bmFrom, bmTo)
 

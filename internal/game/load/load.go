@@ -18,6 +18,7 @@ type BoardState struct {
 	PieceLoadError      error
 	FriendKing          bitmap.Bitmap
 	FriendKingLoc       uint32
+	SwapPawn            bool                     //Needed for checking becuase the pawn attacks differnet than it moves
 	AllIndividualPieces map[string]bitmap.Bitmap //map[string]bitmap.Bitmap
 	PieceInProcess      string                   //The piece currently being processed (used in protecting king in genMoves.restrictMoves)
 }

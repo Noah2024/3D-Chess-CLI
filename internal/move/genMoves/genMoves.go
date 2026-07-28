@@ -422,8 +422,8 @@ func generatePawnMove(BoardState load.BoardState, loc uint32, x int, y int, z in
 				return
 			}
 			uin := bitutil.VecToUint(X, Y, Z)
-			if !BoardState.AllPieces.Contains(uin) { //Normal moves can only be made if there are no pieces there, ANY
-				result.Set(uin)
+			if !BoardState.AllPieces.Contains(uin) && !BoardState.SwapPawn { //Normal moves can only be made if there are no pieces there, ANY
+				result.Set(uin) //Plus if were not looking for checks
 			}
 		})
 	}
@@ -439,15 +439,13 @@ func generatePawnMove(BoardState load.BoardState, loc uint32, x int, y int, z in
 				return
 			}
 			uin := bitutil.VecToUint(X, Y, Z)
-			if BoardState.EnemyPieces.Contains(uin) { //Attacking moves can only be made if there ARE enemy pieces there
+			if BoardState.EnemyPieces.Contains(uin) || BoardState.SwapPawn { //Attacking moves can only be made if there ARE enemy pieces there
 				result.Set(uin)
 			}
 		})
 	}
 
 	wg.Wait()
-	// fmt.Printf("All Pieces %064b\n", allPieces)
-	// fmt.Printf("Result %064b\n", result)
 	return result
 }
 
