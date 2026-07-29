@@ -85,7 +85,6 @@ func MoveCommand(from string, to string) {
 	}
 
 	BoardState, err := load.GenerateBoardState(allLoadedPieces, visFrom)
-	BoardState.PieceInProcess = visFrom //Setting the piece were working with
 
 	if err != nil {
 		logger.Error(fmt.Sprintf("Error in determing pieces team %v", BoardState.PieceLoadError))

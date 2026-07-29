@@ -5,6 +5,8 @@ package debug
 import (
 	"3DC/cmd/debug/dataPlanes"
 	"3DC/cmd/debug/moves"
+	"3DC/cmd/debug/uintvec"
+	"3DC/cmd/debug/vecuint"
 	"3DC/util/logger"
 
 	"github.com/spf13/cobra"
@@ -22,6 +24,8 @@ func Debug() *cobra.Command {
 	}
 	debugCMD.AddCommand(dataPlanes.DataPlanes())
 	debugCMD.AddCommand(moves.DebugMoveGen())
+	debugCMD.AddCommand(uintvec.UintTVec())
+	debugCMD.AddCommand(vecuint.VecTUint())
 	return debugCMD
 
 }
