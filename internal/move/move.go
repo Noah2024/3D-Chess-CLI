@@ -36,7 +36,7 @@ var BoardState load.BoardState
 
 // parseLoc turns the user friendly notation input by the user (e.g., "a1A") to a uint32 index which represents that location in the bitmap
 // inputs: string | outputs: uint32, x, y, z
-func parseLoc(loc string) (uint32, int, int, int) {
+func ParseLoc(loc string) (uint32, int, int, int) {
 
 	if len(loc) != 3 {
 		logger.Error(fmt.Sprintf("Could not parse location '%v' - invalid length of string", loc))
@@ -48,7 +48,7 @@ func parseLoc(loc string) (uint32, int, int, int) {
 
 // Determines peice type
 // inputs uint32 location | outputs: string, bitmap.Bitmap (bitmap )
-func pieceType(allLoadedPieces map[string]bitmap.Bitmap, loc uint32) (string, bitmap.Bitmap) {
+func PieceType(allLoadedPieces map[string]bitmap.Bitmap, loc uint32) (string, bitmap.Bitmap) {
 
 	//Contains is simd vectorized, I don't feel the need to optimize this search
 	for meta, bm := range allLoadedPieces {
@@ -67,17 +67,18 @@ func pieceType(allLoadedPieces map[string]bitmap.Bitmap, loc uint32) (string, bi
 // If it is valid, it updates the bitmaps for both pieces and saves the game state.
 // inputs: from string, to string | outputs: none
 func MoveCommand(from string, to string) {
-	uLocFrom, fX, fY, fZ := parseLoc(from)
+	uLocFrom, fX, fY, fZ := ParseLoc(from)
 	logger.Debug(fmt.Sprintf("Move called from %v to %v", from, to))
 
 	allLoadedPieces, loadErr := load.LoadGame(config.CurrentGame)
+	fmt.Println(allLoadedPieces)
 
 	if loadErr != nil {
 		logger.Error(fmt.Sprintf("Could not load board state (ensure you have  a 'CurrentGame' folder in your data directory) %v", BoardState.PieceLoadError))
 		return
 	}
 
-	visFrom, bmFrom := pieceType(allLoadedPieces, uLocFrom)
+	visFrom, bmFrom := PieceType(allLoadedPieces, uLocFrom)
 	if visFrom == "" {
 		logger.Error(fmt.Sprintf("Could not find piece at location %v", from))
 		return
@@ -91,8 +92,8 @@ func MoveCommand(from string, to string) {
 		return
 	}
 
-	uintLocTo, _, _, _ := parseLoc(to)
-	visTo, bmTo := pieceType(allLoadedPieces, uintLocTo)
+	uintLocTo, _, _, _ := ParseLoc(to)
+	visTo, bmTo := PieceType(allLoadedPieces, uintLocTo)
 
 	//visFrom encodes the type of piece, and thus the move function we use to generate all possible moves
 	moveFunction := genMoves.MoveMap[visFrom]

@@ -3,6 +3,7 @@
 package load
 
 import (
+	"3DC/config"
 	"3DC/util/logger"
 	"3DC/util/must"
 	"os"
@@ -55,6 +56,9 @@ func GenerateBoardState(loadedData map[string]bitmap.Bitmap, referencePiece stri
 	//Need to initalize the map
 	rtn := BoardState{}
 	rtn.AllIndividualPieces = make(map[string]bitmap.Bitmap) //Need to initalize this map
+	rtn.PieceInProcess = referencePiece
+	rtn.AllPieces.Grow(config.BoardSize - 1)
+	rtn.FriendPieces.Grow(config.BoardSize - 1)
 
 	r, _ := utf8.DecodeRuneInString(referencePiece)
 
@@ -66,6 +70,10 @@ func GenerateBoardState(loadedData map[string]bitmap.Bitmap, referencePiece stri
 	for vis, bm := range loadedData {
 
 		visAsRune, _ := utf8.DecodeRuneInString(vis)
+		_, notEmpty := bm.Max()
+		if !notEmpty {
+			continue
+		}
 
 		if visAsRune >= start && visAsRune <= end {
 			rtn.FriendPieces.Or(bm)
