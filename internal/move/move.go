@@ -48,13 +48,10 @@ func parseLoc(loc string) (uint32, int, int, int) {
 
 // Determines peice type
 // inputs uint32 location | outputs: string, bitmap.Bitmap (bitmap )
-func pieceType(loc uint32) (string, bitmap.Bitmap) {
-
-	allPieces, _ := load.LoadGame(config.CurrentGame)
-	// fmt.Printf("All Pieces Alternate %064b\n", allPieces)
+func pieceType(allLoadedPieces map[string]bitmap.Bitmap, loc uint32) (string, bitmap.Bitmap) {
 
 	//Contains is simd vectorized, I don't feel the need to optimize this search
-	for meta, bm := range allPieces {
+	for meta, bm := range allLoadedPieces {
 
 		if bm.Contains(loc) {
 			// logger.Info(meta)
@@ -73,13 +70,20 @@ func MoveCommand(from string, to string) {
 	uLocFrom, fX, fY, fZ := parseLoc(from)
 	logger.Debug(fmt.Sprintf("Move called from %v to %v", from, to))
 
-	visFrom, bmFrom := pieceType(uLocFrom)
+	allLoadedPieces, loadErr := load.LoadGame(config.CurrentGame)
+
+	if loadErr != nil {
+		logger.Error(fmt.Sprintf("Could not load board state (ensure you have  a 'CurrentGame' folder in your data directory) %v", BoardState.PieceLoadError))
+		return
+	}
+
+	visFrom, bmFrom := pieceType(allLoadedPieces, uLocFrom)
 	if visFrom == "" {
 		logger.Error(fmt.Sprintf("Could not find piece at location %v", from))
 		return
 	}
 
-	BoardState, err := load.GenerateBoardState(config.CurrentGame, visFrom)
+	BoardState, err := load.GenerateBoardState(allLoadedPieces, visFrom)
 	BoardState.PieceInProcess = visFrom //Setting the piece were working with
 
 	if err != nil {
@@ -88,7 +92,7 @@ func MoveCommand(from string, to string) {
 	}
 
 	uintLocTo, _, _, _ := parseLoc(to)
-	visTo, bmTo := pieceType(uintLocTo)
+	visTo, bmTo := pieceType(allLoadedPieces, uintLocTo)
 
 	//visFrom encodes the type of piece, and thus the move function we use to generate all possible moves
 	moveFunction := genMoves.MoveMap[visFrom]

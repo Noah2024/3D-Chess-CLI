@@ -23,7 +23,7 @@ type BoardState struct {
 	PieceInProcess      string                   //The piece currently being processed (used in protecting king in genMoves.restrictMoves)
 }
 
-// Loads dictionary mapping display char to the bitmap corresponding with that piece
+// Loads dictionary, mapping display char to the bitmap corresponding with that piece
 func LoadGame(fileLocation string) (data map[string]bitmap.Bitmap, err error) {
 
 	result := make(map[string]bitmap.Bitmap)
@@ -49,14 +49,8 @@ func LoadGame(fileLocation string) (data map[string]bitmap.Bitmap, err error) {
 }
 
 // GenerateBoardState loops through all the bitmaps returned by LoadGame and using a reference piece determines friendly, & enemy pieces.
-// Defined in load becuase it is indepdendly loading in the board to make this determination
-func GenerateBoardState(fileLocation string, referencePiece string) (BoardState, error) {
-	// result := make(map[string]bitmap.Bitmap)
-	if _, err := os.Stat(fileLocation); os.IsNotExist(err) {
-		logger.Warn("No game currently running, create one with '3DC game new'\n")
-		return BoardState{}, err
-	}
-	entries := must.Must(os.ReadDir(fileLocation))
+// Defined in load becuase it requires previously loaded data to function
+func GenerateBoardState(loadedData map[string]bitmap.Bitmap, referencePiece string) (BoardState, error) {
 
 	//Need to initalize the map
 	rtn := BoardState{}
@@ -69,17 +63,9 @@ func GenerateBoardState(fileLocation string, referencePiece string) (BoardState,
 		start, end = '♚', '♟'
 	}
 
-	for _, entry := range entries {
-		if entry.IsDir() {
-			//meta.bin is stored in /meta dir
-			//This is so we can easily skip it when loading the piece bitmaps
-			continue
-		}
-		vis := entry.Name()
-		visAsRune, _ := utf8.DecodeRuneInString(vis)
+	for vis, bm := range loadedData {
 
-		file := must.Must(os.Open(fileLocation + "/" + entry.Name()))
-		bm := must.Must(bitmap.ReadFrom(file))
+		visAsRune, _ := utf8.DecodeRuneInString(vis)
 
 		if visAsRune >= start && visAsRune <= end {
 			rtn.FriendPieces.Or(bm)

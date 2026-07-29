@@ -25,6 +25,11 @@ var UintToVec = bitutil.UintToVec
 
 // Generates new board with a hardcoded start state as a series of len 512 bitmaps
 func NewCommand() {
+	save.SaveGame(DefaultStartState(), config.CurrentGame)
+}
+
+// Default starting state for board
+func DefaultStartState() map[string]bitmap.Bitmap {
 	logger.Debug("Running New Command Now")
 	var whitePawn bitmap.Bitmap
 
@@ -106,9 +111,5 @@ func NewCommand() {
 		"♛": whiteQueen,
 		"♚": whiteKing,
 	}
-	// _, _, all, _ := load.GetFriendsAndEnemies(config.CurrentGame, "♖")
-	// fmt.Printf("ALL %064b\n", all)
-
-	//Need a dialog box for this
-	save.SaveGame(fullMap, config.CurrentGame)
+	return fullMap
 }
