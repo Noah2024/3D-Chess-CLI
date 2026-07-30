@@ -27,9 +27,9 @@ var UintToVec = bitutil.UintToVec
 // Generates new board with a hardcoded start state as a series of len 64 bitmaps
 func NewCommand() {
 
-	// save.SaveGame(GenerateSinglePiece("♖", 5, 5, 5), config.CurrentGame)
-	save.SaveGame(GenerateSinglePiece(map[string]uint32{"♖": 292, "♟": 290}), config.CurrentGame)
-	// save.SaveGame(DefaultStartState(), config.CurrentGame)
+	save.SaveGame(DefaultStartState(), config.CurrentGame)
+	// save.SaveGame(GenerateSinglePiece(map[string]uint32{"♟": 292, "♗": 235}), config.CurrentGame)
+
 }
 
 // For now I will store possible game states to start from here, for NOW
