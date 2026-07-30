@@ -1,3 +1,5 @@
+// Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
+
 // Generate moves contians all the functions which are used at runtime by the move function to generate all moves.
 // Move generates the board state which is then passed into these functions, hence move needs to be run/loaded first otherwise
 // BordState will have no data
@@ -376,7 +378,7 @@ func generateKingMove(BoardState load.BoardState, loc uint32, x int, y int, z in
 		// })
 	}
 
-	wg.Wait()
+	// wg.Wait()
 	result = removeFriends(BoardState, result)
 	// fmt.Printf("All Pieces %064b\n", allPieces)
 	// fmt.Printf("Result %064b\n", result)
@@ -445,7 +447,7 @@ func generatePawnMove(BoardState load.BoardState, loc uint32, x int, y int, z in
 		// })
 	}
 
-	wg.Wait()
+	// wg.Wait()
 	return result
 }
 

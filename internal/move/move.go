@@ -103,7 +103,7 @@ func MoveCommand(from string, to string) {
 	}
 
 	//Run entire checking system
-	inCheck, inCheckMate, allowedKingMoves, allowedProtectingMoves := checking.IsKingInCheck(BoardState)
+	inCheck, inCheckMate, allowedKingMoves, savingKingMoves := checking.IsKingInCheck(BoardState)
 	//If in checkmate, exit immiedatley
 	if inCheckMate {
 		logger.Error("Game is over, this pieces team is in checkmate!")
@@ -131,10 +131,16 @@ func MoveCommand(from string, to string) {
 		allMoves.And(allowedKingMoves)
 	} else { //If king is in check can this piece take it out of check
 		if inCheck {
-			fmt.Println("Piece can take the king out of check")
-			allMoves.And(allowedProtectingMoves)
+			fmt.Println("Piece needs take the king out of check if possible")
+			allMoves.And(savingKingMoves)
+			_, canUnceck := allMoves.Max()
+			if !canUnceck {
+				logger.Error("Your king is in check!")
+				return
+			}
 		}
 	}
+	//Restrict King Moves for king
 
 	//Final check to see if piece can or can not move
 	if !(allMoves.Contains(uintLocTo)) {
