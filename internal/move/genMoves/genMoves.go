@@ -145,29 +145,29 @@ func generateRookMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 	sideToSide := dataplane.YPlane[y-1].Clone(nil)
 	upAndDown := dataplane.YPlane[y-1].Clone(nil)
 
-	wg.Go(
-		func() {
-			forward.And(dataplane.ZPlane[z-1])
-			forward = restrictMoves(BoardState, loc, forward) //x
-		},
-	)
+	// wg.Go(
+	// 	func() {
+	forward.And(dataplane.ZPlane[z-1])
+	forward = restrictMoves(BoardState, loc, forward) //x
+	// 	},
+	// )
 
-	wg.Go(
-		func() {
-			sideToSide.And(dataplane.XPlane[x-1])                   //-2
-			sideToSide = restrictMoves(BoardState, loc, sideToSide) //z
-		},
-	)
+	// wg.Go(
+	// 	func() {
+	sideToSide.And(dataplane.XPlane[x-1])                   //-2
+	sideToSide = restrictMoves(BoardState, loc, sideToSide) //z
+	// 	},
+	// )
 
 	// wg.Add(1)
-	wg.Go(
-		func() {
-			upAndDown.And(dataplane.ZPlane[z-1])
-			upAndDown = restrictMoves(BoardState, loc, upAndDown) //y
-		},
-	)
+	// wg.Go(
+	// 	func() {
+	upAndDown.And(dataplane.ZPlane[z-1])
+	upAndDown = restrictMoves(BoardState, loc, upAndDown) //y
+	// 	},
+	// )
 
-	wg.Wait()
+	// wg.Wait()
 	forward.Or(upAndDown)
 	forward.Or(sideToSide)
 	// fmt.Printf("All Pieces %064b\n", allPieces)                //For Debug
@@ -296,20 +296,20 @@ func generateKnightMove(BoardState load.BoardState, loc uint32, x int, y int, z 
 	}
 
 	for _, comb := range allCombs {
-		wg.Go(func() {
-			X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
+		// wg.Go(func() {
+		X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
 
-			if X > 8 || Y > 8 || Z > 8 {
-				return
-			}
-			if X < 1 || Y < 1 || Z < 1 {
-				return
-			}
-			result.Set(bitutil.VecToUint(X, Y, Z))
-		})
+		if X > 8 || Y > 8 || Z > 8 {
+			continue
+		}
+		if X < 1 || Y < 1 || Z < 1 {
+			continue
+		}
+		result.Set(bitutil.VecToUint(X, Y, Z))
+		// })
 	}
 
-	wg.Wait()
+	// wg.Wait()
 	result = removeFriends(BoardState, result)
 	// fmt.Printf("All Pieces %064b\n", load.BS.AllPieces)
 	// fmt.Printf("Result %064b\n", result)
@@ -363,17 +363,17 @@ func generateKingMove(BoardState load.BoardState, loc uint32, x int, y int, z in
 	}
 
 	for _, comb := range allCombs {
-		wg.Go(func() {
-			X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
+		// wg.Go(func() {
+		X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
 
-			if X > 8 || Y > 8 || Z > 8 {
-				return
-			}
-			if X < 1 || Y < 1 || Z < 1 {
-				return
-			}
-			result.Set(bitutil.VecToUint(X, Y, Z))
-		})
+		if X > 8 || Y > 8 || Z > 8 {
+			continue
+		}
+		if X < 1 || Y < 1 || Z < 1 {
+			continue
+		}
+		result.Set(bitutil.VecToUint(X, Y, Z))
+		// })
 	}
 
 	wg.Wait()
@@ -412,37 +412,37 @@ func generatePawnMove(BoardState load.BoardState, loc uint32, x int, y int, z in
 	}
 
 	for _, comb := range normalMoves {
-		wg.Go(func() {
-			X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
+		// wg.Go(func() {
+		X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
 
-			if X > 8 || Y > 8 || Z > 8 {
-				return
-			}
-			if X < 1 || Y < 1 || Z < 1 {
-				return
-			}
-			uin := bitutil.VecToUint(X, Y, Z)
-			if !BoardState.AllPieces.Contains(uin) && !BoardState.SwapPawn { //Normal moves can only be made if there are no pieces there, ANY
-				result.Set(uin) //Plus if were not looking for checks
-			}
-		})
+		if X > 8 || Y > 8 || Z > 8 {
+			continue
+		}
+		if X < 1 || Y < 1 || Z < 1 {
+			continue
+		}
+		uin := bitutil.VecToUint(X, Y, Z)
+		if !BoardState.AllPieces.Contains(uin) && !BoardState.SwapPawn { //Normal moves can only be made if there are no pieces there, ANY
+			result.Set(uin) //Plus if were not looking for checks
+		}
+		// })
 	}
 
 	for _, comb := range attackingMoves {
-		wg.Go(func() {
-			X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
+		// wg.Go(func() {
+		X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
 
-			if X > 8 || Y > 8 || Z > 8 {
-				return
-			}
-			if X < 1 || Y < 1 || Z < 1 {
-				return
-			}
-			uin := bitutil.VecToUint(X, Y, Z)
-			if BoardState.EnemyPieces.Contains(uin) || BoardState.SwapPawn { //Attacking moves can only be made if there ARE enemy pieces there
-				result.Set(uin)
-			}
-		})
+		if X > 8 || Y > 8 || Z > 8 {
+			continue
+		}
+		if X < 1 || Y < 1 || Z < 1 {
+			continue
+		}
+		uin := bitutil.VecToUint(X, Y, Z)
+		if BoardState.EnemyPieces.Contains(uin) || BoardState.SwapPawn { //Attacking moves can only be made if there ARE enemy pieces there
+			result.Set(uin)
+		}
+		// })
 	}
 
 	wg.Wait()
