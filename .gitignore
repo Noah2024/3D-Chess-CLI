@@ -33,3 +33,6 @@ data/*
 
 # Generated Binary
 3DC 
+
+#Vscode
+.vscode
