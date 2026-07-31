@@ -3,6 +3,7 @@
 package debug
 
 import (
+	"3DC/cmd/debug/bmstring"
 	"3DC/cmd/debug/dataPlanes"
 	"3DC/cmd/debug/moves"
 	"3DC/cmd/debug/uintvec"
@@ -26,6 +27,7 @@ func Debug() *cobra.Command {
 	debugCMD.AddCommand(moves.DebugMoveGen())
 	debugCMD.AddCommand(uintvec.UintTVec())
 	debugCMD.AddCommand(vecuint.VecTUint())
+	debugCMD.AddCommand(bmstring.Bmstring())
 	return debugCMD
 
 }

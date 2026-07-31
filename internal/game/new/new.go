@@ -28,7 +28,10 @@ var UintToVec = bitutil.UintToVec
 func NewCommand() {
 
 	save.SaveGame(DefaultStartState(), config.CurrentGame)
-	// save.SaveGame(GenerateSinglePiece(map[string]uint32{"♟": 292, "♗": 235}), config.CurrentGame)
+	// save.SaveGame(GenerateSinglePiece(map[string]uint32{
+	// 	"♙": 300,
+	// 	"♟": 292,
+	// }), config.CurrentGame)
 
 }
 

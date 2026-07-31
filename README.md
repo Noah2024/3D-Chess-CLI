@@ -11,8 +11,12 @@ SO Im now using this project to a) work on making that dream a reality 2) learn 
 
 
 ## Final Checklist before 1.0
+- Ensure UintToVec and VecToUint are really inverses
+- Clean Up Checking logic
+- Systems Test Using the full move command
 - Turn Tracking
 - Upper Level API Integration
+ - And test cases for said API 
 - pawn double move
 - pawn promotion
 - Time trials/stress test

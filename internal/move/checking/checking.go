@@ -23,6 +23,18 @@ func inBounds(v int) bool {
 	return 0 <= v && v <= 8
 }
 
+// Determines if two positions are related to one another
+func distance(loc1 uint32, loc2 uint32) int {
+	x1, y1, z1 := bitutil.UintToVec(loc1)
+	x2, y2, z2 := bitutil.UintToVec(loc2)
+
+	dx := x2 - x1
+	dy := y2 - y1
+	dz := z2 - z1
+
+	return abs(dx) + abs(dy) + abs(dz)
+}
+
 // Determines if the given piece will put its king in danger by moving.
 // If so, it returns the only legal moves it can make, if not then it reuturns and empty bitmap
 func KingInDanger(BoardState load.BoardState, loc uint32) (bitmap.Bitmap, bool) {
@@ -113,7 +125,9 @@ func KingInDanger(BoardState load.BoardState, loc uint32) (bitmap.Bitmap, bool) 
 
 	var PinningEnemies bitmap.Bitmap
 	PinningEnemies.Grow(config.BoardSize - 1)
-	PinningEnemies.Or(BoardState.AllIndividualPieces[badQueen])
+	if BoardState.AllIndividualPieces[badQueen] != nil {
+		PinningEnemies.Or(BoardState.AllIndividualPieces[badQueen])
+	}
 	PinningEnemies.Or(BoardState.AllIndividualPieces[string(lookingFor)])
 
 	// ==========================================
@@ -145,12 +159,10 @@ func KingInDanger(BoardState load.BoardState, loc uint32) (bitmap.Bitmap, bool) 
 // If king in check it returns a list of all the moves which other peices could make to move the king out of check
 // Returns isCheck, isCheckMate, allowedKingMoves, allowedProtectingMoves
 func IsKingInCheck(BoardState load.BoardState) (bool, bool, bitmap.Bitmap, bitmap.Bitmap) {
-	// var pieceWaitGroup sync.WaitGroup
 	var validKingMoves bitmap.Bitmap
 	var enemyAttackingMoves bitmap.Bitmap
-	// fmt.Println("Running king check")
-	var allowedProtectingMoves bitmap.Bitmap
-	allowedProtectingMoves.Grow(config.BoardSize - 1)
+	var savingKingMoves bitmap.Bitmap
+	savingKingMoves.Grow(config.BoardSize - 1)
 	var inCheck bool
 	var directionOfAttack = 0 //If there is more than one direction of attack then
 	//There is no need to check for friends that can take the king out of check
@@ -189,10 +201,17 @@ func IsKingInCheck(BoardState load.BoardState) (bool, bool, bitmap.Bitmap, bitma
 		if visAsRune >= start && visAsRune <= end { //Computing types of enemy moves
 
 			// pieceWaitGroup.Go(func() {
-			bm.Range(func(X uint32) {
+
+			bm.Range(func(curtLoc uint32) {
+				fmt.Println(vis)
+				var tmp bitmap.Bitmap
+				tmp.Grow(511)
+				tmp.Set(curtLoc)
+				fmt.Printf("%s LOCATION : %064b\n", vis, tmp)
+
 				//Get this pieces move
-				x, y, z := bitutil.UintToVec(X)
-				attackLine := genMoves.MoveMap[vis](BoardState, X, x, y, z)
+				x, y, z := bitutil.UintToVec(curtLoc)
+				attackLine := genMoves.MoveMap[vis](BoardState, curtLoc, x, y, z)
 
 				fmt.Printf("%s attackLine : %064b\n", vis, attackLine)
 
@@ -201,20 +220,46 @@ func IsKingInCheck(BoardState load.BoardState) (bool, bool, bitmap.Bitmap, bitma
 
 				//Determine if king is in check from this piece
 				if attackLine.Contains(BoardState.FriendKingLoc) { //Attack contains the king
-					fmt.Println("KING IN CHECK")
-					inCheck = true
-					enemyAttackingMoves.Or(attackLine)
-					directionOfAttack += 1
+					if directionOfAttack < 1 { //Only need to do this the first time
+						fmt.Println("KING IN CHECK")
+						inCheck = true
+						enemyAttackingMoves.Or(attackLine)
+
+						//Calculating the same move type as if it was coming form the king
+						//ANDing them togther, then limiting their output to the given distance between
+						//The two pieces to prevent false positives
+						x, y, z := bitutil.UintToVec(BoardState.FriendKingLoc)
+						limitedAttackingMoves := genMoves.MoveMap[vis](BoardState, BoardState.FriendKingLoc, x, y, z)
+						enemyAttackingMoves.And(limitedAttackingMoves)
+
+						maxDist := distance(curtLoc, BoardState.FriendKingLoc)
+						enemyAttackingMoves.Filter(func(x uint32) bool {
+							if distance(x, BoardState.FriendKingLoc) < maxDist {
+								return true
+							} else {
+								return false
+							}
+						})
+						enemyAttackingMoves.Set(curtLoc)
+
+						fmt.Println("Enemy Attacking Moves Here")
+						fmt.Printf("enemyAttackingMoves : %064b\n", enemyAttackingMoves)
+
+						directionOfAttack += 1
+					} else {
+						enemyAttackingMoves.Clear()
+						directionOfAttack += 1
+					}
 				}
 			})
 		}
 	}
 
 	//Actually removing illegal moves from kings valid moves
-	fmt.Printf("kingCantMove : %064b\n", kingCantMove)
+	// fmt.Printf("kingCantMove : %064b\n", kingCantMove)
 	tmpKing := kingCantMove.Clone(nil)
 	tmpKing.And(validKingMoves)
-	fmt.Printf("tmpKing : %064b\n", tmpKing)
+	// fmt.Printf("King Location : %064b\n", tmpKing)
 	validKingMoves.Xor(tmpKing)
 
 	//Adding the king back to his correct palce
@@ -229,7 +274,14 @@ func IsKingInCheck(BoardState load.BoardState) (bool, bool, bitmap.Bitmap, bitma
 	fmt.Printf("validKingMoves : %064b\n", validKingMoves)
 
 	if !inCheck { //If the king is not in check there is no need to test the other pieces
-		return false, false, validKingMoves, allowedProtectingMoves
+		return false, false, validKingMoves, savingKingMoves
+	}
+
+	//Swap them back so we can loop over friends again
+	if start == '♔' {
+		start, end = '♚', '♟'
+	} else {
+		start, end = '♔', '♙'
 	}
 
 	//If the king is attacked from more than one direction it dosn't matter if any piece can move, becuase there is no move
@@ -237,40 +289,43 @@ func IsKingInCheck(BoardState load.BoardState) (bool, bool, bitmap.Bitmap, bitma
 	fmt.Println("Direction of Attack: ", directionOfAttack)
 	if directionOfAttack <= 1 {
 		// return inCheck, false, validKingMoves, bitmap.Bitmap{}
+		// fmt.Printf("Enemy Attacking Moves %064b", enemyAttackingMoves)
 
 		//After computing if the king is in check we need to see if there are any pieces which can take it out of check
 		//Otherwise there is no way to tell if were in a state of checkmate
 		for vis, bm := range BoardState.AllIndividualPieces {
+			if vis == "♚" || vis == "♔" { //AGAIN, the king cannont save itself
+				continue
+			}
 			visAsRune := []rune(vis)[0]
-			if visAsRune >= start && visAsRune <= end { //Computing types of enemy moves
+			if visAsRune >= start && visAsRune <= end {
 				// x, y, z := bitutil.UintToVec(BoardState.FriendKingLoc)
 				//Computing friendlies moves
-				fmt.Println(vis)
 				bm.Range(func(X uint32) {
 					x, y, z := bitutil.UintToVec(X)
 					friendAttempt := genMoves.MoveMap[vis](BoardState, X, x, y, z)
+					fmt.Println("PROTECTING PIECE", vis)
+					fmt.Printf("%064b\n", friendAttempt)
+
 					friendAttempt.And(enemyAttackingMoves)
 					_, present := friendAttempt.Max()
 					if present { //If this freind intersects with any of the attacking moves
-						allowedProtectingMoves.Or(genMoves.MoveMap[vis](BoardState, X, x, y, z))
+						savingKingMoves = friendAttempt
 					}
 				})
 			}
 		}
 	}
 
-	fmt.Println("HERE")
-	fmt.Printf("validKingMoves : %064b\n", validKingMoves)
-
-	//By know we know that the king is in check
+	//By now we know that the king is in check
 	//So we know need to test if either the king can move, AND/OR if it can be taken out of check
 	_, canMove := validKingMoves.Max()
-	_, canBeSaved := allowedProtectingMoves.Max()
+	_, canBeSaved := savingKingMoves.Max()
 
 	//If neither then its checkmate
 	if !canMove && !canBeSaved {
-		return true, true, validKingMoves, allowedProtectingMoves
+		return true, true, validKingMoves, savingKingMoves
 	}
 
-	return true, false, validKingMoves, allowedProtectingMoves
+	return true, false, validKingMoves, savingKingMoves
 }
