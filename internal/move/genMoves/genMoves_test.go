@@ -502,5 +502,5 @@ func TestMovement(t *testing.T) {
 			AllMovementTest(t, testCase)
 		})
 	}
-	testutil.DumpExpectedMoves(PiecesUnderTest)
+	// testutil.DumpExpectedMoves(PiecesUnderTest)
 }

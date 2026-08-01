@@ -114,6 +114,7 @@ func MoveCommand(from string, to string) {
 
 	//Make sure this piece isn't protecting the king
 	protectingMoves, kingDanger := checking.KingInDanger(BoardState, uLocFrom)
+	fmt.Println("King Danger: ", kingDanger)
 	if kingDanger { //I don't think this is right
 		allMoves.And(protectingMoves)
 		fmt.Printf("Protecting Moves: %064b\n", protectingMoves)

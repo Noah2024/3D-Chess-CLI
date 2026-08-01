@@ -6,7 +6,6 @@ package new
 import (
 	"3DC/internal/game/save"
 	"3DC/util/logger"
-	"fmt"
 
 	"3DC/config"
 	"3DC/util/bitutil"
@@ -26,12 +25,8 @@ var UintToVec = bitutil.UintToVec
 
 // Generates new board with a hardcoded start state as a series of len 64 bitmaps
 func NewCommand() {
-
 	save.SaveGame(DefaultStartState(), config.CurrentGame)
-	// save.SaveGame(GenerateSinglePiece(map[string]uint32{
-	// 	"♙": 300,
-	// 	"♟": 292,
-	// }), config.CurrentGame)
+	// save.SaveGame(GenerateSinglePiece(map[string]uint32{"♔": 0, "♛": 9, "♟": 18, "♜": 73}), config.CurrentGame)
 
 }
 
@@ -149,7 +144,7 @@ func GenerateSinglePiece(allPieces map[string]uint32) map[string]bitmap.Bitmap {
 		fullMap[piece] = tmp
 
 	}
-	logger.Debug(fmt.Sprintf("Init custom inline board setup finsihed '%s' ", allPieces))
+	// logger.Debug(fmt.Sprintf("Init custom inline board setup finsihed '%s' ", allPieces))
 
 	return fullMap
 }

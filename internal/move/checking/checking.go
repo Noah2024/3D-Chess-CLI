@@ -7,7 +7,6 @@ import (
 	"3DC/internal/game/load"
 	"3DC/internal/move/genMoves"
 	"3DC/util/bitutil"
-	"fmt"
 
 	"github.com/kelindar/bitmap"
 )
@@ -91,7 +90,8 @@ func KingInDanger(BoardState load.BoardState, loc uint32) (bitmap.Bitmap, bool) 
 	bishopLine :=
 		(dz == 0 && abs(dx) == abs(dy)) ||
 			(dy == 0 && abs(dx) == abs(dz)) ||
-			(dx == 0 && abs(dy) == abs(dz))
+			(dx == 0 && abs(dy) == abs(dz)) ||
+			(abs(dx) == abs(dy) && abs(dy) == abs(dz))
 
 	// ONLY check if we are in line with the king
 	if !(rookLine || bishopLine) {
@@ -135,6 +135,24 @@ func KingInDanger(BoardState load.BoardState, loc uint32) (bitmap.Bitmap, bool) 
 	// If we find a friendly we exit immediatley
 	// If we find an enemy we return all the moves it took for us to get there, including that piece
 	// ==========================================
+
+	x := x1
+	y := y1
+	z := z1
+
+	for inBounds(x+stepX) && inBounds(y+stepY) && inBounds(z+stepZ) {
+		x += stepX
+		y += stepY
+		z += stepZ
+
+		uloc := bitutil.VecToUint(x, y, z)
+
+		if uloc == BoardState.FriendKingLoc {
+			break
+		}
+
+		protectingMoves.Set(uloc)
+	}
 
 	for inBounds(x1-stepX) && inBounds(y1-stepY) && inBounds(z1-stepZ) {
 		x1 -= stepX
@@ -203,17 +221,10 @@ func IsKingInCheck(BoardState load.BoardState) (bool, bool, bitmap.Bitmap, bitma
 			// pieceWaitGroup.Go(func() {
 
 			bm.Range(func(curtLoc uint32) {
-				fmt.Println(vis)
-				var tmp bitmap.Bitmap
-				tmp.Grow(511)
-				tmp.Set(curtLoc)
-				fmt.Printf("%s LOCATION : %064b\n", vis, tmp)
 
 				//Get this pieces move
 				x, y, z := bitutil.UintToVec(curtLoc)
 				attackLine := genMoves.MoveMap[vis](BoardState, curtLoc, x, y, z)
-
-				fmt.Printf("%s attackLine : %064b\n", vis, attackLine)
 
 				//Remove these moves from possible king moves
 				kingCantMove.Or(attackLine)
@@ -221,7 +232,6 @@ func IsKingInCheck(BoardState load.BoardState) (bool, bool, bitmap.Bitmap, bitma
 				//Determine if king is in check from this piece
 				if attackLine.Contains(BoardState.FriendKingLoc) { //Attack contains the king
 					if directionOfAttack < 1 { //Only need to do this the first time
-						fmt.Println("KING IN CHECK")
 						inCheck = true
 						enemyAttackingMoves.Or(attackLine)
 
@@ -241,9 +251,6 @@ func IsKingInCheck(BoardState load.BoardState) (bool, bool, bitmap.Bitmap, bitma
 							}
 						})
 						enemyAttackingMoves.Set(curtLoc)
-
-						fmt.Println("Enemy Attacking Moves Here")
-						fmt.Printf("enemyAttackingMoves : %064b\n", enemyAttackingMoves)
 
 						directionOfAttack += 1
 					} else {
@@ -271,8 +278,6 @@ func IsKingInCheck(BoardState load.BoardState) (bool, bool, bitmap.Bitmap, bitma
 	BoardState.EnemyPieces = BoardState.FriendPieces
 	BoardState.FriendPieces = tmp2
 
-	fmt.Printf("validKingMoves : %064b\n", validKingMoves)
-
 	if !inCheck { //If the king is not in check there is no need to test the other pieces
 		return false, false, validKingMoves, savingKingMoves
 	}
@@ -286,7 +291,7 @@ func IsKingInCheck(BoardState load.BoardState) (bool, bool, bitmap.Bitmap, bitma
 
 	//If the king is attacked from more than one direction it dosn't matter if any piece can move, becuase there is no move
 	//from another piece which could take the king out of check
-	fmt.Println("Direction of Attack: ", directionOfAttack)
+	// fmt.Println("Direction of Attack: ", directionOfAttack)
 	if directionOfAttack <= 1 {
 		// return inCheck, false, validKingMoves, bitmap.Bitmap{}
 		// fmt.Printf("Enemy Attacking Moves %064b", enemyAttackingMoves)
@@ -304,8 +309,6 @@ func IsKingInCheck(BoardState load.BoardState) (bool, bool, bitmap.Bitmap, bitma
 				bm.Range(func(X uint32) {
 					x, y, z := bitutil.UintToVec(X)
 					friendAttempt := genMoves.MoveMap[vis](BoardState, X, x, y, z)
-					fmt.Println("PROTECTING PIECE", vis)
-					fmt.Printf("%064b\n", friendAttempt)
 
 					friendAttempt.And(enemyAttackingMoves)
 					_, present := friendAttempt.Max()
