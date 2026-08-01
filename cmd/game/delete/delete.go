@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// delete Provides CLI interface for deleting a saved game
 package delete
 
 import (
@@ -8,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Deletes a saved game from the CurrentGame folder. Takes 1 argument; the name of the game or its number; use 'game list' to see a list of commands
 func DeleteCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "del",

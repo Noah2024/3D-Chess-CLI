@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// genMoves_test contains tests for the genMoves package, which is responsible for generating all possible moves for a given piece on the board.
 package genMoves_test
 
 import (
@@ -12,13 +13,27 @@ import (
 	"testing"
 )
 
+type movementScenario struct {
+	Name string
+
+	Board    map[string]uint32
+	Position []int
+
+	Expected string
+}
+
+type pieceTestCase struct {
+	Piece     string
+	Scenarios []movementScenario
+}
+
 //As it stands many movement scenarious are exactly the same
 //So there is room to create common Scenarios which could be better
 
-var PiecesUnderTest = []testutil.PieceTestCase{
+var PiecesUnderTest = []pieceTestCase{
 	{
 		Piece: "♖",
-		Scenarios: []testutil.MovementScenario{
+		Scenarios: []movementScenario{
 			{
 				Name:     "movementCenter",
 				Board:    map[string]uint32{},
@@ -78,9 +93,9 @@ var PiecesUnderTest = []testutil.PieceTestCase{
 			},
 		},
 	},
-	testutil.PieceTestCase{
+	pieceTestCase{
 		Piece: "♗",
-		Scenarios: []testutil.MovementScenario{
+		Scenarios: []movementScenario{
 			{
 				Name:     "movementCenter",
 				Board:    map[string]uint32{},
@@ -141,9 +156,9 @@ var PiecesUnderTest = []testutil.PieceTestCase{
 		},
 	},
 
-	testutil.PieceTestCase{
+	pieceTestCase{
 		Piece: "♕",
-		Scenarios: []testutil.MovementScenario{
+		Scenarios: []movementScenario{
 			{
 				Name:     "movementCenter",
 				Board:    map[string]uint32{},
@@ -203,9 +218,9 @@ var PiecesUnderTest = []testutil.PieceTestCase{
 			},
 		},
 	},
-	testutil.PieceTestCase{
+	pieceTestCase{
 		Piece: "♘",
-		Scenarios: []testutil.MovementScenario{
+		Scenarios: []movementScenario{
 			{
 				Name:     "movementCenter",
 				Board:    map[string]uint32{},
@@ -266,9 +281,9 @@ var PiecesUnderTest = []testutil.PieceTestCase{
 		},
 	},
 
-	testutil.PieceTestCase{
+	pieceTestCase{
 		Piece: "♔",
-		Scenarios: []testutil.MovementScenario{
+		Scenarios: []movementScenario{
 			{
 				Name:     "movementCenter",
 				Board:    map[string]uint32{},
@@ -329,9 +344,9 @@ var PiecesUnderTest = []testutil.PieceTestCase{
 		},
 	},
 
-	testutil.PieceTestCase{
+	pieceTestCase{
 		Piece: "♙",
-		Scenarios: []testutil.MovementScenario{
+		Scenarios: []movementScenario{
 			{
 				Name:     "movementCenter",
 				Board:    map[string]uint32{},
@@ -392,11 +407,11 @@ var PiecesUnderTest = []testutil.PieceTestCase{
 		},
 	},
 
-	testutil.PieceTestCase{
+	pieceTestCase{
 		// Pawns are the only Piece whose movement depends on their team,
 		// so it makes sense to test both teams.
 		Piece: "♟",
-		Scenarios: []testutil.MovementScenario{
+		Scenarios: []movementScenario{
 			{
 				Name:     "movementCenter",
 				Board:    map[string]uint32{},
@@ -479,7 +494,7 @@ func checkMovement(t *testing.T, Piece string, piecesToLoad map[string]uint32, x
 	}
 }
 
-func AllMovementTest(t *testing.T, tc testutil.PieceTestCase) {
+func AllMovementTest(t *testing.T, tc pieceTestCase) {
 	for _, scenario := range tc.Scenarios {
 		t.Run(scenario.Name, func(t *testing.T) {
 			checkMovement(
@@ -503,4 +518,49 @@ func TestMovement(t *testing.T) {
 		})
 	}
 	// testutil.DumpExpectedMoves(PiecesUnderTest)
+}
+
+// The functions below were AI generated to speed up the initial validation of piece moves
+// All outputs from the below functions were throughly checked with the 3D debugger to ensure accuracy
+// While not used at runtime they are kept here for reference's sake
+
+func DumpExpectedMoves(PiecesUnderTest []pieceTestCase) {
+	for _, tc := range PiecesUnderTest {
+		fmt.Printf("\n=== %s ===\n", tc.Piece)
+
+		for _, scenario := range tc.Scenarios {
+			// Copy the board so we don't modify the original test data.
+			board := make(map[string]uint32, len(scenario.Board)+1)
+			for piece, loc := range scenario.Board {
+				board[piece] = loc
+			}
+
+			// Ensure the piece under test is present.
+			board[tc.Piece] = bitutil.VecToUint(
+				scenario.Position[0],
+				scenario.Position[1],
+				scenario.Position[2],
+			)
+
+			loaded := new.GenerateSinglePiece(board)
+			bs, _ := load.GenerateBoardState(loaded, tc.Piece)
+
+			loc := bitutil.VecToUint(
+				scenario.Position[0],
+				scenario.Position[1],
+				scenario.Position[2],
+			)
+
+			moves := genMoves.MoveMap[tc.Piece](
+				bs,
+				loc,
+				scenario.Position[0],
+				scenario.Position[1],
+				scenario.Position[2],
+			)
+
+			asStr, _ := testutil.BitmapStringToBinary(fmt.Sprint(moves))
+			fmt.Printf("%-24s %q\n", scenario.Name+":", asStr)
+		}
+	}
 }

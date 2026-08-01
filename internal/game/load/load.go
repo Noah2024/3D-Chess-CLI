@@ -1,5 +1,7 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// load provides the functionality to load a game from the data directory.
+// as well as contains the BoardState struct which is used to store the state of the board after loading a game.
 package load
 
 import (
@@ -12,16 +14,19 @@ import (
 	"github.com/kelindar/bitmap"
 )
 
+// BoardState struct is used to store the state of the board after loading a game.
+// BoardState is computed relative to a given reference piece, which is used to determine which pieces are friendly and which are enemy pieces.
+// The reference piece is whicever piece is currently being moved
 type BoardState struct {
-	FriendPieces        bitmap.Bitmap
-	EnemyPieces         bitmap.Bitmap
-	AllPieces           bitmap.Bitmap
-	PieceLoadError      error
-	FriendKing          bitmap.Bitmap
-	FriendKingLoc       uint32
+	FriendPieces        bitmap.Bitmap            // All friendly pieces on the board
+	EnemyPieces         bitmap.Bitmap            // All enemy pieces on the board
+	AllPieces           bitmap.Bitmap            // All pieces on the board (both friendly and enemy)
+	PieceLoadError      error                    // Error encountered during the loading of pieces, if any
+	FriendKing          bitmap.Bitmap            // Location of the king of the friendly pieces
+	FriendKingLoc       uint32                   // Location of the king of the friendly pieces, stored as a uint32 value
 	SwapPawn            bool                     //Needed for checking becuase the pawn attacks differnet than it moves
 	AllIndividualPieces map[string]bitmap.Bitmap //map[string]bitmap.Bitmap
-	PieceInProcess      string                   //The piece currently being processed (used in protecting king in genMoves.restrictMoves)
+	ReferencePiece      string                   //The piece currently being processed (used in protecting king in genMoves.restrictMoves)
 }
 
 // Loads dictionary, mapping display char to the bitmap corresponding with that piece
@@ -56,7 +61,7 @@ func GenerateBoardState(loadedData map[string]bitmap.Bitmap, referencePiece stri
 	//Need to initalize the map
 	rtn := BoardState{}
 	rtn.AllIndividualPieces = make(map[string]bitmap.Bitmap) //Need to initalize this map
-	rtn.PieceInProcess = referencePiece
+	rtn.ReferencePiece = referencePiece
 	rtn.AllPieces.Grow(config.BoardSize - 1)
 	rtn.FriendPieces.Grow(config.BoardSize - 1)
 

@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// root_ test provides a test for the root command of the 3DC CLI application.
 package root_test
 
 import (
@@ -9,6 +10,8 @@ import (
 	"testing"
 )
 
+// TestRootCommand tests the root command of the 3DC CLI application by executing it and redirecting stdout.
+// Then it checks if the output matches the expected output.
 func TestRootCommand(t *testing.T) {
 	//Create the root command
 	cmd := root.RootCommand()

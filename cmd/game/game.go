@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// game Provides CLI interface for creating and managing games
 package game
 
 import (
@@ -13,6 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// GameCommand returns the root command for the game subcommand, which allows users to create and manage games.
 func GameCommand() *cobra.Command {
 	gameCmd := &cobra.Command{
 		Use:   "game",

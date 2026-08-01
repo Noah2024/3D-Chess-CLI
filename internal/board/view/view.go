@@ -43,7 +43,7 @@ func ViewLayer(yLevel int, displayMetaData bool) {
 	allPieces, _ := load.LoadGame(config.CurrentGame)
 
 	if displayMetaData == true {
-		meta := must.Must(metadata.LoadMetaData(filepath.Join("data/output", "meta")))
+		meta := must.Must(metadata.LoadMetaData(filepath.Join(config.CurrentGame, "meta")))
 		metadata.DistplayMetaData(meta)
 	}
 
@@ -77,7 +77,7 @@ func ViewLayer(yLevel int, displayMetaData bool) {
 
 func ViewAllLayers() {
 	numLayers := int(BoardSize / LayerSize)
-	meta := must.Must(metadata.LoadMetaData(filepath.Join("data/output", "meta")))
+	meta := must.Must(metadata.LoadMetaData(filepath.Join(config.CurrentGame, "meta")))
 	metadata.DistplayMetaData(meta)
 
 	for i := 0; i < numLayers; i++ {

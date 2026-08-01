@@ -1,5 +1,7 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// list provides the functionality to list all saved games in the data directory.
+// utalizing the os.ReadDir function to read the contents of the data directory and print the names of all saved games to the console.
 package list
 
 import (

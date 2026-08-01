@@ -1,6 +1,7 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
-// Hardcoded creation of a default board game state
+// Contains the command to create and save a new board state
+// the intial boardstate is Hardcoded to ensure that 'game new' command always creates the same start state
 package new
 
 import (
@@ -24,6 +25,7 @@ var VecToUint = bitutil.VecToUint
 var UintToVec = bitutil.UintToVec
 
 // Generates new board with a hardcoded start state as a series of len 64 bitmaps
+// DESTRUCTIVE: Overwrites any existing game in the CurrentGame folder without prompting for confirmation.
 func NewCommand() {
 	save.SaveGame(DefaultStartState(), config.CurrentGame)
 	// save.SaveGame(GenerateSinglePiece(map[string]uint32{"♔": 0, "♛": 9, "♟": 18, "♜": 73}), config.CurrentGame)

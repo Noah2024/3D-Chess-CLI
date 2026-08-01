@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// save Provides CLI interface for saving the current game
 package save
 
 import (
@@ -12,6 +13,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// SaveCommand returns a cobra command that saves the current game to the data/games folder.
+// It takes a single argument, which is the name of the game to save.
 func SaveCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "save",

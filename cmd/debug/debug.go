@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// debug Provides CLI interface for accessing the debug functions
 package debug
 
 import (
@@ -13,14 +14,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Debug returns the root command for the debug subcommand, which allows users to execute various debug commands and functions.
 func Debug() *cobra.Command {
 	debugCMD := &cobra.Command{
 		Use:   "debug",
 		Short: "execute debug commans and functions",
 		Long:  "Used to debug very specific debug commands and functions, DO NOT use uless you know whats happening",
 		Run: func(cmd *cobra.Command, args []string) {
-			logger.Info("Calling Debug command")
-			// fmt.Fprintf(cmd.OutOrStdout(), "Testing args %s\n", args[0])
+			logger.Debug("Calling Debug command")
 		},
 	}
 	debugCMD.AddCommand(dataPlanes.DataPlanes())

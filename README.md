@@ -8,8 +8,6 @@ Simple idea, I want to make 3d chess, I've made an old shitty version in python,
 SO Im now using this project to a) work on making that dream a reality 2) learn how to structure a go project, and III) have a bit of fun along the way. Once this shit is actually in a workable state, i'll get on some actual documentation and work on a v1 release
 
 ## Final Checklist before 0.5
-- finalize test cases
-- Ensure UintToVec and VecToUint are really inverses
 - touch up code
 - documentation
 - contribution guide 
@@ -17,6 +15,8 @@ SO Im now using this project to a) work on making that dream a reality 2) learn 
 
 ## Final Checklist before 1.0
 - Clean Up/Refactor and modularize Checking logic
+- Actually Integrate metadata
+- Ensure UintToVec and VecToUint are really inverses
 - Systems Test Using the full move command
 - Turn Tracking
 - Upper Level API Integration

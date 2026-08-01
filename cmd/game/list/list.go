@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// list Provides CLI interface for listing all saved games
 package list
 
 import (
@@ -8,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Lists all saved games from the CurrentGame folder (prints to stdout). Takes no arguments.
 func ListCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",

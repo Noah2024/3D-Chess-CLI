@@ -44,7 +44,7 @@ func KingInDanger(BoardState load.BoardState, loc uint32) (bitmap.Bitmap, bool) 
 
 	//King can never protect itself out of check
 	//Also without this there is a really big recursion loop (obviously)
-	if BoardState.PieceInProcess == "♚" || BoardState.PieceInProcess == "♔" {
+	if BoardState.ReferencePiece == "♚" || BoardState.ReferencePiece == "♔" {
 		return bitmap.Bitmap{}, false
 	}
 
@@ -113,7 +113,7 @@ func KingInDanger(BoardState load.BoardState, loc uint32) (bitmap.Bitmap, bool) 
 	//=========== Some AI Used above
 
 	//Then determining if we are black or white
-	r := []rune(BoardState.PieceInProcess)[0]
+	r := []rune(BoardState.ReferencePiece)[0]
 	badQueen := "♛"
 	if r > 9817 {
 		lookingFor -= 6
@@ -198,7 +198,7 @@ func IsKingInCheck(BoardState load.BoardState) (bool, bool, bitmap.Bitmap, bitma
 
 	//The swaped pieces ensure that this refernce to enemies... I think (look theres a lot of swtiching happening here)
 	start, end := '♔', '♙'
-	if []rune(BoardState.PieceInProcess)[0] <= '♙' {
+	if []rune(BoardState.ReferencePiece)[0] <= '♙' {
 		start, end = '♚', '♟'
 	}
 

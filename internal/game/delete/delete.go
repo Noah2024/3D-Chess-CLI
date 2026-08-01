@@ -1,5 +1,7 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// delete provides the functionality to delete a game from the data directory.
+// It prompts the user for confirmation before deleting the specified game.
 package delete
 
 import (

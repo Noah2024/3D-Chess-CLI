@@ -114,10 +114,10 @@ func MoveCommand(from string, to string) {
 
 	//Make sure this piece isn't protecting the king
 	protectingMoves, kingDanger := checking.KingInDanger(BoardState, uLocFrom)
-	fmt.Println("King Danger: ", kingDanger)
+	// fmt.Println("King Danger: ", kingDanger)
 	if kingDanger { //I don't think this is right
 		allMoves.And(protectingMoves)
-		fmt.Printf("Protecting Moves: %064b\n", protectingMoves)
+		// fmt.Printf("Protecting Moves: %064b\n", protectingMoves)
 		// logger.Error(fmt.Sprintf("Piece %v is protecting its king!", visFrom))
 	}
 
@@ -127,12 +127,12 @@ func MoveCommand(from string, to string) {
 
 	//Restrict King Moves for king
 	if visFrom == "♚" || visFrom == "♔" {
-		fmt.Println("Restricting kings moves")
-		fmt.Printf("Pos: %064b\n", BoardState.FriendKing)
+		// fmt.Println("Restricting kings moves")
+		// fmt.Printf("Pos: %064b\n", BoardState.FriendKing)
 		allMoves.And(allowedKingMoves)
 	} else { //If king is in check can this piece take it out of check
 		if inCheck {
-			fmt.Println("Piece needs take the king out of check if possible")
+			// fmt.Println("Piece needs take the king out of check if possible")
 			allMoves.And(savingKingMoves)
 			_, canUnceck := allMoves.Max()
 			if !canUnceck {

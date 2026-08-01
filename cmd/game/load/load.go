@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// load Provides CLI interface for loading a saved game
 package load
 
 import (
@@ -14,6 +15,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// LoadCommand returns a cobra command that loads a saved game into the CurrentGame folder. It takes a single argument, which is the name of the game to load.
+// If the CurrentGame folder already contains a game, it prompts the user for confirmation before overwriting it.
 func LoadCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "load",

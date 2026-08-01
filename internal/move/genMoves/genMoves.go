@@ -15,10 +15,11 @@ import (
 	"github.com/kelindar/bitmap"
 )
 
-// Friend & Enemy pieces get swaped during the very beginning of check testing
-// Due to the need to see if the king is under attack
+// global wait group is no bueno, this lead to raceconditions
+// I will at some point take another pass at parallizing this code, but for now its aight
 var wg sync.WaitGroup
 
+// removeFriends takes a given bitmap of all possible moves and removes any moves that would result in a piece moving onto a friendly piece
 func removeFriends(BoardState load.BoardState, allPossibleMoves bitmap.Bitmap) bitmap.Bitmap {
 	// fmt.Printf("ALL POSSIBLE MOVES BEFORE %064b\n", allPossibleMoves)//For Debug
 	result := allPossibleMoves.Clone(nil)
@@ -178,7 +179,10 @@ func generateRookMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 	return forward
 }
 
-func generateBishopMove(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
+// generateBishopMoves contains the bitwise operations necessary to generate all possible moves for a bishop piece
+// it takes x y and z integer cooridnates and outputs a size 511 bitmap all ones of which represent possible moves
+// inputs: x, y, z int | outputs: bitmap.Bitmap
+func generateBishopMoves(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
 	x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing dataplanes
 
 	//The indexing for each of these is computed using a formula based on how they were computed, go to dataplanes to check
@@ -244,21 +248,27 @@ func generateBishopMove(BoardState load.BoardState, loc uint32, x int, y int, z 
 	return cardinalRight
 }
 
-func generateQueenMove(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
+// generateQueenMoves is just a logal OR between the bishop and rook moves, as the queen can move like both pieces
+func generateQueenMoves(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
 	// Must not zero index here becuase otherwise that would throw off the move generation
 	// from the generators below
 	var bishopMoves bitmap.Bitmap
 	var rookMoves bitmap.Bitmap
 
-	bishopMoves = generateBishopMove(BoardState, loc, x, y, z)
+	bishopMoves = generateBishopMoves(BoardState, loc, x, y, z)
 	rookMoves = generateRookMoves(BoardState, loc, x, y, z)
 
 	rookMoves.Or(bishopMoves)
 	return rookMoves
 }
 
-// Hand coded and validated moves for the knight (becuase I can't use a cheeky lil bitmap for it)
-func generateKnightMove(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
+// ==============================================
+// General Note:
+// The knight, pawn, and king are all hand coded and validated moves for the knight (becuase I can't use a cheeky lil bitmap for it)
+// ==============================================
+
+// generateKnightMoves is a hand coded and validated function for generating all possible moves for a knight piece
+func generateKnightMoves(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
 	// x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing da
 
 	var result bitmap.Bitmap
@@ -318,8 +328,8 @@ func generateKnightMove(BoardState load.BoardState, loc uint32, x int, y int, z 
 	return result
 }
 
-// Hand coded and validated moves for the knight (becuase I can't use a cheeky lil bitmap for it)
-func generateKingMove(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
+// generateKingMoves is a hand coded and validated function for generating all possible moves for a king piece
+func generateKingMoves(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
 	// x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing da
 
 	var result bitmap.Bitmap
@@ -386,7 +396,7 @@ func generateKingMove(BoardState load.BoardState, loc uint32, x int, y int, z in
 }
 
 // Hand coded and validated moves for the knight (becuase I can't use a cheeky lil bitmap for it)
-func generatePawnMove(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
+func generatePawnMoves(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
 	// x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing da
 
 	var result bitmap.Bitmap
@@ -454,16 +464,16 @@ func generatePawnMove(BoardState load.BoardState, loc uint32, x int, y int, z in
 // moveMap matches a pieces visual representation to the function that generates all possible moves for that piece
 // inputs: string | outputs: function(int, int, int) bitmap.Bitmap
 var MoveMap = map[string]func(load.BoardState, uint32, int, int, int) bitmap.Bitmap{
-	"♙": generatePawnMove,
-	"♘": generateKnightMove,
-	"♗": generateBishopMove,
+	"♙": generatePawnMoves,
+	"♘": generateKnightMoves,
+	"♗": generateBishopMoves,
 	"♖": generateRookMoves,
-	"♕": generateQueenMove,
-	"♔": generateKingMove,
-	"♟": generatePawnMove,
-	"♞": generateKnightMove,
-	"♝": generateBishopMove,
+	"♕": generateQueenMoves,
+	"♔": generateKingMoves,
+	"♟": generatePawnMoves,
+	"♞": generateKnightMoves,
+	"♝": generateBishopMoves,
 	"♜": generateRookMoves,
-	"♛": generateQueenMove,
-	"♚": generateKingMove,
+	"♛": generateQueenMoves,
+	"♚": generateKingMoves,
 }

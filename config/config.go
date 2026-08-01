@@ -1,6 +1,11 @@
 // Static config used to set certian game wide defaults at compile time.\n
 
-// Loaded into bitutil at runtime, which is intern loaded when a game is loaded
+// config is a package that provides static configuration for the 3DC application, including constants and variables that define the game's settings and directories.
+// It is loaded at compile time and is used throughout the application to ensure consistent behavior and settings.
+//
+//	!!! After compilation its settings cannont be altered without recompiling the application. !!!
+//
+// It may be worth while to make a dynamic config file that can be altered by the user, but for now this is sufficent.
 package config
 
 import (
@@ -11,10 +16,12 @@ import (
 	"time"
 )
 
+//Basic information application
+
 const name = "3DC"
 const year = "2026"
-const version = "0.1.0"
-const author = "Noah Yoder"
+const version = "0.5.0"
+const author = "Noah Yurasko"
 
 // Controls what log level the users sees.
 // All logs are output to LOG dir no matter what
@@ -34,14 +41,29 @@ const (
 // Stored in Uints right now to make Uint -> Vec easier
 // BUT it may be benificial later to store them as ints
 // And to make Vec -> Uint easier
+
+// Board size is 8x8x8 THIS IS SIZE, NOT INDEX, SO 0-63 is valid range
 const BoardSize uint32 = 512
+
+// Layer size is 8x8 THIS IS SIZE, NOT INDEX, SO 0-63 is valid range
 const LayerSize uint32 = 64
+
+// Line size is 8 THIS IS SIZE, NOT INDEX, SO 0-7 is valid range
 const LineSize uint32 = 8
+
+// Sinle space size (please don't change this, I really honestly don't know what will happen if you do)
 const SpaceSize uint32 = 1
 
+// Direction which all data for the CLI application is stored. This includes game states, logs, and any other data that the application needs to persist between runs.
 var DataDir string
+
+// CurrentGame is the path to the current game state. It is used by the application to load and save the current game.
 var CurrentGame string
+
+// LogDir is the path to the directory where log files are stored. Each log file is named with the date it was created, and a new log file is created each day.
 var LogDir string
+
+// CurrentLog is the path to the current log file. It is used by the application to write log messages to the appropriate log file.
 var CurrentLog string
 
 // Implementation of must function completly internal to the config file.
@@ -55,7 +77,9 @@ func internalMust[T any](val T, err error) T {
 	return val
 }
 
-// Initalize all the requiset data directories
+// Initalize all the requiset data directories for the applications function.
+// Creaing them if necessary. This includes the data directory, the current game directory, and the log directory.
+// It also creates a new log file for the current day if one does not already exist.
 func init() {
 
 	//Setting up the main user directory

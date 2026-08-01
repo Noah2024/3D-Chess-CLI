@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// save provides the functionality to save the current game state to a specified location.
 package save
 
 import (
@@ -33,6 +34,7 @@ func SavePieceType(vis string, bm bitmap.Bitmap) {
 	bm.WriteTo(file)
 }
 
+// Temporary function to save the current board state to a debug file for testing purposes
 func SaveDebugBoard(str string, location string) {
 	os.Mkdir(location, 0o755) //Owner can rwx but everyone else can only r and x
 	fileLoc := filepath.Join(location, "DebugBoardState")

@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// root Provides CLI interface for 3DC
 package root
 
 import (
@@ -14,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// RootCommand returns the root command for the 3DC CLI application, which allows users to access all subcommands.
 func RootCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "3DC",

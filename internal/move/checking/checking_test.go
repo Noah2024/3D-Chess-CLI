@@ -1,10 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
-// checking Contians all the business logic for determing the state of checked pieces
-// Mostly used inside genMoves
-// As it stands this this logic is very messy and FAAAR to coupled together
-// I do fully plan on refactoring and redoring much of this logic for the 1.0 release
-// I just really want to get a MVP before the end of summer :/
+// checking_test contains tests for the checking system, which is responsible for determining if a king is in check or checkmate, and for identifying legal moves to protect the king.
 package checking_test
 
 import (
@@ -16,6 +12,7 @@ import (
 	"testing"
 )
 
+// The expected state of the checking system for a given scenario, including whether the king is in check or checkmate, and the legal moves available to protect the king.
 type CheckExpected struct {
 	InCheck     bool //Obvious
 	InCheckMate bool //Obious
@@ -26,9 +23,10 @@ type CheckExpected struct {
 	//A blank [] represents that the pinningAlgorithm did not need to run for the given piece
 	//Meanwhile [0 0 0 0 0 0 0 0] means that it did in some capacity
 
-	KingDanger bool
+	KingDanger bool // If a king would be placed in danger by a given refernece piece moving
 }
 
+// The board state and reference piece for a given checking scenario, including the expected outputs of the checking system.
 type CheckingScenario struct {
 	Name        string //Name of the given scenario
 	RefPiece    string //Determines who's team were seeing is in check
@@ -293,7 +291,7 @@ func checkCheckingSystem(t *testing.T, piece string, piecesToLoad map[string]uin
 	}
 }
 
-// Runs all movement tests for all pieces
+// Runs all checking tests for all pieces
 func TestChecking(t *testing.T) {
 	for _, testCase := range AllCheckingTests {
 		t.Run(testCase.Name, func(t *testing.T) {
