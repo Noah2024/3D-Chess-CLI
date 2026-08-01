@@ -3,17 +3,31 @@
 ![Static Badge](https://img.shields.io/badge/GPL%203.0%20-%20red?logo=gplv3&label=license&link=https%3A%2F%2Fwww.gnu.org%2Flicenses%2Fgpl-3.0.en.html))
 ![Static Badge](https://img.shields.io/badge/v1.25.5-blue?logo=go&label=go)
 
-Simple idea, I want to make 3d chess, I've made an old shitty version in python, but that was very specific needed big libraries and took alot of time to run.
+3D-Chess-CLI (3DC) is just as the name implies a Command-Line-Interface built built to make, change, and validate 3 Dimensions of play for a game of chess. 
 
-SO Im now using this project to a) work on making that dream a reality 2) learn how to structure a go project, and III) have a bit of fun along the way. Once this shit is actually in a workable state, i'll get on some actual documentation and work on a v1 release
+## What is meant by 3 Dimensions?
 
-## Final Checklist before 0.5
-- touch up code
-- documentation
+3DC is not meant for a graphically three dimensional game, but A LITTERLY three dimensional game of chess. 
+The standard board size is 8x8x8 (just a regular board stacked ontop of itself 8 times).
+Pieces can move, attack, check, and deliver checkmate in all three dimensions. 
+
+## Current State
+
+As it stands much of the basics of chess work and work well, HOWEVER certian features are not implmented and some won't be at all.
+For starters there will be no castling. In a normal game of chess castling is very often a very good way to protect your king, in 3DC however its not.
+Due to the phyical laws of nature, in 3DC your king could still be attacked 14 differnet ways even after castling, so I feel its really not worth it. 
+
+Additionally pawns CURRENTlY cannont promot, move twice from their starting square, or make an en-pessent move (for the 5 people who actually en-pessent).
+This is becuase the pawn is a stupid, ridicious piece, whos very existence is predicated on being differnet in every concivable way from everyone else.
+However I do have plans to implment these before a 1.0 release. 
+
+## Road Map
+### Final Checklist before 0.5
 - contribution guide 
+- actual binary release
+- finish readme
 
-
-## Final Checklist before 1.0
+### Final Checklist before 1.0
 - Clean Up/Refactor and modularize Checking logic
 - Actually Integrate metadata
 - Ensure UintToVec and VecToUint are really inverses
@@ -25,3 +39,8 @@ SO Im now using this project to a) work on making that dream a reality 2) learn 
 - pawn promotion
 - Time trials/stress test
 - Optimize w/ concurrent goroutine
+
+### Further Future 
+- Compilation to Web Assembly
+- Web app to play games
+- Docker Image for self hosting move validation engine
