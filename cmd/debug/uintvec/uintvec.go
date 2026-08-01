@@ -1,6 +1,7 @@
-package uintvec
-
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
+
+// uintvec Provides CLI interface for accessing the UintToVec function
+package uintvec
 
 import (
 	"3DC/util/bitutil"
@@ -10,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// UintTVec converts a given unsigned integer to a vector in game space using the UintToVec function from the bitutil package.
 func UintTVec() *cobra.Command {
 	return &cobra.Command{
 		Use:   "uintvec",

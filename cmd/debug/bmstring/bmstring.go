@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// Debug package for testing the bitmap string conversion function
 package bmstring
 
 import (
@@ -9,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Bmstring converts short string bitmap in form [0 0 0 0 0 0 0 0] to long form [00000000000...~512]
 func Bmstring() *cobra.Command {
 	return &cobra.Command{
 		Use:   "bmstring",

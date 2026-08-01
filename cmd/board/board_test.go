@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// Test package with validates the existance and useage of the board root command
 package board_test
 
 import (
@@ -9,6 +10,7 @@ import (
 	"testing"
 )
 
+// Tests the board command by executating it and setting standard output to a buffer and then checking the output of the command against the expected output
 func TestLSCmd(t *testing.T) {
 	//Create Greet Command
 	cmd := board.Board()

@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Re-executes algorithms used to generate data planes, DOES NOT affect data planes already in use. They come with the compiled binary
 func DataPlanes() *cobra.Command {
 	return &cobra.Command{
 		Use:   "planes",

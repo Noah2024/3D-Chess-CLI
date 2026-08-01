@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// vecuint Provides CLI interface for accessing the VecToUint function
 package vecuint
 
 import (
@@ -10,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// VecTUint converts a given x,y, and z vector into unsigned integer in game space using the VecToUint function from the bitutil package.
 func VecTUint() *cobra.Command {
 	return &cobra.Command{
 		Use:   "vecuint",

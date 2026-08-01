@@ -1,5 +1,7 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// view Provides CLI interface for accessing the view board function
+// It preforms basic input validation on behalf of the view function and then calls the view function with the appropriate arguments
 package view
 
 import (
@@ -14,12 +16,11 @@ import (
 func View() *cobra.Command {
 	ViewCommand := &cobra.Command{
 		Use:   "view",
-		Short: "View a given vertical slice of baord",
+		Short: "View given vertical slice/s of the game board",
 		Long:  "Takes one optional integer argument noting what layer to display (0-7). No argument passed will show every layer",
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			logger.Info("Calling Board command")
-			//Validating view command input
+			logger.Debug("Calling Board command")
 
 			if len(args) == 1 {
 				asRune := []rune(args[0])
@@ -38,7 +39,6 @@ func View() *cobra.Command {
 			} else {
 				view.ViewAllLayers()
 			}
-			// fmt.Fprintf(cmd.OutOrStdout(), "Testing args %s\n", args[0])
 		},
 	}
 	return ViewCommand

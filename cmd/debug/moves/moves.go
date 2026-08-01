@@ -1,5 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// moves Provides CLI interface for accessing the debug movement function
 package moves
 
 import (
@@ -14,11 +15,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Re-executes algorithms contained in the genMoves.go file DOES NOT handle checking.
+// But will handle all over movmenet validation rules
 func DebugMoveGen() *cobra.Command {
 	return &cobra.Command{
 		Use:   "moves",
-		Short: "Generates all valid moves for a given peice ",
-		Long:  "Re-executes algorithms contianed in the genMoves.go file DOES NOT handle checking",
+		Short: "Generates all valid moves for a given piece ",
+		Long:  "Re-executes algorithms contained in the genMoves.go file DOES NOT handle checking",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
