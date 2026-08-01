@@ -1,4 +1,6 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
+
+// metadata package provides functionality for creating, saving, and loading metadata related to the game state. It defines the MetaData struct, which holds information about the game version, configuration, turn, castling rights, en passant rights, and the time of the last save. The package includes functions to create and save metadata to a specified location, load metadata from a file, and display the metadata in a human-readable format.
 package metadata
 
 import (
@@ -11,6 +13,7 @@ import (
 	"time"
 )
 
+// MetaData struct holds information about the game state, including version, configuration, turn, castling rights, en passant rights, and the time of the last save.
 type MetaData struct {
 	// Version contains data about the version of data stored
 	Version uint8
@@ -72,6 +75,8 @@ func LoadMetaData(location string) (MetaData, error) {
 	return data, nil
 }
 
+// Displays the metadata in a human-readable format, including version, configuration, turn, castling rights, en passant rights, and the time of the last save.
+// Called mostly by the view function
 func DistplayMetaData(meta MetaData) {
 	fmt.Println("Meta Data")
 	fmt.Println("----------")

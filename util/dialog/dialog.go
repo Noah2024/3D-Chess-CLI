@@ -1,5 +1,9 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// dialog package provides a simple way to prompt users for confirmation in the terminal.
+// It includes a function to display a yes/no question and wait for the user's response, returning a boolean value based on the input.
+// It is currently little used as I have yet to decide if I want to be constantly promoting users.
+// But im leaning twords no.
 package dialog
 
 //Lowkey can chatgpt gen this for me

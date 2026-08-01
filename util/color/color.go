@@ -1,5 +1,7 @@
 // Copyright © 2026 Noah Yurasko distributed under GNU GENERAL PUBLIC LICENSE V3
 
+// color package provides a simple way to colorize text output in the terminal using ANSI escape codes.
+// It defines constants for various foreground and background colors, as well as a function to apply these colors to strings.
 package color
 
 //"\033[31mThis is red text\033[0m"

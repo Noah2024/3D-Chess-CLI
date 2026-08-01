@@ -182,10 +182,6 @@ var XY45NegPlane = [15]bitmap.Bitmap{
 // So to access the correst plane for the xz45PosPlane, you would use x + z as the index
 // ====================================
 
-func getDot(x1 int, y1 int, z1 int, x2 int, y2 int, z2 int) {
-
-}
-
 // Don't even say a god damn word on the atrocious time complexity of this function.
 // Its only meant to be run once EVER, its saying in the source code for reference
 func GenerateAllPlanes() {
@@ -312,8 +308,6 @@ func GenerateAllPlanes() {
 func GeneratePlane(fn func(x, y, z int) bool) bitmap.Bitmap {
 	var bm bitmap.Bitmap
 	bm.Grow(511) //again, bitmap is zero indexed
-	// fmt.Println("")
-	// bm.Ones()
 	//Must use zero indexed because were talking about the indexing of the bitmap itself
 	//Rather than simply indexing the board, which for other reasons starts at one
 	for y := 0; y < int(config.LineSize); y++ {
@@ -331,6 +325,5 @@ func GeneratePlane(fn func(x, y, z int) bool) bitmap.Bitmap {
 			}
 		}
 	}
-	// fmt.Println(bm)
 	return bm
 }
