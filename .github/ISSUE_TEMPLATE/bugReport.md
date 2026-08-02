@@ -35,23 +35,3 @@ Describe what actually happened.
 
 Please include the log.txt found in the data directory managed by 3DC.
 As well as any other logs, screenshots, or other information you belive is relevent.
-
----
-name: General Issue
-about: Report a bug or request an improvement
-title: ""
-labels: ""
-assignees: ""
----
-
-## Description
-
-Describe the issue or request.
-
-## Expected Outcome
-
-What should happen?
-
-## Additional Information
-
-Include logs, screenshots, or anything else that might help.

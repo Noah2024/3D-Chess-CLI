@@ -1,33 +1,15 @@
 # Contributing 
 
- 
-
 This document describes the internal design of **3D-Chess-CLI (3DC)** and the reasoning behind its implementation. 
-
 Before making contributions to the codebase, please read and understand the decisions described here. 
-
- 
-
 --- 
-
- 
 
 ## Project Goals 
 
- 
-
 - Implement a complete rules engine for physically three-dimensional chess. 
-
 - Keep the engine modular so individual systems can be tested independently. 
-
 - Keep compiled binary as small reasonable.  
-
 - Optimize for runtime execution speed where possible 
-
- 
-
---- 
-
  
 
 ---
@@ -59,7 +41,6 @@ main.go/
 
 ---
 ## Board Representation 
-
 
 The entire board is represented in memory as a series of length 512 bitmaps. Each bitmap named corresponding to the type of peice its indicies represent. 
 
