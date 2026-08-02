@@ -1,7 +1,10 @@
 # 3D-Chess-CLI
 
-![Static Badge](https://img.shields.io/badge/GPL%203.0%20-%20red?logo=gplv3&label=license&link=https%3A%2F%2Fwww.gnu.org%2Flicenses%2Fgpl-3.0.en.html))
+![Static Badge](https://img.shields.io/badge/GPL%203.0%20-%20red?logo=gplv3&label=license&link=https%3A%2F%2Fwww.gnu.org%2Flicenses%2Fgpl-3.0.en.html)
 ![Static Badge](https://img.shields.io/badge/v1.25.5-blue?logo=go&label=go)
+![GitHub Release](https://img.shields.io/github/v/release/Noah2024/3D-Chess-CLI?include_prereleases&link=https%3A%2F%2Fgithub.com%2FNoah2024%2F3D-Chess-CLI%2Freleases)
+![Github Size](https://img.shields.io/github/repo-size/Noah2024/3D-Chess-CLI)
+
 
 3D-Chess-CLI (3DC) is just as the name implies a Command-Line-Interface built built to make, change, and validate 3 Dimensions of play for a game of chess. 
 
