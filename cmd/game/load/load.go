@@ -11,6 +11,7 @@ import (
 	"3DC/util/must"
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/spf13/cobra"
 )
@@ -28,15 +29,17 @@ func LoadCommand() *cobra.Command {
 			//But thats a later me problem
 
 			//Checks if file exists
-			if _, err := os.Stat(config.DataDir); err == nil {
+			if _, err := os.Stat(config.CurrentGame); err == nil {
+				fmt.Println("HERE ", err)
 				if !dialog.Confirm("Are you sure you want to overwrite your current game?") {
 					return nil
 				}
+			} else {
 				return err
 			}
-			game := must.Must(load.LoadGame(config.DataDir))
-			save.SaveGame(game, args[0])
-			fmt.Println("Saved game loaded succesfully")
+
+			game := must.Must(load.LoadGame(path.Join(config.DataDir, args[0])))
+			save.SaveGame(game, config.CurrentGame)
 			return nil
 		},
 	}
