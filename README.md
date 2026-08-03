@@ -32,6 +32,7 @@ However I do have plans to implment these before a 1.0 release.
 
 ### Final Checklist before 1.0
 - Clean Up/Refactor and modularize Checking logic
+- Change view for terminal 
 - Actually Integrate metadata
 - Ensure UintToVec and VecToUint are really inverses
 - Systems Test Using the full move command

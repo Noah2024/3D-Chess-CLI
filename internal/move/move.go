@@ -71,7 +71,6 @@ func MoveCommand(from string, to string) {
 	logger.Debug(fmt.Sprintf("Move called from %v to %v", from, to))
 
 	allLoadedPieces, loadErr := load.LoadGame(config.CurrentGame)
-	fmt.Println(allLoadedPieces)
 
 	if loadErr != nil {
 		logger.Error(fmt.Sprintf("Could not load board state (ensure you have  a 'CurrentGame' folder in your data directory) %v", BoardState.PieceLoadError))
