@@ -109,7 +109,7 @@ func init() {
 	//Atomic create //Because otherwise the gap between opening the file and checking its existence
 	//Could technically allow another program to create it
 	f, err3 := os.OpenFile(CurrentLog, os.O_CREATE|os.O_EXCL, 0o755)
-	if err3 != nil {
+	if err3 != nil && f != nil {
 		if !os.IsExist(err3) {
 			//Could not find or create log file
 			internalMust("", err3)
