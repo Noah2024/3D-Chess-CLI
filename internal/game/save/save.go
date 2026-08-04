@@ -5,9 +5,9 @@ package save
 
 import (
 	"3DC/config"
+	"3DC/util/logger"
 	"3DC/util/metadata"
 	"3DC/util/must"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -15,33 +15,31 @@ import (
 )
 
 // Saves entire board state
-func SaveGame(bmps map[string]bitmap.Bitmap, location string) {
+func SaveGame(bmps map[string]bitmap.Bitmap, location string) error {
 	os.Mkdir(location, 0o755) //Owner can rwx but everyone else can only r and x
 	metadata.CreateSaveMetaData(location)
 	for key, bm := range bmps {
 		fileLoc := filepath.Join(location, string(key))
 		file := must.Must(os.Create(fileLoc))
-		bm.WriteTo(file)
+		_, err := bm.WriteTo(file)
+		if err != nil {
+			logger.Error("Unexpected Error in saving game type %s")
+			return err
+		}
 	}
+	return nil
 }
 
 // Saves state for only one pieceType (lowkey need a better name)
-func SavePieceType(vis string, bm bitmap.Bitmap) {
+func SavePieceType(vis string, bm bitmap.Bitmap) error {
 	// fmt.Println(vis)
 	fileLoc := filepath.Join(config.CurrentGame, vis)
 	// fmt.Println(fileLoc)
 	file := must.Must(os.Create(fileLoc))
-	bm.WriteTo(file)
-}
-
-// Temporary function to save the current board state to a debug file for testing purposes
-func SaveDebugBoard(str string, location string) {
-	os.Mkdir(location, 0o755) //Owner can rwx but everyone else can only r and x
-	fileLoc := filepath.Join(location, "DebugBoardState")
-	// file := must.Must(os.Create(fileLoc))
-	err := os.WriteFile(fileLoc, []byte(str), 0o755)
+	_, err := bm.WriteTo(file)
 	if err != nil {
-		log.Fatal(err)
+		logger.Error("Unexpected Error in saving piece type %s")
+		return err
 	}
-	// bm.WriteTo(file)
+	return err
 }

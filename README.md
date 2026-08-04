@@ -25,12 +25,9 @@ This is becuase the pawn is a stupid, ridicious piece, whos very existence is pr
 However I do have plans to implment these before a 1.0 release. 
 
 ## Road Map
-### Final Checklist before 0.5
-- contribution guide 
-- actual binary release
-- finish readme
 
 ### Final Checklist before 1.0
+- Standardize debug logs & improve storage
 - Clean Up/Refactor and modularize Checking logic
 - Change view for terminal 
 - Actually Integrate metadata
@@ -41,6 +38,7 @@ However I do have plans to implment these before a 1.0 release.
  - And test cases for said API 
 - pawn double move
 - pawn promotion
+- en pessant 🤮
 - Time trials/stress test
 - Optimize w/ concurrent goroutine
 

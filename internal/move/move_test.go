@@ -49,6 +49,7 @@ func TestFunctionalMove(t *testing.T) {
 				t.Fatal("expected panic")
 			}
 		}()
+		fmt.Println("!!! A Formatted Error Below Here is Expected!!!")
 		move.ParseLoc("d7f")
 	})
 

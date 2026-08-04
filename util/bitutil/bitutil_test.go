@@ -5,6 +5,7 @@ package bitutil_test
 
 import (
 	"3DC/util/bitutil"
+	"fmt"
 	"testing"
 )
 
@@ -40,7 +41,7 @@ func TestBitutil(t *testing.T) {
 				t.Fatal("expected panic")
 			}
 		}()
-
+		fmt.Println("!!! An Formatted Error Below Here is Expected!!!")
 		bitutil.VecToUint(7, 7, 8)
 	})
 
@@ -50,7 +51,7 @@ func TestBitutil(t *testing.T) {
 				t.Fatal("expected panic")
 			}
 		}()
-
+		fmt.Println("!!! An Formatted Error Below Here is Expected!!!")
 		bitutil.VecToUint(-1, 0, 0)
 	})
 
@@ -82,7 +83,7 @@ func TestBitutil(t *testing.T) {
 				t.Fatal("expected panic")
 			}
 		}()
-
+		fmt.Println("!!! An Formatted Error Below Here is Expected!!!")
 		bitutil.UintToVec(512)
 	})
 
@@ -92,7 +93,7 @@ func TestBitutil(t *testing.T) {
 				t.Fatal("expected panic")
 			}
 		}()
-
+		fmt.Println("!!! An Formatted Error Below Here is Expected!!!")
 		bitutil.UintToVec(10000)
 
 	})

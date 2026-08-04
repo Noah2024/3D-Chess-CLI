@@ -37,8 +37,9 @@ func NewCommand() {
 
 // For now I will store possible game states to start from here, for NOW
 // Until I can think of a better place to put them
-//As a note all valid board states REQUIRE a king on either side
-//This is a requiremnet for the checking validation system
+//As a note any board with will be making use of the checking system
+//will NEEED a king on either side, though if only testing for postion and move generation
+//This is not important
 
 // Default starting state for board
 func DefaultStartState() map[string]bitmap.Bitmap {
