@@ -34,6 +34,26 @@ func TestBitutil(t *testing.T) {
 		}
 	})
 
+	t.Run("VecToUintOutsideRange#1", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Fatal("expected panic")
+			}
+		}()
+
+		bitutil.VecToUint(7, 7, 8)
+	})
+
+	t.Run("VecToUintOutsideRange#2", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Fatal("expected panic")
+			}
+		}()
+
+		bitutil.VecToUint(-1, 0, 0)
+	})
+
 	t.Run("UintToVecBoundry#1", func(t *testing.T) {
 		gotx, goty, gotz := bitutil.UintToVec(uint32(0))
 		expX, expY, expZ := 0, 0, 0
@@ -54,6 +74,27 @@ func TestBitutil(t *testing.T) {
 		if gotx != expX || goty != expY || gotz != expZ {
 			t.Errorf("Expected (%d, %d, %d) but got (%d, %d, %d) ", expX, expY, expZ, gotx, goty, gotz)
 		}
+	})
+
+	t.Run("UintToVecOutsideRange#1", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Fatal("expected panic")
+			}
+		}()
+
+		bitutil.UintToVec(512)
+	})
+
+	t.Run("UintToVecOutsideRange#2", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Fatal("expected panic")
+			}
+		}()
+
+		bitutil.UintToVec(10000)
+
 	})
 
 	t.Run("BitutilInverseTest", func(t *testing.T) {

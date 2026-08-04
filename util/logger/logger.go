@@ -57,7 +57,10 @@ func SetOutput(w io.Writer) {
 
 // Ensures that the log file can write as soon as initlaized
 func init() {
-	logFile, _ := os.OpenFile(config.CurrentLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o755)
+	logFile, err := os.OpenFile(config.CurrentLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o755)
+	if err != nil {
+		Fatal(fmt.Sprintf("Could not find or load log file for reason %s", err))
+	}
 
 	logger = log.New(logFile, "", log.Ldate|log.Ltime|log.Lshortfile)
 	logger.SetFlags(0)
@@ -110,5 +113,5 @@ func Error(msg string) {
 func Fatal(msg string) {
 	logger.Print("FATAL: " + metadata() + msg)
 	fmt.Fprintln(output, color.ColorText("FATAL: "+msg, color.Purple))
-	// os.Exit(1)
+	os.Exit(1)
 }

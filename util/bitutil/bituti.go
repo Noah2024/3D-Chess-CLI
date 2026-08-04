@@ -21,7 +21,12 @@ const (
 
 // VecToUint encodes a 3D vector (x, y, z) into a uint32 representation of a position on the board.
 func VecToUint(x, y, z int) uint32 {
-	return uint32(x + (y)*int(LayerSize) + (z)*int(LineSize))
+	rtn := uint32(x + (y)*int(LayerSize) + (z)*int(LineSize))
+	if rtn > 511 {
+		logger.Error(fmt.Sprintf("uint32 %d out of range for board size %d ", rtn, BoardSize))
+		panic(fmt.Sprintf("uint32 %d out of range for board size %d ", rtn, BoardSize))
+	}
+	return rtn
 }
 
 // Decodes uint32 position into integer x,y,z position

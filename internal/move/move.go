@@ -39,6 +39,7 @@ func ParseLoc(loc string) (uint32, int, int, int) {
 		logger.Error(fmt.Sprintf("Could not parse location '%v' - invalid length of string", loc))
 	}
 	x, z, y := int(loc[0]-'a'), int(loc[1]-'1'), int(loc[2]-'A')
+	fmt.Println("INTERMEDIATE: ", x, y, z)
 
 	return bitutil.VecToUint(x, y, z), x, y, z //bitutil.VecToUint(x, y, z)
 }
