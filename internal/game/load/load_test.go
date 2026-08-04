@@ -50,7 +50,6 @@ func TestLoad(t *testing.T) {
 			t.Errorf("Could not generate board state because : '%s'", err)
 		}
 
-		fmt.Println(BoardState)
 		friendAsStr := fmt.Sprint(BoardState.FriendPieces)
 		expectedFriend := "[1 0 0 0 0 0 0 0]"
 		if friendAsStr != expectedFriend {
@@ -117,15 +116,3 @@ func TestLoad(t *testing.T) {
 		}
 	})
 }
-
-// type BoardState struct {
-// 	FriendPieces        bitmap.Bitmap            // All friendly pieces on the board
-// 	EnemyPieces         bitmap.Bitmap            // All enemy pieces on the board
-// 	AllPieces           bitmap.Bitmap            // All pieces on the board (both friendly and enemy)
-// 	PieceLoadError      error                    // Error encountered during the loading of pieces, if any
-// 	FriendKing          bitmap.Bitmap            // Location of the king of the friendly pieces
-// 	FriendKingLoc       uint32                   // Location of the king of the friendly pieces, stored as a uint32 value
-// 	SwapPawn            bool                     //Needed for checking becuase the pawn attacks differnet than it moves
-// 	AllIndividualPieces map[string]bitmap.Bitmap //map[string]bitmap.Bitmap
-// 	ReferencePiece      string                   //The piece currently being processed (used in protecting king in genMoves.restrictMoves)
-// }

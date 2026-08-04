@@ -24,6 +24,40 @@ Additionally pawns CURRENTlY cannont promot, move twice from their starting squa
 This is becuase the pawn is a stupid, ridicious piece, whos very existence is predicated on being differnet in every concivable way from everyone else.
 However I do have plans to implment these before a 1.0 release. 
 
+## Building From Source
+
+```
+make build
+```
+
+## Usage
+
+Use '-h' at any time and on any command for extra help
+
+```
+board/ - commnads relating to board
+    view - to view a certian board (accepts optional paramter of layers UPPERCASE letter)
+
+game/ - commands related to managing games
+    delete - deletes a given name by either name or listed number
+    list - lists all games in saved game directory with both name and number
+    load - loads a given game from saved game direcotry using either name or number
+    new - creates new game in default start state, destroys previous game
+    save - saves CurrentGame to saved game directory with given name
+
+move/ 
+    move - takes two arguments, locationFrom and locationToo, expected in format a1A, and h1H (x, y, z)
+
+debug/ - commands related to debug (if using please read implemnetation)
+   bmstring
+   dataPlanes
+   moves
+   uintvec
+   vecuint
+```
+
+*Tip* The standard game starts on layer C, so to ground yourself try doing ```3DC board view C``` after creating a new game
+
 ## Road Map
 
 ### Final Checklist before 1.0
