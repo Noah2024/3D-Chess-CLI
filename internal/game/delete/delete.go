@@ -6,7 +6,6 @@ package delete
 
 import (
 	"3DC/config"
-	"3DC/util/dialog"
 	"3DC/util/must"
 	"fmt"
 	"os"
@@ -16,9 +15,9 @@ import (
 
 // Helper function which confirms users choice and does the deletion
 func deleteDir(entry os.DirEntry) {
-	if !dialog.Confirm(fmt.Sprintf("Are you sure you want to delete game '%v'?", entry.Name())) {
-		return
-	}
+	// if !dialog.Confirm(fmt.Sprintf("Are you sure you want to delete game '%v'?", entry.Name())) {
+	// 	return
+	// }
 	err := os.RemoveAll(filepath.Join(config.DataDir, entry.Name()))
 	must.Must("", err)
 }

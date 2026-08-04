@@ -9,6 +9,7 @@ import (
 	"3DC/util/metadata"
 	"3DC/util/must"
 	"fmt"
+	"io"
 	"path/filepath"
 	"sync"
 
@@ -37,50 +38,56 @@ func buildBoardLayer(layerSlice *[8][8]string, bm bitmap.Bitmap, vis string, yLe
 	})
 }
 
-// Internal function call to bitmap storing the
-func ViewLayer(yLevel int, displayMetaData bool) {
+func BuildLayer(allPieces map[string]bitmap.Bitmap, yLevel int) [8][8]string {
 	//Will allow for variable input later
+
+	var board [8][8]string
+	for meta, bm := range allPieces {
+		wg.Add(1)
+		go buildBoardLayer(&board, bm, meta, yLevel)
+	}
+
+	wg.Wait()
+	return board
+}
+
+// Internal function call to bitmap storing the
+func PrintLayer(yLevel int, displayMetaData bool, w io.Writer) {
 	allPieces, _ := load.LoadGame(config.CurrentGame)
+
+	sliceOfBoard := BuildLayer(allPieces, yLevel)
 
 	if displayMetaData == true {
 		meta := must.Must(metadata.LoadMetaData(filepath.Join(config.CurrentGame, "meta")))
 		metadata.DistplayMetaData(meta)
 	}
 
-	var sliceOfBoard [8][8]string
-	for meta, bm := range allPieces {
-		wg.Add(1)
-		go buildBoardLayer(&sliceOfBoard, bm, meta, yLevel)
-
-	}
-
-	wg.Wait()
-	fmt.Printf("Layer : %c \n", rune('A'+yLevel))
+	fmt.Fprintf(w, "Layer : %c \n", rune('A'+yLevel))
 	zInc := 1
-	fmt.Println("╔══════════════════╗")
+	fmt.Fprintln(w, "╔══════════════════╗")
 	for _, V := range sliceOfBoard {
-		fmt.Print("║")
+		fmt.Fprint(w, "║")
 		for _, K := range V {
 			if K == "" {
-				fmt.Print(" -")
+				fmt.Fprint(w, " -")
 			} else {
-				fmt.Print(" " + K)
+				fmt.Fprint(w, " "+K)
 			}
 		}
-		fmt.Printf("  ║ %v", zInc)
+		fmt.Fprintf(w, "  ║ %v", zInc)
 		zInc += 1
-		fmt.Println()
+		fmt.Fprintln(w)
 	}
-	fmt.Println("╚══════════════════╝")
-	fmt.Println("  A B C D E F G H ")
+	fmt.Fprintln(w, "╚══════════════════╝")
+	fmt.Fprintln(w, "  A B C D E F G H ")
 }
 
-func ViewAllLayers() {
+func ViewAllLayers(w io.Writer) {
 	numLayers := int(BoardSize / LayerSize)
 	meta := must.Must(metadata.LoadMetaData(filepath.Join(config.CurrentGame, "meta")))
 	metadata.DistplayMetaData(meta)
 
 	for i := 0; i < numLayers; i++ {
-		ViewLayer(i, false)
+		PrintLayer(i, false, w)
 	}
 }

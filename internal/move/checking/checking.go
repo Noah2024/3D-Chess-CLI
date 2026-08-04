@@ -19,7 +19,7 @@ func abs(x int) int {
 }
 
 func inBounds(v int) bool {
-	return 0 <= v && v <= 8
+	return 0 <= v && v <= 7
 }
 
 // Determines if two positions are related to one another

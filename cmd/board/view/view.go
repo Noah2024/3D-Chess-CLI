@@ -9,6 +9,7 @@ import (
 	"3DC/internal/board/view"
 	"3DC/util/logger"
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -32,12 +33,12 @@ func View() *cobra.Command {
 
 				numOfLayers := int((config.BoardSize / config.LayerSize)) - 1
 				if (layerNum >= 0) && (layerNum <= numOfLayers) {
-					view.ViewLayer(layerNum, true)
+					view.PrintLayer(layerNum, true, os.Stdout)
 				} else {
 					logger.Error(fmt.Sprintf("Layer %d does not exist; provide a number between (0-%d)", layerNum, numOfLayers))
 				}
 			} else {
-				view.ViewAllLayers()
+				view.ViewAllLayers(os.Stdout)
 			}
 		},
 	}

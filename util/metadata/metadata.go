@@ -3,6 +3,8 @@
 // metadata package provides functionality for creating, saving, and loading metadata related to the game state. It defines the MetaData struct, which holds information about the game version, configuration, turn, castling rights, en passant rights, and the time of the last save. The package includes functions to create and save metadata to a specified location, load metadata from a file, and display the metadata in a human-readable format.
 package metadata
 
+//Will need ot update metadata to use io.writer intead of fmt
+
 import (
 	"3DC/util/must"
 	"bytes"
