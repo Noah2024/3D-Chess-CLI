@@ -21,7 +21,7 @@ const (
 
 // VecToUint encodes a 3D vector (x, y, z) into a uint32 representation of a position on the board.
 func VecToUint(x, y, z int) uint32 {
-	return uint32(x - 1 + (y-1)*int(LayerSize) + (z-1)*int(LineSize))
+	return uint32(x + (y)*int(LayerSize) + (z)*int(LineSize))
 }
 
 // Decodes uint32 position into integer x,y,z position
@@ -38,5 +38,5 @@ func UintToVec(space uint32) (int, int, int) {
 	z := space / LineSize
 	x := space % LineSize
 
-	return int(x + 1), int(y + 1), int(z + 1)
+	return int(x), int(y), int(z)
 }

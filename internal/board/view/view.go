@@ -31,8 +31,8 @@ func buildBoardLayer(layerSlice *[8][8]string, bm bitmap.Bitmap, vis string, yLe
 	defer wg.Done()
 	bm.Range(func(index uint32) {
 		X, Y, Z := bitutil.UintToVec(index)
-		if Y-1 == yLevel {
-			layerSlice[Z-1][X-1] = vis
+		if Y == yLevel {
+			layerSlice[Z][X] = vis
 		}
 	})
 }

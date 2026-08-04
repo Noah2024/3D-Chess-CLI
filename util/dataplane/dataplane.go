@@ -193,7 +193,7 @@ func GenerateAllPlanes() {
 	var xzPlane [int(config.LineSize)]bitmap.Bitmap //Set Z
 	for i := 0; i < int(config.LineSize); i++ {
 		plane := GeneratePlane(func(x, y, z int) bool {
-			return y == i //Zero indexed
+			return y == i
 		})
 		xzPlane[i] = plane
 	}
@@ -201,7 +201,7 @@ func GenerateAllPlanes() {
 	var xyPlane [int(config.LineSize)]bitmap.Bitmap // Set Y
 	for i := 0; i < int(config.LineSize); i++ {
 		plane := GeneratePlane(func(x, y, z int) bool {
-			return z == i //Zero indexed
+			return z == i
 		})
 		xyPlane[i] = plane
 	}
@@ -209,7 +209,7 @@ func GenerateAllPlanes() {
 	var zyPlane [int(config.LineSize)]bitmap.Bitmap // Set X
 	for i := 0; i < int(config.LineSize); i++ {
 		plane := GeneratePlane(func(x, y, z int) bool {
-			return x == i //Zero indexed
+			return x == i
 		})
 		zyPlane[i] = plane
 	}
@@ -300,14 +300,27 @@ func GenerateAllPlanes() {
 		}
 		xy45NegPlane[index] = plane
 	}
+	fmt.Println("xzPlane", xzPlane)
+	fmt.Println("xyPlane", xyPlane)
+	fmt.Println("zyPlane", zyPlane)
 
-	fmt.Print(xy45NegPlane)
+	fmt.Println("xz45PosPlane", xz45PosPlane)
+	fmt.Println("xz45NegPlane", xz45NegPlane)
+
+	fmt.Println("zy45Plane", zy45Plane)
+
+	fmt.Println("zy45NegPlane", zy45NegPlane)
+
+	fmt.Println("xy45Plane", xy45Plane)
+
+	fmt.Println("xy45NegPlane", xy45NegPlane)
+
 	fmt.Println("Please god")
 }
 
 func GeneratePlane(fn func(x, y, z int) bool) bitmap.Bitmap {
 	var bm bitmap.Bitmap
-	bm.Grow(511) //again, bitmap is zero indexed
+	bm.Grow(config.BoardSize - 1) //again, bitmap is zero indexed
 	//Must use zero indexed because were talking about the indexing of the bitmap itself
 	//Rather than simply indexing the board, which for other reasons starts at one
 	for y := 0; y < int(config.LineSize); y++ {
@@ -316,7 +329,7 @@ func GeneratePlane(fn func(x, y, z int) bool) bitmap.Bitmap {
 				if fn(x, y, z) {
 					// fmt.Printf("Letting on %s, %s, %s \n", x, y, z)
 					// idx := uint32(((x + 1) + (y)*int(config.LayerSize) + (z)*int(config.LineSize)) - 1)
-					idx := bitutil.VecToUint(x+1, y+1, z+1)
+					idx := bitutil.VecToUint(x, y, z)
 
 					// fmt.Println(idx)
 

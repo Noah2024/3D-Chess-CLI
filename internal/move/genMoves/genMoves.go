@@ -144,20 +144,20 @@ func generateRookMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 	//Note to self, OK SO, the bitmaps when storing values store an ENTIRE BYTE at a time
 
 	// logger.Debug(fmt.Sprintf("Generating all possible rook moves from :x: %d, y: %d, z: %d", x, y, z))
-	forward := dataplane.XPlane[x-1].Clone(nil) //-2
-	sideToSide := dataplane.YPlane[y-1].Clone(nil)
-	upAndDown := dataplane.YPlane[y-1].Clone(nil)
+	forward := dataplane.XPlane[x].Clone(nil) //-2
+	sideToSide := dataplane.YPlane[y].Clone(nil)
+	upAndDown := dataplane.YPlane[y].Clone(nil)
 
 	// wg.Go(
 	// 	func() {
-	forward.And(dataplane.ZPlane[z-1])
+	forward.And(dataplane.ZPlane[z])
 	forward = restrictMoves(BoardState, loc, forward) //x
 	// 	},
 	// )
 
 	// wg.Go(
 	// 	func() {
-	sideToSide.And(dataplane.XPlane[x-1])                   //-2
+	sideToSide.And(dataplane.XPlane[x])                     //-2
 	sideToSide = restrictMoves(BoardState, loc, sideToSide) //z
 	// 	},
 	// )
@@ -165,7 +165,7 @@ func generateRookMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 	// wg.Add(1)
 	// wg.Go(
 	// 	func() {
-	upAndDown.And(dataplane.ZPlane[z-1])
+	upAndDown.And(dataplane.ZPlane[z])
 	upAndDown = restrictMoves(BoardState, loc, upAndDown) //y
 	// 	},
 	// )
@@ -183,7 +183,7 @@ func generateRookMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 // it takes x y and z integer cooridnates and outputs a size 511 bitmap all ones of which represent possible moves
 // inputs: x, y, z int | outputs: bitmap.Bitmap
 func generateBishopMoves(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
-	x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing dataplanes
+	// x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing dataplanes
 
 	//The indexing for each of these is computed using a formula based on how they were computed, go to dataplanes to check
 	//And work it out for yourself until I have time to better document it
@@ -311,10 +311,10 @@ func generateKnightMoves(BoardState load.BoardState, loc uint32, x int, y int, z
 		// wg.Go(func() {
 		X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
 
-		if X > 8 || Y > 8 || Z > 8 {
+		if X > 7 || Y > 7 || Z > 7 {
 			continue
 		}
-		if X < 1 || Y < 1 || Z < 1 {
+		if X < 0 || Y < 0 || Z < 0 {
 			continue
 		}
 		result.Set(bitutil.VecToUint(X, Y, Z))
@@ -378,10 +378,10 @@ func generateKingMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 		// wg.Go(func() {
 		X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
 
-		if X > 8 || Y > 8 || Z > 8 {
+		if X > 7 || Y > 7 || Z > 7 {
 			continue
 		}
-		if X < 1 || Y < 1 || Z < 1 {
+		if X < 0 || Y < 0 || Z < 0 {
 			continue
 		}
 		result.Set(bitutil.VecToUint(X, Y, Z))
@@ -427,10 +427,10 @@ func generatePawnMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 		// wg.Go(func() {
 		X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
 
-		if X > 8 || Y > 8 || Z > 8 {
+		if X > 7 || Y > 7 || Z > 7 {
 			continue
 		}
-		if X < 1 || Y < 1 || Z < 1 {
+		if X < 0 || Y < 0 || Z < 0 {
 			continue
 		}
 		uin := bitutil.VecToUint(X, Y, Z)
@@ -444,10 +444,10 @@ func generatePawnMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 		// wg.Go(func() {
 		X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
 
-		if X > 8 || Y > 8 || Z > 8 {
+		if X > 7 || Y > 7 || Z > 7 {
 			continue
 		}
-		if X < 1 || Y < 1 || Z < 1 {
+		if X < 0 || Y < 0 || Z < 0 {
 			continue
 		}
 		uin := bitutil.VecToUint(X, Y, Z)

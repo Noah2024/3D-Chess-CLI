@@ -27,9 +27,6 @@ var BoardState load.BoardState
 //In the future I my plan is the leave move generation as sequential, then when I need to generate muliple moves
 //Simply seperate those out and put them in parallel (such as for determining checking)
 
-// BIG NOTE TO SELF 7/13/2026
-// uintLoc is ONE indexed, meanwhile the bitmap  is ZERO indexed
-
 //Taking input from
 //X               Z               Y
 //a b c d e f g - 1 2 3 4 5 6 7 8 - A B C D E F G
@@ -41,7 +38,7 @@ func ParseLoc(loc string) (uint32, int, int, int) {
 	if len(loc) != 3 {
 		logger.Error(fmt.Sprintf("Could not parse location '%v' - invalid length of string", loc))
 	}
-	x, z, y := int(loc[0]-'a'+1), int(loc[1]-'1'+1), int(loc[2]-'A'+1)
+	x, z, y := int(loc[0]-'a'), int(loc[1]-'1'), int(loc[2]-'A')
 
 	return bitutil.VecToUint(x, y, z), x, y, z //bitutil.VecToUint(x, y, z)
 }
@@ -68,6 +65,7 @@ func PieceType(allLoadedPieces map[string]bitmap.Bitmap, loc uint32) (string, bi
 // inputs: from string, to string | outputs: none
 func MoveCommand(from string, to string) {
 	uLocFrom, fX, fY, fZ := ParseLoc(from)
+	fmt.Println(uLocFrom, fX, fY, fZ)
 	logger.Debug(fmt.Sprintf("Move called from %v to %v", from, to))
 
 	allLoadedPieces, loadErr := load.LoadGame(config.CurrentGame)

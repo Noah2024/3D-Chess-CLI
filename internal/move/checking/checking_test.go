@@ -49,7 +49,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "No Check",
 		RefPiece:    "♔",
-		RefPosition: []int{4, 8, 8},
+		RefPosition: []int{3, 7, 7},
 		Board:       map[string]uint32{"♔": 511, "♜": 292},
 		Expected: CheckExpected{
 			InCheck:          false,
@@ -66,7 +66,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "BasicRookCheck",
 		RefPiece:    "♔",
-		RefPosition: []int{4, 8, 8},
+		RefPosition: []int{3, 7, 7},
 		Board:       map[string]uint32{"♔": 507, "♜": 451},
 		Expected: CheckExpected{
 			InCheck:          true,
@@ -79,7 +79,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "BasicBishopCheck",
 		RefPiece:    "♔",
-		RefPosition: []int{4, 8, 8},
+		RefPosition: []int{3, 7, 7},
 		Board:       map[string]uint32{"♔": 511, "♝": 292},
 		Expected: CheckExpected{
 			InCheck:          true,
@@ -91,7 +91,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "BasicKnightCheck",
 		RefPiece:    "♔",
-		RefPosition: []int{4, 8, 8},
+		RefPosition: []int{3, 7, 7},
 		Board:       map[string]uint32{"♔": 511, "♞": 375},
 		Expected: CheckExpected{
 			InCheck:          true,
@@ -103,7 +103,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "BasicPawnCheck",
 		RefPiece:    "♔",
-		RefPosition: []int{4, 8, 8},
+		RefPosition: []int{3, 7, 7},
 		Board:       map[string]uint32{"♔": 63, "♟": 118},
 		Expected: CheckExpected{
 			InCheck:          true,
@@ -120,7 +120,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "RookSaving",
 		RefPiece:    "♖",
-		RefPosition: []int{4, 8, 8},
+		RefPosition: []int{3, 7, 7},
 		Board:       map[string]uint32{"♔": 507, "♜": 451, "♖": 27},
 		Expected: CheckExpected{
 			InCheck:          true,
@@ -133,7 +133,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "BishopSaving",
 		RefPiece:    "♗",
-		RefPosition: []int{7, 6, 5},
+		RefPosition: []int{6, 5, 4},
 		Board:       map[string]uint32{"♔": 511, "♝": 292, "♗": 358},
 		Expected: CheckExpected{
 			InCheck:          true,
@@ -145,7 +145,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "KnightSaving",
 		RefPiece:    "♘",
-		RefPosition: []int{6, 6, 6},
+		RefPosition: []int{5, 5, 5},
 		Board:       map[string]uint32{"♔": 511, "♞": 375, "♘": 365},
 		Expected: CheckExpected{
 			InCheck:          true,
@@ -157,7 +157,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "PawnSaving",
 		RefPiece:    "♔",
-		RefPosition: []int{4, 8, 8},
+		RefPosition: []int{3, 7, 7},
 		Board:       map[string]uint32{"♔": 480, "♜": 487, "♙": 491},
 		Expected: CheckExpected{
 			InCheck:          true,
@@ -169,7 +169,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{ //Cause the pawn has to be fucking different all the damn time
 		Name:        "PawnSavingAsAttack",
 		RefPiece:    "♔",
-		RefPosition: []int{4, 8, 8},
+		RefPosition: []int{3, 7, 7},
 		Board:       map[string]uint32{"♔": 480, "♜": 487, "♙": 494},
 		Expected: CheckExpected{
 			InCheck:          true,
@@ -186,7 +186,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "RookPinned",
 		RefPiece:    "♖",
-		RefPosition: []int{5, 8, 5},
+		RefPosition: []int{4, 7, 4},
 		Board:       map[string]uint32{"♔": 507, "♜": 451, "♖": 483},
 		Expected: CheckExpected{
 			InCheck:          false,
@@ -200,7 +200,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "BishopPinning",
 		RefPiece:    "♗",
-		RefPosition: []int{7, 6, 6},
+		RefPosition: []int{6, 5, 5},
 		Board:       map[string]uint32{"♔": 511, "♝": 292, "♗": 365},
 		Expected: CheckExpected{
 			InCheck:          false,
@@ -213,7 +213,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "KnightPinning",
 		RefPiece:    "♘",
-		RefPosition: []int{5, 8, 5},
+		RefPosition: []int{4, 7, 4},
 		Board:       map[string]uint32{"♔": 507, "♜": 451, "♘": 483},
 		Expected: CheckExpected{
 			InCheck:          false,
@@ -226,7 +226,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "PawnPinning",
 		RefPiece:    "♙",
-		RefPosition: []int{5, 8, 5},
+		RefPosition: []int{4, 7, 4},
 		Board:       map[string]uint32{"♔": 507, "♜": 451, "♙": 483},
 		Expected: CheckExpected{
 			InCheck:          false,
@@ -243,7 +243,7 @@ var AllCheckingTests = []CheckingScenario{
 	CheckingScenario{
 		Name:        "Checkmate#1",
 		RefPiece:    "♔",
-		RefPosition: []int{5, 8, 5},
+		RefPosition: []int{4, 7, 4},
 		Board:       map[string]uint32{"♔": 0, "♛": 9, "♟": 18, "♜": 73},
 		Expected: CheckExpected{
 			InCheck:          true,
