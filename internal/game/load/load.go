@@ -7,7 +7,9 @@ package load
 import (
 	"3DC/config"
 	"3DC/util/logger"
+	"3DC/util/metadata"
 	"3DC/util/must"
+	"fmt"
 	"os"
 	"unicode/utf8"
 
@@ -31,12 +33,12 @@ type BoardState struct {
 }
 
 // Loads dictionary, mapping display char to the bitmap corresponding with that piece
-func LoadGame(fileLocation string) (data map[string]bitmap.Bitmap, err error) {
+func LoadGame(fileLocation string) (data map[string]bitmap.Bitmap, meta metadata.MetaData, err error) {
 
 	result := make(map[string]bitmap.Bitmap)
 	if _, err := os.Stat(fileLocation); os.IsNotExist(err) {
 		logger.Warn("No game currently running, create one with '3DC game new'\n")
-		return nil, err
+		return nil, metadata.MetaData{}, err
 	}
 	entries := must.Must(os.ReadDir(fileLocation))
 
@@ -51,7 +53,13 @@ func LoadGame(fileLocation string) (data map[string]bitmap.Bitmap, err error) {
 		bm := must.Must(bitmap.ReadFrom(file))
 		result[entry.Name()] = bm
 	}
-	return result, nil
+
+	metadata, err := metadata.LoadMetaData(fileLocation)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Could not load metadata for some reason: %s", err))
+	}
+
+	return result, metadata, nil
 
 }
 

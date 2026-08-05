@@ -7,6 +7,7 @@ package new
 import (
 	"3DC/internal/game/save"
 	"3DC/util/logger"
+	"3DC/util/metadata"
 
 	"3DC/config"
 	"3DC/util/bitutil"
@@ -27,7 +28,8 @@ var UintToVec = bitutil.UintToVec
 // Generates new board with a hardcoded start state as a series of len 64 bitmaps
 // DESTRUCTIVE: Overwrites any existing game in the CurrentGame folder without prompting for confirmation.
 func NewCommand() {
-	save.SaveGame(DefaultStartState(), config.CurrentGame)
+
+	save.SaveGame(DefaultStartState(), metadata.CreateDefaultMetaData(), config.CurrentGame)
 	// save.SaveGame(GenerateSinglePiece(map[string]uint32{"♟": 495, "♚": 64, "♙": 0, "♔": 455}), config.CurrentGame)
 
 }

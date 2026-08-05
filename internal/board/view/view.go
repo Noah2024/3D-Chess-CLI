@@ -53,12 +53,11 @@ func BuildLayer(allPieces map[string]bitmap.Bitmap, yLevel int) [8][8]string {
 
 // Internal function call to bitmap storing the
 func PrintLayer(yLevel int, displayMetaData bool, w io.Writer) {
-	allPieces, _ := load.LoadGame(config.CurrentGame)
+	allPieces, meta, _ := load.LoadGame(config.CurrentGame)
 
 	sliceOfBoard := BuildLayer(allPieces, yLevel)
 
 	if displayMetaData == true {
-		meta := must.Must(metadata.LoadMetaData(filepath.Join(config.CurrentGame, "meta")))
 		metadata.DistplayMetaData(meta)
 	}
 

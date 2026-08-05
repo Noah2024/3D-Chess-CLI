@@ -68,7 +68,7 @@ func MoveCommand(from string, to string) {
 	uLocFrom, fX, fY, fZ := ParseLoc(from)
 	logger.Debug(fmt.Sprintf("Move called from %v to %v", from, to))
 
-	allLoadedPieces, loadErr := load.LoadGame(config.CurrentGame)
+	allLoadedPieces, meta, loadErr := load.LoadGame(config.CurrentGame)
 
 	if loadErr != nil {
 		logger.Error(fmt.Sprintf("Could not load board state (ensure you have  a 'CurrentGame' folder in your data directory) %v", loadErr))
@@ -154,7 +154,7 @@ func MoveCommand(from string, to string) {
 	}
 	//Updates bitmap of piece being moved - does not validate if move is legal
 
-	AtomicMove(uLocFrom, uintLocTo, visTo, visFrom, bmFrom, bmTo)
+	AtomicMove(meta, uLocFrom, uintLocTo, visTo, visFrom, bmFrom, bmTo)
 
 	logger.Info("Piece Moved Successfully!")
 	// move.AtomicMove(uLocFrom, uLocFrom, promotionTarget, visFrom, bmFrom, BoardState.AllIndividualPieces[promotionTarget])
@@ -165,7 +165,7 @@ func MoveCommand(from string, to string) {
 // It is only used in practice from within a validated move funciton, and should only be used for debugging elsehwere
 // So many variables are needed becuase no state is stored in the compiled binary itself, and thus the piece must be updated here for changes to take effect.
 // inputs: from string, to string | outputs: none
-func AtomicMove(uintLocFrom uint32, uintLocTo uint32, visTo string, visFrom string, bmFrom bitmap.Bitmap, bmTo bitmap.Bitmap) {
+func AtomicMove(meta metadata.MetaData, uintLocFrom uint32, uintLocTo uint32, visTo string, visFrom string, bmFrom bitmap.Bitmap, bmTo bitmap.Bitmap) {
 
 	bmFrom.Remove(uintLocFrom)
 	bmFrom.Set(uintLocTo)
@@ -173,7 +173,7 @@ func AtomicMove(uintLocFrom uint32, uintLocTo uint32, visTo string, visFrom stri
 	//Updates bitmap (if it exists) of piece being taken
 	bmTo.Remove(uintLocTo)
 
-	metadata.CreateSaveMetaData(config.CurrentGame)
+	metadata.SaveMetaData(meta, config.CurrentGame)
 	save.SavePieceType(visFrom, bmFrom)
 
 	if visTo != "" {

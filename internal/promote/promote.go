@@ -57,7 +57,7 @@ func AttemptPawnPromotion(promotionTo string, teamStr string) {
 		return
 	}
 
-	allLoadedPieces, loadErr := load.LoadGame(config.CurrentGame)
+	allLoadedPieces, meta, loadErr := load.LoadGame(config.CurrentGame)
 	if loadErr != nil {
 		logger.Error(fmt.Sprintf("Could not load board state (ensure you have  a 'CurrentGame' folder in your data directory) %v", loadErr))
 		return
@@ -74,7 +74,7 @@ func AttemptPawnPromotion(promotionTo string, teamStr string) {
 		promotionTarget = string([]rune(promotionTarget)[0] - 6)
 	}
 
-	PromotePawn(uLoc, uLoc, promotionTarget, visFrom, allLoadedPieces[visFrom], allLoadedPieces[promotionTarget])
+	PromotePawn(meta, uLoc, uLoc, promotionTarget, visFrom, allLoadedPieces[visFrom], allLoadedPieces[promotionTarget])
 
 }
 
@@ -103,12 +103,12 @@ func CanPromotePawn(Team bool, AllIndividualPieces map[string]bitmap.Bitmap) (ui
 	return 0, false
 }
 
-func PromotePawn(uintLocFrom uint32, uintLocTo uint32, visTo string, visFrom string, bmFrom bitmap.Bitmap, bmTo bitmap.Bitmap) {
+func PromotePawn(meta metadata.MetaData, uintLocFrom uint32, uintLocTo uint32, visTo string, visFrom string, bmFrom bitmap.Bitmap, bmTo bitmap.Bitmap) {
 
 	bmFrom.Remove(uintLocFrom)
 	bmTo.Set(uintLocTo)
 
-	metadata.CreateSaveMetaData(config.CurrentGame)
+	metadata.SaveMetaData(meta, config.CurrentGame)
 	save.SavePieceType(visFrom, bmFrom)
 
 	if visTo != "" {

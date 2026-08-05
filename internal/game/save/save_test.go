@@ -5,12 +5,15 @@ package save_test
 
 import (
 	"3DC/internal/game/save"
+	"3DC/util/metadata"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/kelindar/bitmap"
 )
+
+var meta = metadata.MetaData{}
 
 func TestSaveGame(t *testing.T) {
 
@@ -22,7 +25,7 @@ func TestSaveGame(t *testing.T) {
 			"♚": bitmap.Bitmap{}, //NNo information is really needed here
 		}
 
-		saveErr := save.SaveGame(bmps, location)
+		saveErr := save.SaveGame(bmps, meta, location)
 		if saveErr != nil {
 			t.Errorf("Could not save game because of error %s", saveErr)
 		}
@@ -41,7 +44,7 @@ func TestSaveGame(t *testing.T) {
 		}
 
 		//Was already tested, so we use without testing now
-		saveErr := save.SaveGame(bmps, location)
+		saveErr := save.SaveGame(bmps, meta, location)
 		if saveErr != nil {
 			t.Errorf("Could not save game because of error %s", saveErr)
 		}

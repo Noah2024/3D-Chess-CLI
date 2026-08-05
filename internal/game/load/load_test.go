@@ -6,6 +6,7 @@ import (
 	"3DC/internal/game/load"
 	"3DC/internal/game/new"
 	"3DC/internal/game/save"
+	"3DC/util/metadata"
 	"fmt"
 	"path/filepath"
 	"testing"
@@ -20,14 +21,15 @@ func TestLoad(t *testing.T) {
 			"♚": 0,
 			"♔": 511,
 		})
+		meta := metadata.MetaData{}
 
 		//Was already tested, so we use without testing now
-		saveErr := save.SaveGame(allPieces, location)
+		saveErr := save.SaveGame(allPieces, meta, location)
 		if saveErr != nil {
 			t.Errorf("Could not save game because of error %s", saveErr)
 		}
 
-		loadedPieces, loadErr := load.LoadGame(location)
+		loadedPieces, _, loadErr := load.LoadGame(location)
 		if loadErr != nil {
 			t.Errorf("Could not load game because of error %s", saveErr)
 		}

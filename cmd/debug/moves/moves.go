@@ -25,7 +25,7 @@ func DebugMoveGen() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			allLoadedPieces, _ := load.LoadGame(config.CurrentGame)
+			allLoadedPieces, _, _ := load.LoadGame(config.CurrentGame)
 
 			uintLocFrom, _, _, _ := move.ParseLoc(args[0])
 			visFrom, _ := move.PieceType(allLoadedPieces, uintLocFrom)

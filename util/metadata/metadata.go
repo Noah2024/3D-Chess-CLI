@@ -6,6 +6,7 @@ package metadata
 //Will need ot update metadata to use io.writer intead of fmt
 
 import (
+	"3DC/util/logger"
 	"3DC/util/must"
 	"bytes"
 	"encoding/binary"
@@ -41,40 +42,51 @@ type MetaData struct {
 // Default metadata declaration
 var MetaDataVersion uint8 = 1
 var Config uint8 = 1
-var Turn uint8 = 1
+var Turn uint8 = 0
 var CastleRights uint8 = 0b11000011
 var EnPessentRights uint8 = 0b00000000
 
-// Creates directory at location and saves metadata as collection of bitmaps
-func CreateSaveMetaData(location string) error {
-	os.Mkdir(filepath.Join(location, "meta"), 0o755)
-	buf := new(bytes.Buffer)
-
-	binary.Write(buf, binary.LittleEndian, MetaData{
+// Creates directory at location and saves metadata as collection of bitmaps //CreateSaveMetaData
+func CreateDefaultMetaData() MetaData {
+	return MetaData{
 		Version:   MetaDataVersion,
 		Config:    Config,
 		Turn:      Turn,
 		Castle:    CastleRights,
 		EnPassant: EnPessentRights,
 		Time:      time.Now().Unix(),
-	})
-
-	err := os.WriteFile(filepath.Join(location, "meta", "meta.bin"), buf.Bytes(), 0o755)
-	must.Must("", err)
-	return nil
+	}
 }
 
 // Loads the bin file from the given location and reads it into predefined metdata struct
 func LoadMetaData(location string) (MetaData, error) {
 	var data MetaData
 
-	filePath := filepath.Join(location, "meta.bin")
+	filePath := filepath.Join(location, "meta", "meta.bin")
 	b := must.Must(os.ReadFile(filePath))
 	buf := bytes.NewReader(b)
 	err := binary.Read(buf, binary.LittleEndian, &data)
 	must.Must("", err)
 
 	return data, nil
+}
+
+func SaveMetaData(data MetaData, location string) {
+
+	filePath := filepath.Join(location, "meta", "meta.bin")
+	metaDir := filepath.Join(location, "meta")
+
+	_, err := os.Stat(metaDir)
+	if err != nil {
+		logger.Debug("No metadata currently exists for this game, creating it now")
+		os.Mkdir(metaDir, 0o755)
+	}
+
+	buf := new(bytes.Buffer)
+
+	binary.Write(buf, binary.LittleEndian, data)
+	err = os.WriteFile(filePath, buf.Bytes(), 0o755)
+	must.Must("", err)
 }
 
 // Displays the metadata in a human-readable format, including version, configuration, turn, castling rights, en passant rights, and the time of the last save.

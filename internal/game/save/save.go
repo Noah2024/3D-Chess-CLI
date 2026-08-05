@@ -15,9 +15,9 @@ import (
 )
 
 // Saves entire board state
-func SaveGame(bmps map[string]bitmap.Bitmap, location string) error {
+func SaveGame(bmps map[string]bitmap.Bitmap, meta metadata.MetaData, location string) error {
 	os.Mkdir(location, 0o755) //Owner can rwx but everyone else can only r and x
-	metadata.CreateSaveMetaData(location)
+	metadata.SaveMetaData(meta, location)
 	for key, bm := range bmps {
 		fileLoc := filepath.Join(location, string(key))
 		file := must.Must(os.Create(fileLoc))

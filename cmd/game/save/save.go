@@ -7,7 +7,7 @@ import (
 	"3DC/config"
 	"3DC/internal/game/load"
 	"3DC/internal/game/save"
-	"3DC/util/must"
+	"3DC/util/logger"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -24,9 +24,12 @@ func SaveCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			//Ik ik I really need to do better input validation here
 			//But thats a later me problem
-			game := must.Must(load.LoadGame(config.CurrentGame))
+			game, meta, err := load.LoadGame(config.CurrentGame)
+			if err != nil {
+				logger.Error("Could not load game in cobra save command")
+			}
 			gameLoc := filepath.Join(config.DataDir, args[0])
-			save.SaveGame(game, gameLoc)
+			save.SaveGame(game, meta, gameLoc)
 			return nil
 		},
 	}

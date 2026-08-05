@@ -8,7 +8,6 @@ import (
 	"3DC/internal/game/load"
 	"3DC/internal/game/save"
 	"3DC/util/dialog"
-	"3DC/util/must"
 	"fmt"
 	"os"
 	"path"
@@ -38,8 +37,11 @@ func LoadCommand() *cobra.Command {
 				return err
 			}
 
-			game := must.Must(load.LoadGame(path.Join(config.DataDir, args[0])))
-			save.SaveGame(game, config.CurrentGame)
+			game, meta, err := load.LoadGame(path.Join(config.DataDir, args[0]))
+			if err != nil {
+				fmt.Println("Bro")
+			}
+			save.SaveGame(game, meta, config.CurrentGame)
 			return nil
 		},
 	}
