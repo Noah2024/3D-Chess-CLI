@@ -25,6 +25,20 @@ func testIndex(bm bitmap.Bitmap, nums []uint32) {
 }
 
 // ====================================
+// Pawn Promotion Dataplanes
+// ====================================
+
+// Pregenerated plane along with a black piece may be promoted
+var BlackPromotionPlane = bitmap.Bitmap{
+	255, 255, 255, 255, 255, 255, 255, 255,
+}
+
+// Pregenerated plane along with a white piece may be promoted
+var WhitePromotionPlane = bitmap.Bitmap{
+	18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680,
+}
+
+// ====================================
 // Cardinal Directions
 // ====================================
 
@@ -339,4 +353,21 @@ func GeneratePlane(fn func(x, y, z int) bool) bitmap.Bitmap {
 		}
 	}
 	return bm
+}
+
+// BlackPromotionPlane = bitmap.Bitmap{[255 255 255 255 255 255 255 255]}
+// Utalizes dataplnes to generate the plane on which white pieces can be promoted
+// Is not used at runtime
+func GenerateWhitePromotionPlane() bitmap.Bitmap {
+	return GeneratePlane(func(x, y, z int) bool {
+		return z == 7
+	})
+}
+
+// Utalizes dataplnes to generate the plane on which black pieces can be promoted
+// Is not used at runtime
+func GenerateBlackPromotionPlane() bitmap.Bitmap {
+	return GeneratePlane(func(x, y, z int) bool {
+		return z == 0
+	})
 }

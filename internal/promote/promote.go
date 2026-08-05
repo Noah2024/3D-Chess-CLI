@@ -27,18 +27,7 @@ var wordToPiece = map[string]string{
 	"queen":  "♛",
 }
 
-// Pregenerated plane along with a black piece may be promoted
-var BlackPromotionPlane = bitmap.Bitmap{
-	255, 255, 255, 255, 255, 255, 255, 255,
-}
-
-// Pregenerated plane along with a white piece may be promoted
-var WhitePromotionPlane = bitmap.Bitmap{
-	18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680, 18374686479671623680,
-}
-
 // Will attempt to promote a pawn to the type given
-// Will check
 func AttemptPawnPromotion(promotionTo string, teamStr string) {
 	var team bool
 	var visFrom string
@@ -96,10 +85,10 @@ func CanPromotePawn(Team bool, AllIndividualPieces map[string]bitmap.Bitmap) (ui
 	var planeToCheck bitmap.Bitmap
 	if Team {
 		pieceToCheck = "♟"
-		planeToCheck = WhitePromotionPlane
+		planeToCheck = dataplane.WhitePromotionPlane
 	} else {
 		pieceToCheck = "♙"
-		planeToCheck = BlackPromotionPlane
+		planeToCheck = dataplane.BlackPromotionPlane
 
 	}
 
@@ -126,21 +115,4 @@ func PromotePawn(uintLocFrom uint32, uintLocTo uint32, visTo string, visFrom str
 		save.SavePieceType(visTo, bmTo)
 	}
 	logger.Info(fmt.Sprintf("Successfully Promoted pawn to '%s'", visTo))
-}
-
-// BlackPromotionPlane = bitmap.Bitmap{[255 255 255 255 255 255 255 255]}
-// Utalizes dataplnes to generate the plane on which white pieces can be promoted
-// Is not used at runtime
-func GenerateWhitePromotionPlane() bitmap.Bitmap {
-	return dataplane.GeneratePlane(func(x, y, z int) bool {
-		return z == 7
-	})
-}
-
-// Utalizes dataplnes to generate the plane on which black pieces can be promoted
-// Is not used at runtime
-func GenerateBlackPromotionPlane() bitmap.Bitmap {
-	return dataplane.GeneratePlane(func(x, y, z int) bool {
-		return z == 0
-	})
 }
