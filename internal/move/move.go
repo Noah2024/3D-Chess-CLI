@@ -87,6 +87,17 @@ func MoveCommand(from string, to string) {
 		return
 	}
 
+	var allowedTurn uint8
+	if BoardState.Team { // If team if white
+		allowedTurn = 0
+	} else { // If team if black
+		allowedTurn = 1
+	}
+	if !(meta.Turn%2 == allowedTurn) {
+		logger.Error(fmt.Sprintf("Its not the teams turn! "))
+		return
+	}
+
 	promotionLoc, canPromote := promote.CanPromotePawn(BoardState.Team, BoardState.AllIndividualPieces)
 
 	if canPromote {
@@ -152,8 +163,11 @@ func MoveCommand(from string, to string) {
 		logger.Error(fmt.Sprintf("Piece %v cannot move in that way", visFrom))
 		return
 	}
-	//Updates bitmap of piece being moved - does not validate if move is legal
 
+	//Update Metadata
+	meta.Turn += 1
+
+	//Updates bitmap of piece being moved - does not validate if move is legal
 	AtomicMove(meta, uLocFrom, uintLocTo, visTo, visFrom, bmFrom, bmTo)
 
 	logger.Info("Piece Moved Successfully!")

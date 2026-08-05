@@ -36,7 +36,9 @@ type MetaData struct {
 	EnPassant uint8
 
 	//Time of last game save
-	Time int64
+	LastSaved int64
+
+	Created int64
 }
 
 // Default metadata declaration
@@ -54,7 +56,8 @@ func CreateDefaultMetaData() MetaData {
 		Turn:      Turn,
 		Castle:    CastleRights,
 		EnPassant: EnPessentRights,
-		Time:      time.Now().Unix(),
+		LastSaved: time.Now().Unix(),
+		Created:   time.Now().Unix(),
 	}
 }
 
@@ -82,6 +85,8 @@ func SaveMetaData(data MetaData, location string) {
 		os.Mkdir(metaDir, 0o755)
 	}
 
+	data.LastSaved = time.Now().Unix()
+
 	buf := new(bytes.Buffer)
 
 	binary.Write(buf, binary.LittleEndian, data)
@@ -99,6 +104,7 @@ func DistplayMetaData(meta MetaData) {
 	fmt.Printf("Turn: %d \n", meta.Turn)
 	fmt.Printf("Castle: %d \n", meta.Castle)
 	fmt.Printf("EnPessent %d\n", meta.EnPassant)
-	fmt.Printf("Saved at %s\n", time.Unix(meta.Time, 0).UTC().Format(time.RFC3339))
+	fmt.Printf("Game Created %s\n", time.Unix(meta.Created, 0).UTC().Format(time.RFC3339))
+	fmt.Printf("Last Saved %s\n", time.Unix(meta.LastSaved, 0).UTC().Format(time.RFC3339))
 	fmt.Println("----------")
 }
