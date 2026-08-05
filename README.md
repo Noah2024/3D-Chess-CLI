@@ -48,6 +48,9 @@ game/ - commands related to managing games
 move/ 
     move - takes two arguments, locationFrom and locationToo, expected in format a1A, and h1H (x, y, z)
 
+promote/
+    promote - takes two arugments, promotionTarget (knight, rook, bishop, queen), and team (black, white)
+
 debug/ - commands related to debug (if using please read implemnetation)
    bmstring
    dataPlanes
@@ -71,7 +74,6 @@ debug/ - commands related to debug (if using please read implemnetation)
 - Upper Level API Integration
  - And test cases for said API 
 - pawn double move
-- pawn promotion
 - en pessant 🤮
 - Time trials/stress test
 - Optimize w/ concurrent goroutine

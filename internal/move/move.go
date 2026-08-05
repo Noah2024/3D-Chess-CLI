@@ -10,6 +10,7 @@ import (
 	"3DC/internal/game/save"
 	"3DC/internal/move/checking"
 	"3DC/internal/move/genMoves"
+	"3DC/internal/promote"
 	"3DC/util/bitutil"
 	"3DC/util/logger"
 	"3DC/util/metadata"
@@ -27,7 +28,7 @@ var BoardState load.BoardState
 //In the future I my plan is the leave move generation as sequential, then when I need to generate muliple moves
 //Simply seperate those out and put them in parallel (such as for determining checking)
 
-//Taking input from
+//Taking input fromfmt
 //X               Z               Y
 //a b c d e f g - 1 2 3 4 5 6 7 8 - A B C D E F G
 
@@ -65,13 +66,12 @@ func PieceType(allLoadedPieces map[string]bitmap.Bitmap, loc uint32) (string, bi
 // inputs: from string, to string | outputs: none
 func MoveCommand(from string, to string) {
 	uLocFrom, fX, fY, fZ := ParseLoc(from)
-	fmt.Println(uLocFrom, fX, fY, fZ)
 	logger.Debug(fmt.Sprintf("Move called from %v to %v", from, to))
 
 	allLoadedPieces, loadErr := load.LoadGame(config.CurrentGame)
 
 	if loadErr != nil {
-		logger.Error(fmt.Sprintf("Could not load board state (ensure you have  a 'CurrentGame' folder in your data directory) %v", BoardState.PieceLoadError))
+		logger.Error(fmt.Sprintf("Could not load board state (ensure you have  a 'CurrentGame' folder in your data directory) %v", loadErr))
 		return
 	}
 
@@ -82,9 +82,16 @@ func MoveCommand(from string, to string) {
 	}
 
 	BoardState, err := load.GenerateBoardState(allLoadedPieces, visFrom)
-
 	if err != nil {
 		logger.Error(fmt.Sprintf("Error in determing pieces team %v", BoardState.PieceLoadError))
+		return
+	}
+
+	promotionLoc, canPromote := promote.CanPromotePawn(BoardState.Team, BoardState.AllIndividualPieces)
+
+	if canPromote {
+		x, y, z := bitutil.UintToVec(promotionLoc)
+		logger.Error(fmt.Sprintf("You must promote your pawn at (%d, %d, %d) before moving other pieces", x, y, z))
 		return
 	}
 
@@ -146,9 +153,11 @@ func MoveCommand(from string, to string) {
 		return
 	}
 	//Updates bitmap of piece being moved - does not validate if move is legal
-	atomicMove(uLocFrom, uintLocTo, visTo, visFrom, bmFrom, bmTo)
+
+	AtomicMove(uLocFrom, uintLocTo, visTo, visFrom, bmFrom, bmTo)
 
 	logger.Info("Piece Moved Successfully!")
+	// move.AtomicMove(uLocFrom, uLocFrom, promotionTarget, visFrom, bmFrom, BoardState.AllIndividualPieces[promotionTarget])
 
 }
 
@@ -156,7 +165,7 @@ func MoveCommand(from string, to string) {
 // It is only used in practice from within a validated move funciton, and should only be used for debugging elsehwere
 // So many variables are needed becuase no state is stored in the compiled binary itself, and thus the piece must be updated here for changes to take effect.
 // inputs: from string, to string | outputs: none
-func atomicMove(uintLocFrom uint32, uintLocTo uint32, visTo string, visFrom string, bmFrom bitmap.Bitmap, bmTo bitmap.Bitmap) {
+func AtomicMove(uintLocFrom uint32, uintLocTo uint32, visTo string, visFrom string, bmFrom bitmap.Bitmap, bmTo bitmap.Bitmap) {
 
 	bmFrom.Remove(uintLocFrom)
 	bmFrom.Set(uintLocTo)

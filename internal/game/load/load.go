@@ -25,6 +25,7 @@ type BoardState struct {
 	FriendKing          bitmap.Bitmap            // Location of the king of the friendly pieces
 	FriendKingLoc       uint32                   // Location of the king of the friendly pieces, stored as a uint32 value
 	SwapPawn            bool                     //Needed for checking becuase the pawn attacks differnet than it moves
+	Team                bool                     //True refers to White and False refers to black
 	AllIndividualPieces map[string]bitmap.Bitmap //map[string]bitmap.Bitmap
 	ReferencePiece      string                   //The piece currently being processed (used in protecting king in genMoves.restrictMoves)
 }
@@ -70,6 +71,7 @@ func GenerateBoardState(loadedData map[string]bitmap.Bitmap, referencePiece stri
 	start, end := '♔', '♙'
 	if r > '♙' {
 		start, end = '♚', '♟'
+		rtn.Team = true
 	}
 
 	for vis, bm := range loadedData {

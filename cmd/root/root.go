@@ -12,6 +12,8 @@ import (
 	"3DC/cmd/debug"
 	"3DC/cmd/game"
 
+	"3DC/cmd/promote"
+
 	"github.com/spf13/cobra"
 )
 
@@ -30,5 +32,6 @@ func RootCommand() *cobra.Command {
 	rootCmd.AddCommand(game.GameCommand())
 	rootCmd.AddCommand(move.MoveCommand())
 	rootCmd.AddCommand(debug.Debug())
+	rootCmd.AddCommand(promote.PromoteCommand())
 	return rootCmd
 }

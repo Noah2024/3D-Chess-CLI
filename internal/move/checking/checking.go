@@ -128,7 +128,10 @@ func KingInDanger(BoardState load.BoardState, loc uint32) (bitmap.Bitmap, bool) 
 	if BoardState.AllIndividualPieces[badQueen] != nil {
 		PinningEnemies.Or(BoardState.AllIndividualPieces[badQueen])
 	}
-	PinningEnemies.Or(BoardState.AllIndividualPieces[string(lookingFor)])
+
+	if BoardState.AllIndividualPieces[string(lookingFor)] != nil {
+		PinningEnemies.Or(BoardState.AllIndividualPieces[string(lookingFor)])
+	}
 
 	// ==========================================
 	// Step through the vector opposite to the king we are in line with
