@@ -39,6 +39,18 @@ var WhitePromotionPlane = bitmap.Bitmap{
 }
 
 // ====================================
+// Pawn Double Move Data-Planes
+// ====================================
+
+var BlackDoubleMovePlane = bitmap.Bitmap{
+	65280, 65280, 65280, 65280, 65280, 65280, 65280, 65280,
+}
+
+var WhiteDoubleMovePlane = bitmap.Bitmap{
+	71776119061217280, 71776119061217280, 71776119061217280, 71776119061217280, 71776119061217280, 71776119061217280, 71776119061217280, 71776119061217280,
+}
+
+// ====================================
 // Cardinal Directions
 // ====================================
 
@@ -314,20 +326,20 @@ func GenerateAllPlanes() {
 		}
 		xy45NegPlane[index] = plane
 	}
-	fmt.Println("xzPlane", xzPlane)
-	fmt.Println("xyPlane", xyPlane)
-	fmt.Println("zyPlane", zyPlane)
+	// fmt.Println("xzPlane", xzPlane)
+	// fmt.Println("xyPlane", xyPlane)
+	// fmt.Println("zyPlane", zyPlane)
+	// fmt.Println("xz45PosPlane", xz45PosPlane)
+	// fmt.Println("xz45NegPlane", xz45NegPlane)
+	// fmt.Println("zy45Plane", zy45Plane)
+	// fmt.Println("zy45NegPlane", zy45NegPlane)
+	// fmt.Println("xy45Plane", xy45Plane)
+	// fmt.Println("xy45NegPlane", xy45NegPlane)
 
-	fmt.Println("xz45PosPlane", xz45PosPlane)
-	fmt.Println("xz45NegPlane", xz45NegPlane)
-
-	fmt.Println("zy45Plane", zy45Plane)
-
-	fmt.Println("zy45NegPlane", zy45NegPlane)
-
-	fmt.Println("xy45Plane", xy45Plane)
-
-	fmt.Println("xy45NegPlane", xy45NegPlane)
+	wp := GenerateWhiteDoublePlane()
+	bp := GenerateBlackDoublePlane()
+	fmt.Println("wp", wp)
+	fmt.Println("bp", bp)
 
 	fmt.Println("Please god")
 }
@@ -369,5 +381,19 @@ func GenerateWhitePromotionPlane() bitmap.Bitmap {
 func GenerateBlackPromotionPlane() bitmap.Bitmap {
 	return GeneratePlane(func(x, y, z int) bool {
 		return z == 0
+	})
+}
+
+func GenerateWhiteDoublePlane() bitmap.Bitmap {
+	return GeneratePlane(func(x, y, z int) bool {
+		return z == 6
+	})
+}
+
+// Utalizes dataplnes to generate the plane on which black pieces can be promoted
+// Is not used at runtime
+func GenerateBlackDoublePlane() bitmap.Bitmap {
+	return GeneratePlane(func(x, y, z int) bool {
+		return z == 1
 	})
 }

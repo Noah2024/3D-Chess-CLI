@@ -469,6 +469,22 @@ var PiecesUnderTest = []pieceTestCase{
 				Position: []int{4, 4, 4},
 				Expected: "[0 0 0 26388279066624 17592186044416 17592186044416 0 0]",
 			},
+			{
+				Name: "ValidDoubleMove",
+				Board: map[string]uint32{
+					"♙": 180,
+				},
+				Position: []int{4, 2, 6},
+				Expected: "[0 17660905521152 17660905521152 17660905521152 0 0 0 0]",
+			},
+			{
+				Name: "NONValidDoubleMove",
+				Board: map[string]uint32{
+					"♙": 172,
+				},
+				Position: []int{4, 2, 5},
+				Expected: "[0 68719476736 68719476736 68719476736 0 0 0 0]",
+			},
 		},
 	},
 }

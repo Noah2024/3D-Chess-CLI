@@ -414,6 +414,17 @@ func generatePawnMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 		{0, -1, zOffset},
 	}
 
+	if DoubleMove(zOffset, loc) {
+		normalMoves = [][]int{
+			{0, 0, zOffset},
+			{0, 1, zOffset},
+			{0, -1, zOffset},
+			{0, 0, zOffset * 2},
+			{0, 1, zOffset * 2},
+			{0, -1, zOffset * 2},
+		}
+	}
+
 	var attackingMoves = [][]int{
 		{1, 0, zOffset},
 		{1, 1, zOffset},
@@ -459,6 +470,28 @@ func generatePawnMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 
 	// wg.Wait()
 	return result
+}
+
+// Determines if a given pawn can move using the zOffset already calulated for the given teams
+func CanDoubleMove(zOffSet int) {
+
+}
+
+// Dynamically determines if a given piece can double move
+// Returns a scalar by which to sc
+func DoubleMove(zOffSet int, locTocheck uint32) bool {
+	var planeToCheck bitmap.Bitmap
+	if zOffSet == -1 {
+		planeToCheck = dataplane.WhiteDoubleMovePlane
+	} else {
+		planeToCheck = dataplane.BlackDoubleMovePlane
+	}
+
+	if planeToCheck.Contains(locTocheck) {
+		return true
+	}
+
+	return false
 }
 
 // moveMap matches a pieces visual representation to the function that generates all possible moves for that piece
