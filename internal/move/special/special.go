@@ -22,8 +22,6 @@ func CouldMakeEnPessent(canEnPessentFrom bitmap.Bitmap, uintloc uint32, x int, e
 	return false
 }
 
-// Determines if a given pawn can move using the zOffset already calulated for the given teams
-
 // Checks state of move just made and determines if the move was 'enPessantable' if so
 // It updates the value stored in metadata. It also clears the metadata for expired Enpessent moves
 func UpdateEnPessent(BoardState *load.BoardState, uLocFrom uint32, uintLocTo uint32, tX int) {

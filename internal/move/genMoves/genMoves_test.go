@@ -485,6 +485,15 @@ var PiecesUnderTest = []pieceTestCase{
 				Position: []int{4, 2, 5},
 				Expected: "[0 68719476736 68719476736 68719476736 0 0 0 0]",
 			},
+			{
+				Name: "CannontDoubleThroughPiece",
+				Board: map[string]uint32{
+					"♙": 180,
+					"♗": 172,
+				},
+				Position: []int{4, 2, 6},
+				Expected: "[0 17660905521152 0 17660905521152 0 0 0 0]",
+			},
 		},
 	},
 }

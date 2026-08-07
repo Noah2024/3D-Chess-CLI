@@ -31,10 +31,13 @@ func NewCommand() {
 
 	save.SaveGame(DefaultStartState(), metadata.CreateDefaultMetaData(), config.CurrentGame)
 	// meta := metadata.CreateDefaultMetaData()
-	// meta.BlackEnPessent = 0
-	// meta.WhiteEnPessent = 0
-	// meta.Turn += 1
-	// save.SaveGame(GenerateSinglePiece(map[string]uint32{"♙": 160, "♟": 161}), meta, config.CurrentGame)
+	// // meta.BlackEnPessent = 0
+	// // meta.WhiteEnPessent = 0
+	// // meta.Turn += 1
+	// save.SaveGame(GenerateSinglePiece(map[string]uint32{
+	// 	"♙": 180,
+	// 	"♗": 187,
+	// }), meta, config.CurrentGame)
 
 }
 

@@ -419,15 +419,10 @@ func generatePawnMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 		{0, -1, zOffset},
 	}
 
-	if DoubleMove(zOffset, loc) {
-		normalMoves = [][]int{
-			{0, 0, zOffset},
-			{0, 1, zOffset},
-			{0, -1, zOffset},
-			{0, 0, zOffset * 2},
-			{0, 1, zOffset * 2},
-			{0, -1, zOffset * 2},
-		}
+	var doubleMoves = [][]int{
+		{0, 0, zOffset * 2},
+		{0, 1, zOffset * 2},
+		{0, -1, zOffset * 2},
 	}
 
 	var attackingMoves = [][]int{
@@ -439,8 +434,12 @@ func generatePawnMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 		{-1, -1, zOffset},
 	}
 
-	for _, comb := range normalMoves {
+	canDouble := DoubleMove(BoardState, zOffset, loc)
+	for i, comb := range normalMoves {
 		// wg.Go(func() {
+		legalDouble := true
+		doubleX, doubleY, doubleZ := x+doubleMoves[i][0], y+doubleMoves[i][1], z+doubleMoves[i][2]
+
 		X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
 
 		if X > 7 || Y > 7 || Z > 7 {
@@ -449,11 +448,21 @@ func generatePawnMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 		if X < 0 || Y < 0 || Z < 0 {
 			continue
 		}
+		if doubleX > 7 || doubleY > 7 || doubleZ > 7 {
+			legalDouble = false
+		}
+		if doubleX < 0 || doubleY < 0 || doubleZ < 0 {
+			legalDouble = false
+		}
 		uin := bitutil.VecToUint(X, Y, Z)
 		if !BoardState.AllPieces.Contains(uin) && !BoardState.SwapPawn { //Normal moves can only be made if there are no pieces there, ANY
-			result.Set(uin) //Plus if were not looking for checks
+			result.Set(uin)               //Plus if were not looking for checks
+			if canDouble && legalDouble { //If the double move exists
+				doubleuin := bitutil.VecToUint(doubleX, doubleY, doubleZ)
+				result.Set(doubleuin)
+
+			}
 		}
-		// })
 	}
 	// fmt.Println(BoardState.ReferencePiece)
 	for _, comb := range attackingMoves {
@@ -482,7 +491,7 @@ func generatePawnMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 }
 
 // Dynamically determines if a given piece can double move
-func DoubleMove(zOffSet int, locTocheck uint32) bool {
+func DoubleMove(BoardState load.BoardState, zOffSet int, locTocheck uint32) bool {
 	var planeToCheck bitmap.Bitmap
 	if zOffSet == -1 {
 		planeToCheck = dataplane.WhiteDoubleMovePlane
@@ -490,6 +499,7 @@ func DoubleMove(zOffSet int, locTocheck uint32) bool {
 		planeToCheck = dataplane.BlackDoubleMovePlane
 	}
 
+	//Check if this piece is on the double move plane &
 	if planeToCheck.Contains(locTocheck) {
 		return true
 	}
