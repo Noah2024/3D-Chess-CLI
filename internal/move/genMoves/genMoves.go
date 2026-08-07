@@ -8,6 +8,7 @@ package genMoves
 import (
 	"3DC/config"
 	"3DC/internal/game/load"
+	"3DC/internal/move/special"
 	"3DC/util/bitutil"
 	"3DC/util/dataplane"
 	"sync"
@@ -398,13 +399,17 @@ func generateKingMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 // Hand coded and validated moves for the knight (becuase I can't use a cheeky lil bitmap for it)
 func generatePawnMoves(BoardState load.BoardState, loc uint32, x int, y int, z int) bitmap.Bitmap {
 	// x, y, z = x-1, y-1, z-1 //positions must be zero indexed for indexing da
-
 	var result bitmap.Bitmap
 	result.Grow(config.BoardSize - 1)
 
-	zOffset := 1 //Using all black pieces to determine which way to move the pawn
+	zOffset := 1                                            //Using all black pieces to determine which way to move the pawn
+	var canEnPessentFrom = dataplane.WhiteEnPessentPlane    //Plane from which can be enpessented from
+	var enemyEnPessentable = BoardState.Meta.WhiteEnPessent //EnPessent move avilable if it exists
+
 	if BoardState.AllIndividualPieces["♙"].Contains(loc) {
 		zOffset = -1
+		canEnPessentFrom = dataplane.BlackEnPessentPlane
+		enemyEnPessentable = BoardState.Meta.BlackEnPessent
 	}
 
 	//AI used to speed up the processes of finding all valid permutations
@@ -450,7 +455,7 @@ func generatePawnMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 		}
 		// })
 	}
-
+	// fmt.Println(BoardState.ReferencePiece)
 	for _, comb := range attackingMoves {
 		// wg.Go(func() {
 		X, Y, Z := x+comb[0], y+comb[1], z+comb[2]
@@ -462,6 +467,10 @@ func generatePawnMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 			continue
 		}
 		uin := bitutil.VecToUint(X, Y, Z)
+
+		if special.CouldMakeEnPessent(canEnPessentFrom, loc, X, int(enemyEnPessentable)) {
+			result.Set(uin)
+		}
 		if BoardState.EnemyPieces.Contains(uin) || BoardState.SwapPawn { //Attacking moves can only be made if there ARE enemy pieces there
 			result.Set(uin)
 		}
@@ -472,13 +481,7 @@ func generatePawnMoves(BoardState load.BoardState, loc uint32, x int, y int, z i
 	return result
 }
 
-// Determines if a given pawn can move using the zOffset already calulated for the given teams
-func CanDoubleMove(zOffSet int) {
-
-}
-
 // Dynamically determines if a given piece can double move
-// Returns a scalar by which to sc
 func DoubleMove(zOffSet int, locTocheck uint32) bool {
 	var planeToCheck bitmap.Bitmap
 	if zOffSet == -1 {

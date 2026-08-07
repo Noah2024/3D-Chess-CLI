@@ -30,7 +30,11 @@ var UintToVec = bitutil.UintToVec
 func NewCommand() {
 
 	save.SaveGame(DefaultStartState(), metadata.CreateDefaultMetaData(), config.CurrentGame)
-	// save.SaveGame(GenerateSinglePiece(map[string]uint32{"♟": 495, "♚": 64, "♙": 0, "♔": 455}), config.CurrentGame)
+	// meta := metadata.CreateDefaultMetaData()
+	// meta.BlackEnPessent = 0
+	// meta.WhiteEnPessent = 0
+	// meta.Turn += 1
+	// save.SaveGame(GenerateSinglePiece(map[string]uint32{"♙": 160, "♟": 161}), meta, config.CurrentGame)
 
 }
 

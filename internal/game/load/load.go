@@ -30,6 +30,7 @@ type BoardState struct {
 	Team                bool                     //True refers to White and False refers to black
 	AllIndividualPieces map[string]bitmap.Bitmap //map[string]bitmap.Bitmap
 	ReferencePiece      string                   //The piece currently being processed (used in protecting king in genMoves.restrictMoves)
+	Meta                metadata.MetaData        // Self explanatory
 }
 
 // Loads dictionary, mapping display char to the bitmap corresponding with that piece

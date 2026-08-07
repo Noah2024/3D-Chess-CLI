@@ -33,7 +33,8 @@ type MetaData struct {
 	// Becuase enpessent rights exist for only one turn this represents the rights of whoevers turn it is
 	// Determined at the end of the previous players turn
 	// Single byte representing who has enpessent rights for this next turn
-	EnPassant uint8
+	WhiteEnPessent uint8
+	BlackEnPessent uint8
 
 	//Time of last game save
 	LastSaved int64
@@ -46,18 +47,20 @@ var MetaDataVersion uint8 = 1
 var Config uint8 = 1
 var Turn uint8 = 0
 var CastleRights uint8 = 0b11000011
-var EnPessentRights uint8 = 0b00000000
+var WhiteEnPessent uint8 = 9 //0b0
+var BlackEnPessent uint8 = 9 //0b0
 
 // Creates directory at location and saves metadata as collection of bitmaps //CreateSaveMetaData
 func CreateDefaultMetaData() MetaData {
 	return MetaData{
-		Version:   MetaDataVersion,
-		Config:    Config,
-		Turn:      Turn,
-		Castle:    CastleRights,
-		EnPassant: EnPessentRights,
-		LastSaved: time.Now().Unix(),
-		Created:   time.Now().Unix(),
+		Version:        MetaDataVersion,
+		Config:         Config,
+		Turn:           Turn,
+		Castle:         CastleRights,
+		WhiteEnPessent: WhiteEnPessent,
+		BlackEnPessent: BlackEnPessent,
+		LastSaved:      time.Now().Unix(),
+		Created:        time.Now().Unix(),
 	}
 }
 
@@ -103,7 +106,8 @@ func DistplayMetaData(meta MetaData) {
 	fmt.Printf("Config: %d \n", meta.Config)
 	fmt.Printf("Turn: %d \n", meta.Turn)
 	fmt.Printf("Castle: %d \n", meta.Castle)
-	fmt.Printf("EnPessent %d\n", meta.EnPassant)
+	fmt.Printf("WhiteEnPessent %d\n", meta.WhiteEnPessent)
+	fmt.Printf("BlackEnPessent %d\n", meta.BlackEnPessent)
 	fmt.Printf("Game Created %s\n", time.Unix(meta.Created, 0).UTC().Format(time.RFC3339))
 	fmt.Printf("Last Saved %s\n", time.Unix(meta.LastSaved, 0).UTC().Format(time.RFC3339))
 	fmt.Println("----------")

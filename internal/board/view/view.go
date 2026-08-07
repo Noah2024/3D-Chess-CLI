@@ -10,7 +10,6 @@ import (
 	"3DC/util/must"
 	"fmt"
 	"io"
-	"path/filepath"
 	"sync"
 
 	"github.com/kelindar/bitmap"
@@ -83,7 +82,7 @@ func PrintLayer(yLevel int, displayMetaData bool, w io.Writer) {
 
 func ViewAllLayers(w io.Writer) {
 	numLayers := int(BoardSize / LayerSize)
-	meta := must.Must(metadata.LoadMetaData(filepath.Join(config.CurrentGame, "meta")))
+	meta := must.Must(metadata.LoadMetaData(config.CurrentGame))
 	metadata.DistplayMetaData(meta)
 
 	for i := 0; i < numLayers; i++ {

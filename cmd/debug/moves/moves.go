@@ -38,6 +38,7 @@ func DebugMoveGen() *cobra.Command {
 			fmt.Printf("Generating moves for %s @ %s\n", visFrom, args[0])
 			fmt.Printf("%064b\n", moves)
 			fmt.Println(moves)
+			fmt.Println("ALL PIECES %064b\n", bs.AllPieces)
 			return nil
 		},
 	}

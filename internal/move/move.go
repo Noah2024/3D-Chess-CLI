@@ -10,6 +10,7 @@ import (
 	"3DC/internal/game/save"
 	"3DC/internal/move/checking"
 	"3DC/internal/move/genMoves"
+	"3DC/internal/move/special"
 	"3DC/internal/promote"
 	"3DC/util/bitutil"
 	"3DC/util/logger"
@@ -86,7 +87,9 @@ func MoveCommand(from string, to string) {
 		logger.Error(fmt.Sprintf("Error in determing pieces team %v", BoardState.PieceLoadError))
 		return
 	}
+	BoardState.Meta = meta //Semantic as shit, I know, but for now this should be fine
 
+	//Set certian variables pertaining to pieces team
 	var allowedTurn uint8
 	if BoardState.Team { // If team if white
 		allowedTurn = 0
@@ -94,24 +97,24 @@ func MoveCommand(from string, to string) {
 		allowedTurn = 1
 	}
 	if !(meta.Turn%2 == allowedTurn) {
-		logger.Error(fmt.Sprintf("Its not the teams turn! "))
+		logger.Error("Its not this teams turn!")
 		return
 	}
 
+	//Determing if any piece on the board can promote, as if so we cannont let this move go through
 	promotionLoc, canPromote := promote.CanPromotePawn(BoardState.Team, BoardState.AllIndividualPieces)
-
 	if canPromote {
 		x, y, z := bitutil.UintToVec(promotionLoc)
 		logger.Error(fmt.Sprintf("You must promote your pawn at (%d, %d, %d) before moving other pieces", x, y, z))
 		return
 	}
 
-	uintLocTo, _, _, _ := ParseLoc(to)
+	//Getting information related to the place we are moving
+	uintLocTo, tX, _, _ := ParseLoc(to)
 	visTo, bmTo := PieceType(allLoadedPieces, uintLocTo)
 
 	//visFrom encodes the type of piece, and thus the move function we use to generate all possible moves
 	moveFunction := genMoves.MoveMap[visFrom]
-
 	if moveFunction == nil {
 		logger.Error(fmt.Sprintf("Unknown piece [%v]", visFrom))
 		return
@@ -128,9 +131,10 @@ func MoveCommand(from string, to string) {
 	allMoves := moveFunction(BoardState, uLocFrom, fX, fY, fZ)
 
 	//Make sure this piece isn't protecting the king
-	protectingMoves, kingDanger := checking.KingInDanger(BoardState, uLocFrom)
+	protectingMoves, InLineWIthKing := checking.KingInDanger(BoardState, uLocFrom)
 	// fmt.Println("King Danger: ", kingDanger)
-	if kingDanger { //I don't think this is right
+	if InLineWIthKing { //I don't think this is right
+		// logger.Warn("Your King is in Danger!\n")
 		allMoves.And(protectingMoves)
 		// fmt.Printf("Protecting Moves: %064b\n", protectingMoves)
 		// logger.Error(fmt.Sprintf("Piece %v is protecting its king!", visFrom))
@@ -141,6 +145,7 @@ func MoveCommand(from string, to string) {
 	// fmt.Printf("Piece Being Taken %s ", visTo)
 
 	//Restrict King Moves for king
+	//And restrict moves for pieces which may put king in check
 	if visFrom == "♚" || visFrom == "♔" {
 		// fmt.Println("Restricting kings moves")
 		// fmt.Printf("Pos: %064b\n", BoardState.FriendKing)
@@ -156,7 +161,6 @@ func MoveCommand(from string, to string) {
 			}
 		}
 	}
-	//Restrict King Moves for king
 
 	//Final check to see if piece can or can not move
 	if !(allMoves.Contains(uintLocTo)) {
@@ -164,11 +168,15 @@ func MoveCommand(from string, to string) {
 		return
 	}
 
+	//Detects if the move about to made is an enPessent, if so it removes the enemy piece removed by it
+	//Updates enPessent state in metadata
+	special.UpdateEnPessent(&BoardState, uLocFrom, uintLocTo, tX)
+
 	//Update Metadata
-	meta.Turn += 1
+	BoardState.Meta.Turn += 1
 
 	//Updates bitmap of piece being moved - does not validate if move is legal
-	AtomicMove(meta, uLocFrom, uintLocTo, visTo, visFrom, bmFrom, bmTo)
+	AtomicMove(BoardState.Meta, uLocFrom, uintLocTo, visTo, visFrom, bmFrom, bmTo)
 
 	logger.Info("Piece Moved Successfully!")
 	// move.AtomicMove(uLocFrom, uLocFrom, promotionTarget, visFrom, bmFrom, BoardState.AllIndividualPieces[promotionTarget])

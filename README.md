@@ -20,9 +20,13 @@ As it stands much of the basics of chess work and work well, HOWEVER certian fea
 For starters there will be no castling. In a normal game of chess castling is very often a very good way to protect your king, in 3DC however its not.
 Due to the phyical laws of nature, in 3DC your king could still be attacked 14 differnet ways even after castling, so I feel its really not worth it. 
 
-Additionally pawns CURRENTlY cannont promot, move twice from their starting square, or make an en-pessent move (for the 5 people who actually en-pessent).
+All pawn specific movement IS implemented but not thoroughly tested, so pawns may have some unexpected behavior for now. 
 This is becuase the pawn is a stupid, ridicious piece, whos very existence is predicated on being differnet in every concivable way from everyone else.
 However I do have plans to implment these before a 1.0 release. 
+
+## Known Error States
+
+If a team is making an en-pessent move against another, and their king is inline with the being being taken, AND that piece is inline with a pinning piece, it is theoritcally possible (as of right now), to put your own king is in check. This is due to the fact that En-Pessent moves need two levels of validation that happen outside the normal flow for of pin detection. As it stands the plan to fix this is to 1) improve the checking code 2) modularize the functions used to determine pin, and 3) use them during the en-pessent detection system to ensure this can't happen. However given how niche this potential scenario is, it remains at the bottom of the To-Do list for now. 
 
 ## Building From Source
 
@@ -67,14 +71,10 @@ debug/ - commands related to debug (if using please read implemnetation)
 - Standardize debug logs & improve storage
 - Clean Up/Refactor and modularize Checking logic
 - Change view for terminal 
-- Actually Integrate metadata
-- Ensure UintToVec and VecToUint are really inverses
 - Systems Test Using the full move command
-- Turn Tracking
 - Upper Level API Integration
  - And test cases for said API 
-- pawn double move
-- en pessant 🤮
+- Fix En-Pessent Error State
 - Time trials/stress test
 - Optimize w/ concurrent goroutine
 

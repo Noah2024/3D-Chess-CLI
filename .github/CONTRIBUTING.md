@@ -114,6 +114,8 @@ As a final note, the outputs are used directly combined in which the previously 
 
 Pawn promotion was seperated out into its own command due to the the nature of promotion having multiple unique choices for users. For example, unlike with castling, this choice COULD NOT be represented simply with moves on the board. Promotion being its own command however means that after a user makes a move to a space on which their pawn can promote, they MUST promote it immediatley using the move command, otherwise they could reach an invalid board state. Becuase of this before move generation takes palce the move command always checks to ensure there are no friendly pawns which need to be promoted, as their previous turn never ended. This promotion scheme however does rely on the fact that only one pawn can be promoted at a time, which seems to be a fair assumption, given a user can only move one piece at a time. 
 
+En-Pessent however functions very differently. Unlike say a double move, En-Pessent requries move validation during both the generation of moves, AND the during the validation of moves. This is becuase 'genMoves' and 'move' are seperated for clarity. 
+
 --- 
 
 ## Piece Logic 

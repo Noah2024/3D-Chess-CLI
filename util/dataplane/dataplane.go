@@ -50,6 +50,14 @@ var WhiteDoubleMovePlane = bitmap.Bitmap{
 	71776119061217280, 71776119061217280, 71776119061217280, 71776119061217280, 71776119061217280, 71776119061217280, 71776119061217280, 71776119061217280,
 }
 
+var BlackEnPessentPlane = bitmap.Bitmap{
+	4278190080, 4278190080, 4278190080, 4278190080, 4278190080, 4278190080, 4278190080, 4278190080,
+}
+
+var WhiteEnPessentPlane = bitmap.Bitmap{
+	1095216660480, 1095216660480, 1095216660480, 1095216660480, 1095216660480, 1095216660480, 1095216660480, 1095216660480,
+}
+
 // ====================================
 // Cardinal Directions
 // ====================================
@@ -336,10 +344,13 @@ func GenerateAllPlanes() {
 	// fmt.Println("xy45Plane", xy45Plane)
 	// fmt.Println("xy45NegPlane", xy45NegPlane)
 
-	wp := GenerateWhiteDoublePlane()
-	bp := GenerateBlackDoublePlane()
-	fmt.Println("wp", wp)
-	fmt.Println("bp", bp)
+	// wp := GenerateWhiteDoublePlane()
+	// bp := GenerateBlackDoublePlane()
+
+	wep := GenerateWhiteEnPessentPlane()
+	bep := GenerateBlackEnPessentPlane()
+	fmt.Println("wep", wep)
+	fmt.Println("bep", bep)
 
 	fmt.Println("Please god")
 }
@@ -395,5 +406,19 @@ func GenerateWhiteDoublePlane() bitmap.Bitmap {
 func GenerateBlackDoublePlane() bitmap.Bitmap {
 	return GeneratePlane(func(x, y, z int) bool {
 		return z == 1
+	})
+}
+
+func GenerateWhiteEnPessentPlane() bitmap.Bitmap {
+	return GeneratePlane(func(x, y, z int) bool {
+		return z == 4
+	})
+}
+
+// Utalizes dataplnes to generate the plane on which black pieces can be promoted
+// Is not used at runtime
+func GenerateBlackEnPessentPlane() bitmap.Bitmap {
+	return GeneratePlane(func(x, y, z int) bool {
+		return z == 3
 	})
 }
